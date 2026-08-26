@@ -1,3 +1,4 @@
+
 {
   "version": 2,
   "functions": {
@@ -8,6 +9,10 @@
   "routes": [
     {
       "handle": "filesystem"
+    },
+    {
+      "src": "/(about|service|booking|events)",
+      "dest": "/api/$1.php"
     },
     {
       "src": "/(.*)",
