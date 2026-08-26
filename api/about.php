@@ -1,22 +1,31 @@
 <?php
+
 include(__DIR__ . '/conn.php');
+
 ?>
 
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
 
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <title>About Us | ABAA Entertainment</title>
+    <title>
+        About Us | ABAA Entertainment
+    </title>
 
-    <link rel="stylesheet" href="about.css">
+    <link
+        rel="stylesheet"
+        href="about.css"
+    >
 
-    <!-- FONT AWESOME -->
     <link
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
@@ -24,16 +33,16 @@ include(__DIR__ . '/conn.php');
 
 </head>
 
+
 <body>
 
 
-<!-- ==================================================
-     HEADER
-================================================== -->
-
 <header class="header">
 
-    <a href="index.php" class="logo">
+    <a
+        href="index.php"
+        class="logo"
+    >
 
         <img
             src="logo.png"
@@ -53,11 +62,14 @@ include(__DIR__ . '/conn.php');
             Events
         </a>
 
-        <a href="#services">
+        <a href="index.php#services">
             Services
         </a>
 
-        <a href="about.php" class="active">
+        <a
+            href="about.php"
+            class="active"
+        >
             About
         </a>
 
@@ -74,11 +86,6 @@ include(__DIR__ . '/conn.php');
 </header>
 
 
-
-<!-- ==================================================
-     ABOUT HERO
-================================================== -->
-
 <section class="about-hero">
 
     <div class="about-hero-content">
@@ -88,22 +95,29 @@ include(__DIR__ . '/conn.php');
         </p>
 
         <h1>
-            <span>Powered by Passion.</span><br>
-            <span>Driven by Excellence.</span>
+
+            <span>
+                Powered by Passion.
+            </span>
+
+            <br>
+
+            <span>
+                Driven by Excellence.
+            </span>
+
         </h1>
 
         <p class="hero-description">
+
             We create unforgettable experiences through
             creativity, technology, passion, and professional
             event production.
+
         </p>
 
     </div>
 
-
-    <!-- ==================================================
-         QR CODE
-    ================================================== -->
 
     <div class="about-hero-qr">
 
@@ -125,17 +139,8 @@ include(__DIR__ . '/conn.php');
 </section>
 
 
-
-<!-- ==================================================
-     MAIN ABOUT PAGE
-================================================== -->
-
 <main class="about-page">
 
-
-    <!-- ==================================================
-         ABOUT COMPANY
-    ================================================== -->
 
     <section class="about-company">
 
@@ -186,12 +191,8 @@ include(__DIR__ . '/conn.php');
     </section>
 
 
-
-    <!-- ==================================================
-         MISSION & VISION
-    ================================================== -->
-
     <section class="mission-section">
+
 
         <div class="info-card">
 
@@ -253,12 +254,10 @@ include(__DIR__ . '/conn.php');
     </section>
 
 
-
-    <!-- ==================================================
-         WHAT WE DO
-    ================================================== -->
-
-    <section class="what-we-do" id="services">
+    <section
+        class="what-we-do"
+        id="services"
+    >
 
         <div class="section-heading">
 
@@ -281,6 +280,7 @@ include(__DIR__ . '/conn.php');
 
 
         <div class="service-grid">
+
 
             <div class="service-card">
 
@@ -388,11 +388,6 @@ include(__DIR__ . '/conn.php');
     </section>
 
 
-
-    <!-- ==================================================
-         WHY CHOOSE US
-    ================================================== -->
-
     <section class="why-us">
 
         <div class="why-image">
@@ -487,11 +482,6 @@ include(__DIR__ . '/conn.php');
     </section>
 
 
-
-    <!-- ==================================================
-         CALL TO ACTION
-    ================================================== -->
-
     <section class="about-cta">
 
         <span class="section-label">
@@ -525,17 +515,10 @@ include(__DIR__ . '/conn.php');
 </main>
 
 
-
-<!-- ==================================================
-     FOOTER
-================================================== -->
-
 <footer class="footer">
 
     <div class="footer-container">
 
-
-        <!-- COMPANY -->
 
         <div class="footer-section footer-brand">
 
@@ -553,9 +536,6 @@ include(__DIR__ . '/conn.php');
 
         </div>
 
-
-
-        <!-- QUICK LINKS -->
 
         <div class="footer-section">
 
@@ -582,9 +562,6 @@ include(__DIR__ . '/conn.php');
         </div>
 
 
-
-        <!-- SERVICES -->
-
         <div class="footer-section">
 
             <h3>
@@ -604,7 +581,7 @@ include(__DIR__ . '/conn.php');
             </a>
 
             <a href="service.php?service=stage">
-                Stage
+                Stage Production
             </a>
 
             <a href="service.php?service=music-studio">
@@ -618,9 +595,6 @@ include(__DIR__ . '/conn.php');
         </div>
 
 
-
-        <!-- CONTACT -->
-
         <div class="footer-section">
 
             <h3>
@@ -629,7 +603,7 @@ include(__DIR__ . '/conn.php');
 
 
             <a
-                href="https://www.google.com/maps/place/ABAA+Entertainment/@14.4652755,121.1915078,19z/data=!3m1!4b1!4m6!3m5!1s0x3397c30041406d53:0x6d94a20f7677a37b!8m2!3d14.4652755!4d121.1921515!16s%2Fg%2F11zwzqbvvf?entry=ttu"
+                href="https://www.google.com/maps/place/ABAA+Entertainment/@14.4652755,121.1915078,19z"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="contact-item"
@@ -673,9 +647,6 @@ include(__DIR__ . '/conn.php');
             </a>
 
 
-
-            <!-- SOCIAL MEDIA -->
-
             <div class="social-links">
 
                 <a
@@ -718,9 +689,6 @@ include(__DIR__ . '/conn.php');
     </div>
 
 
-
-    <!-- FOOTER BOTTOM -->
-
     <div class="footer-bottom">
 
         <p>
@@ -737,14 +705,14 @@ include(__DIR__ . '/conn.php');
 </footer>
 
 
-
 <!-- ==================================================
-     BOOKING POPUP
+     BOOKING MODAL
 ================================================== -->
 
 <div
     class="booking-overlay"
     id="bookingModal"
+    aria-hidden="true"
 >
 
     <div class="booking-modal">
@@ -791,13 +759,13 @@ include(__DIR__ . '/conn.php');
 
                 <div class="form-group">
 
-                    <label for="booking_name">
+                    <label for="about_booking_name">
                         Full Name
                     </label>
 
                     <input
                         type="text"
-                        id="booking_name"
+                        id="about_booking_name"
                         name="name"
                         placeholder="Enter your full name"
                         required
@@ -808,13 +776,13 @@ include(__DIR__ . '/conn.php');
 
                 <div class="form-group">
 
-                    <label for="booking_phone">
-                       Contact Number
+                    <label for="about_booking_phone">
+                        Contact Number
                     </label>
 
                     <input
                         type="tel"
-                        id="booking_phone"
+                        id="about_booking_phone"
                         name="phone"
                         placeholder="09XX XXX XXXX"
                         required
@@ -829,13 +797,13 @@ include(__DIR__ . '/conn.php');
 
                 <div class="form-group">
 
-                    <label for="booking_email">
+                    <label for="about_booking_email">
                         Email Address
                     </label>
 
                     <input
                         type="email"
-                        id="booking_email"
+                        id="about_booking_email"
                         name="email"
                         placeholder="your@email.com"
                         required
@@ -843,30 +811,36 @@ include(__DIR__ . '/conn.php');
 
                 </div>
 
-<div class="form-group">
-
-    <label for="booking_contact_person">
-        Contact Person
-    </label>
-
-    <input
-        type="text"
-        id="booking_contact_person"
-        name="contact_person"
-        placeholder="Enter contact person's name"
-        required
-    >
-
-</div>
 
                 <div class="form-group">
 
-                    <label for="booking_event">
+                    <label for="about_booking_contact">
+                        Contact Person
+                    </label>
+
+                    <input
+                        type="text"
+                        id="about_booking_contact"
+                        name="contact_person"
+                        placeholder="Contact person's name"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <label for="about_booking_event">
                         Event Type
                     </label>
 
                     <select
-                        id="booking_event"
+                        id="about_booking_event"
                         name="event_type"
                         required
                     >
@@ -911,38 +885,17 @@ include(__DIR__ . '/conn.php');
 
                 </div>
 
-            </div>
-
-
-            <div class="form-row">
 
                 <div class="form-group">
 
-                    <label for="booking_date">
+                    <label for="about_booking_date">
                         Event Date
                     </label>
 
                     <input
                         type="date"
-                        id="booking_date"
+                        id="about_booking_date"
                         name="event_date"
-                        required
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label for="booking_company">
-                        Company Name
-                    </label>
-
-                    <input
-                        type="text"
-                        id="booking_company"
-                        name="cname"
-                        placeholder="Enter company name"
                         required
                     >
 
@@ -953,12 +906,29 @@ include(__DIR__ . '/conn.php');
 
             <div class="form-group">
 
-                <label for="booking_service">
+                <label for="about_booking_company">
+                    Company Name
+                </label>
+
+                <input
+                    type="text"
+                    id="about_booking_company"
+                    name="cname"
+                    placeholder="Enter company name"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="about_booking_service">
                     Service Needed
                 </label>
 
                 <select
-                    id="booking_service"
+                    id="about_booking_service"
                     name="service"
                     required
                 >
@@ -975,7 +945,7 @@ include(__DIR__ . '/conn.php');
                         LED Wall
                     </option>
 
-                    <option value="Lights and Sound">
+                    <option value="Lights & Sound">
                         Lights & Sound
                     </option>
 
@@ -1006,12 +976,12 @@ include(__DIR__ . '/conn.php');
 
             <div class="form-group">
 
-                <label for="booking_message">
+                <label for="about_booking_message">
                     Event Details
                 </label>
 
                 <textarea
-                    id="booking_message"
+                    id="about_booking_message"
                     name="message"
                     rows="4"
                     placeholder="Tell us about your event, location, preferred setup, budget, or other requirements..."
@@ -1040,29 +1010,25 @@ include(__DIR__ . '/conn.php');
 </div>
 
 
-
-<!-- ==================================================
-     JAVASCRIPT
-================================================== -->
-
 <script>
-
-/* ==================================================
-   OPEN BOOKING MODAL
-================================================== */
 
 function openBookingModal(event) {
 
     if (event) {
+
         event.preventDefault();
+
     }
 
     const modal =
-        document.getElementById("bookingModal");
+        document.getElementById(
+            "bookingModal"
+        );
 
     if (!modal) {
-        console.error("Booking modal not found.");
+
         return;
+
     }
 
     modal.classList.add("active");
@@ -1072,22 +1038,23 @@ function openBookingModal(event) {
         "false"
     );
 
-    document.body.style.overflow = "hidden";
+    document.body.style.overflow =
+        "hidden";
 
 }
 
 
-/* ==================================================
-   CLOSE BOOKING MODAL
-================================================== */
-
 function closeBookingModal() {
 
     const modal =
-        document.getElementById("bookingModal");
+        document.getElementById(
+            "bookingModal"
+        );
 
     if (!modal) {
+
         return;
+
     }
 
     modal.classList.remove("active");
@@ -1097,27 +1064,25 @@ function closeBookingModal() {
         "true"
     );
 
-    document.body.style.overflow = "";
+    document.body.style.overflow =
+        "";
 
 }
 
-
-/* ==================================================
-   CLICK OUTSIDE MODAL
-================================================== */
 
 document.addEventListener(
     "click",
     function(event) {
 
         const modal =
-            document.getElementById("bookingModal");
+            document.getElementById(
+                "bookingModal"
+            );
 
-        if (!modal) {
-            return;
-        }
-
-        if (event.target === modal) {
+        if (
+            modal &&
+            event.target === modal
+        ) {
 
             closeBookingModal();
 
@@ -1126,10 +1091,6 @@ document.addEventListener(
     }
 );
 
-
-/* ==================================================
-   ESC KEY
-================================================== */
 
 document.addEventListener(
     "keydown",
@@ -1146,18 +1107,6 @@ document.addEventListener(
 
 </script>
 
-
-
-<?php
-if (!method_exists($pdo, 'close')) {
-        class PDO_Close_Wrapper extends PDO {
-            public function close() {
-                // PDO automatically closes connections when the script ends, so we can safely leave this blank
-                return true;
-            }
-        }
-    }
-?>
 
 </body>
 
