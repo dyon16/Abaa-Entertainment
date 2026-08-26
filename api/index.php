@@ -23,7 +23,7 @@ include(__DIR__ . '/conn.php');
 
     <link
         rel="stylesheet"
-        href="style.css"
+        href="/style.css"
     >
 
     <link
