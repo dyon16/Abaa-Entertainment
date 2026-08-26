@@ -1210,7 +1210,14 @@ document.addEventListener(
 
 
 <?php
-
+    if (!method_exists($pdo, 'close')) {
+        class PDO_Close_Wrapper extends PDO {
+            public function close() {
+                // PDO automatically closes connections when the script ends, so we can safely leave this blank
+                return true;
+            }
+        }
+    }
 ?>
 
 </body>
