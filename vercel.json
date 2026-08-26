@@ -10,11 +10,23 @@
       "handle": "filesystem"
     },
     {
-      "src": "/(about|service|booking|events)",
-      "dest": "/api/$1.php"
+      "src": "^/about/?$",
+      "dest": "/api/about.php"
     },
     {
-      "src": "/(.*)",
+      "src": "^/service/?$",
+      "dest": "/api/service.php"
+    },
+    {
+      "src": "^/booking/?$",
+      "dest": "/api/booking.php"
+    },
+    {
+      "src": "^/events/?$",
+      "dest": "/api/events.php"
+    },
+    {
+      "src": "^/?$",
       "dest": "/api/index.php"
     }
   ]
