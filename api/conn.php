@@ -1,5 +1,5 @@
 <?php
-$host = "://aivencloud.com";
+$host = ":mysql-177c6bd3-abaa.g.aivencloud.com";
 $user = "avnadmin";
 $database = "defaultdb";
 $port = 11063;
