@@ -5,7 +5,6 @@ include(__DIR__ . '/conn.php');
 ?>
 
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
@@ -21,9 +20,13 @@ include(__DIR__ . '/conn.php');
         About Us | ABAA Entertainment
     </title>
 
+    <!-- IMPORTANT:
+         about.php is inside /api/
+         but about.css is in the root
+    -->
     <link
         rel="stylesheet"
-        href="/style.css"
+        href="/about.css"
     >
 
     <link
@@ -36,6 +39,10 @@ include(__DIR__ . '/conn.php');
 
 <body>
 
+
+<!-- ==================================================
+     HEADER
+================================================== -->
 
 <header class="header">
 
@@ -66,7 +73,10 @@ include(__DIR__ . '/conn.php');
             Services
         </a>
 
-        <a href="/about">
+        <a
+            href="/about"
+            class="active"
+        >
             About
         </a>
 
@@ -83,71 +93,459 @@ include(__DIR__ . '/conn.php');
 </header>
 
 
+
 <!-- ==================================================
-     ABOUT
+     ABOUT HERO
 ================================================== -->
 
-<section
-    class="about-us"
-    id="about"
->
+<section class="about-hero">
 
-    <div class="about-content">
+    <div class="about-hero-content">
+
+        <p class="small-title">
+            ABOUT ABAA ENTERTAINMENT
+        </p>
 
         <h1>
-            ABAA Entertainment
+            <span>Powered by Passion.</span><br>
+            <span>Driven by Excellence.</span>
         </h1>
 
-        <p>
-
-            ABAA Entertainment is a forward-thinking
-            entertainment company committed to developing
-            talent, producing high-quality entertainment,
-            and creating meaningful opportunities within
-            the industry.
-
-            <br><br>
-
-            Built on creativity, professionalism, and
-            innovation, ABAA Entertainment provides a
-            platform where artists, performers, and creative
-            professionals can showcase their talents and
-            reach wider audiences.
-
-            <br><br>
-
-            The company focuses on nurturing emerging talent,
-            developing engaging entertainment projects, and
-            building strong partnerships that contribute to
-            the growth of the entertainment community.
-
+        <p class="hero-description">
+            We create unforgettable experiences through
+            creativity, technology, passion, and professional
+            event production.
         </p>
 
     </div>
 
 
-    <div class="about-video">
+    <!-- ==================================================
+         QR CODE
+    ================================================== -->
 
-        <video
-            controls
-            autoplay
-            muted
-            loop
-            playsinline
-        >
+    <div class="about-hero-qr">
 
-            <source
-                src="/ads.mp4"
-                type="video/mp4"
+        <div class="qr-card">
+
+            <img
+                src="/qrcode.png"
+                alt="ABAA Entertainment QR Code"
             >
 
-            Your browser does not support the video tag.
+            <p>
+                Scan to connect with us
+            </p>
 
-        </video>
+        </div>
 
     </div>
 
 </section>
+
+
+
+<!-- ==================================================
+     MAIN ABOUT PAGE
+================================================== -->
+
+<main class="about-page">
+
+
+    <!-- ==================================================
+         ABOUT COMPANY
+    ================================================== -->
+
+    <section class="about-company">
+
+        <div class="about-text">
+
+            <span class="section-label">
+                WHO WE ARE
+            </span>
+
+            <h2>
+                ABAA Entertainment
+            </h2>
+
+            <p>
+                ABAA Entertainment is a forward-thinking
+                entertainment company committed to developing
+                talent, producing high-quality entertainment,
+                and creating meaningful opportunities within
+                the industry.
+            </p>
+
+            <p>
+                Built on creativity, professionalism, and
+                innovation, ABAA Entertainment provides a
+                platform where artists, performers, event
+                professionals, and creative individuals can
+                showcase their talents and reach wider audiences.
+            </p>
+
+            <p>
+                We believe that every event should be more
+                than just a gathering. It should be an
+                experience that people remember.
+            </p>
+
+        </div>
+
+
+        <div class="about-image">
+
+            <img
+                src="/logo.png"
+                alt="ABAA Entertainment"
+            >
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ==================================================
+         MISSION & VISION
+    ================================================== -->
+
+    <section class="mission-section">
+
+        <div class="info-card">
+
+            <div class="info-icon">
+                <i class="fa-solid fa-bullseye"></i>
+            </div>
+
+            <h3>
+                Our Mission
+            </h3>
+
+            <p>
+                To deliver professional, creative, and
+                high-quality entertainment services while
+                providing opportunities for artists and
+                creative professionals to grow and succeed.
+            </p>
+
+        </div>
+
+
+        <div class="info-card">
+
+            <div class="info-icon">
+                <i class="fa-solid fa-eye"></i>
+            </div>
+
+            <h3>
+                Our Vision
+            </h3>
+
+            <p>
+                To become a trusted and influential
+                entertainment company known for excellence,
+                innovation, and unforgettable experiences.
+            </p>
+
+        </div>
+
+
+        <div class="info-card">
+
+            <div class="info-icon">
+                <i class="fa-solid fa-star"></i>
+            </div>
+
+            <h3>
+                Our Values
+            </h3>
+
+            <p>
+                Creativity, professionalism, teamwork,
+                innovation, integrity, and dedication
+                guide everything we do.
+            </p>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ==================================================
+         WHAT WE DO
+    ================================================== -->
+
+    <section
+        class="what-we-do"
+        id="services"
+    >
+
+        <div class="section-heading">
+
+            <span class="section-label">
+                WHAT WE DO
+            </span>
+
+            <h2>
+                Creating Experiences
+            </h2>
+
+            <p>
+                From technical production to live
+                entertainment, we provide the tools
+                and expertise needed to bring events
+                to life.
+            </p>
+
+        </div>
+
+
+        <div class="service-grid">
+
+            <div class="service-card">
+
+                <i class="fa-solid fa-display"></i>
+
+                <h3>
+                    LED Wall
+                </h3>
+
+                <p>
+                    High-quality LED wall solutions
+                    for concerts, corporate events,
+                    celebrations, and productions.
+                </p>
+
+            </div>
+
+
+            <div class="service-card">
+
+                <i class="fa-solid fa-lightbulb"></i>
+
+                <h3>
+                    Lights & Sound
+                </h3>
+
+                <p>
+                    Professional lighting and sound
+                    production designed to enhance
+                    every event.
+                </p>
+
+            </div>
+
+
+            <div class="service-card">
+
+                <i class="fa-solid fa-video"></i>
+
+                <h3>
+                    Live Feed
+                </h3>
+
+                <p>
+                    Reliable live video production
+                    and projection solutions for
+                    large-scale events.
+                </p>
+
+            </div>
+
+
+            <div class="service-card">
+
+                <i class="fa-solid fa-layer-group"></i>
+
+                <h3>
+                    Stage Production
+                </h3>
+
+                <p>
+                    Complete stage production and
+                    technical support for memorable
+                    performances.
+                </p>
+
+            </div>
+
+
+            <div class="service-card">
+
+                <i class="fa-solid fa-music"></i>
+
+                <h3>
+                    Music Studio
+                </h3>
+
+                <p>
+                    Creative spaces and professional
+                    equipment for music and audio
+                    production.
+                </p>
+
+            </div>
+
+
+            <div class="service-card">
+
+                <i class="fa-solid fa-cubes"></i>
+
+                <h3>
+                    Trusses
+                </h3>
+
+                <p>
+                    Safe and professional truss
+                    solutions for lighting, LED walls,
+                    and event equipment.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ==================================================
+         WHY CHOOSE US
+    ================================================== -->
+
+    <section class="why-us">
+
+        <div class="why-image">
+
+            <img
+                src="/event5.jpg"
+                alt="ABAA Entertainment Event"
+            >
+
+        </div>
+
+
+        <div class="why-content">
+
+            <span class="section-label">
+                WHY ABAA ENTERTAINMENT
+            </span>
+
+            <h2>
+                Built For Unforgettable Events
+            </h2>
+
+            <p>
+                We combine creativity, technology,
+                and professional event production
+                to create experiences that leave
+                a lasting impression.
+            </p>
+
+
+            <div class="feature">
+
+                <i class="fa-solid fa-check"></i>
+
+                <div>
+
+                    <h4>
+                        Professional Production
+                    </h4>
+
+                    <p>
+                        Reliable equipment and experienced
+                        event professionals.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="feature">
+
+                <i class="fa-solid fa-check"></i>
+
+                <div>
+
+                    <h4>
+                        Creative Solutions
+                    </h4>
+
+                    <p>
+                        Customized entertainment solutions
+                        designed around your event.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="feature">
+
+                <i class="fa-solid fa-check"></i>
+
+                <div>
+
+                    <h4>
+                        Memorable Experiences
+                    </h4>
+
+                    <p>
+                        We focus on creating events that
+                        audiences will remember.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ==================================================
+         CALL TO ACTION
+    ================================================== -->
+
+    <section class="about-cta">
+
+        <span class="section-label">
+            LET'S WORK TOGETHER
+        </span>
+
+        <h2>
+            Ready To Create Something Amazing?
+        </h2>
+
+        <p>
+            LET ABAA ENTERTAINMENT HELP BRING YOUR NEXT
+            EVENT, PERFORMANCE, OR PROJECT TO LIFE.
+        </p>
+
+
+        <a
+            href="#"
+            class="cta-button"
+            onclick="openBookingModal(event)"
+        >
+
+            Book An Event
+
+            <i class="fa-solid fa-arrow-right"></i>
+
+        </a>
+
+    </section>
+
+</main>
+
 
 
 <!-- ==================================================
@@ -158,6 +556,8 @@ include(__DIR__ . '/conn.php');
 
     <div class="footer-container">
 
+
+        <!-- COMPANY -->
 
         <div class="footer-section footer-brand">
 
@@ -175,6 +575,9 @@ include(__DIR__ . '/conn.php');
 
         </div>
 
+
+
+        <!-- QUICK LINKS -->
 
         <div class="footer-section">
 
@@ -201,6 +604,9 @@ include(__DIR__ . '/conn.php');
         </div>
 
 
+
+        <!-- SERVICES -->
+
         <div class="footer-section">
 
             <h3>
@@ -220,7 +626,7 @@ include(__DIR__ . '/conn.php');
             </a>
 
             <a href="/service?service=stage">
-                Stage Production
+                Stage
             </a>
 
             <a href="/service?service=music-studio">
@@ -233,6 +639,9 @@ include(__DIR__ . '/conn.php');
 
         </div>
 
+
+
+        <!-- CONTACT -->
 
         <div class="footer-section">
 
@@ -251,8 +660,8 @@ include(__DIR__ . '/conn.php');
                 <i class="fa-solid fa-location-dot"></i>
 
                 <span>
-                    2F, Casa Ynares, P. Gomez,
-                    Libis, Binangonan, Rizal
+                    2F, Casa Ynares, P. Gomez, Libis,
+                    Binangonan, Rizal
                 </span>
 
             </a>
@@ -328,6 +737,9 @@ include(__DIR__ . '/conn.php');
     </div>
 
 
+
+    <!-- FOOTER BOTTOM -->
+
     <div class="footer-bottom">
 
         <p>
@@ -344,8 +756,9 @@ include(__DIR__ . '/conn.php');
 </footer>
 
 
+
 <!-- ==================================================
-     BOOKING MODAL
+     BOOKING POPUP
 ================================================== -->
 
 <div
@@ -460,7 +873,7 @@ include(__DIR__ . '/conn.php');
                         type="text"
                         id="booking_contact_person"
                         name="contact_person"
-                        placeholder="Contact person's name"
+                        placeholder="Enter contact person's name"
                         required
                     >
 
@@ -648,25 +1061,24 @@ include(__DIR__ . '/conn.php');
 </div>
 
 
+
+<!-- ==================================================
+     JAVASCRIPT
+================================================== -->
+
 <script>
 
 function openBookingModal(event) {
 
     if (event) {
-
         event.preventDefault();
-
     }
 
     const modal =
-        document.getElementById(
-            "bookingModal"
-        );
+        document.getElementById("bookingModal");
 
     if (!modal) {
-
         return;
-
     }
 
     modal.classList.add("active");
@@ -678,21 +1090,16 @@ function openBookingModal(event) {
 
     document.body.style.overflow =
         "hidden";
-
 }
 
 
 function closeBookingModal() {
 
     const modal =
-        document.getElementById(
-            "bookingModal"
-        );
+        document.getElementById("bookingModal");
 
     if (!modal) {
-
         return;
-
     }
 
     modal.classList.remove("active");
@@ -704,7 +1111,6 @@ function closeBookingModal() {
 
     document.body.style.overflow =
         "";
-
 }
 
 
@@ -713,9 +1119,7 @@ document.addEventListener(
     function(event) {
 
         const modal =
-            document.getElementById(
-                "bookingModal"
-            );
+            document.getElementById("bookingModal");
 
         if (
             modal &&
@@ -745,6 +1149,15 @@ document.addEventListener(
 
 </script>
 
+
+
+<?php
+
+if (isset($conn)) {
+    $conn->close();
+}
+
+?>
 
 </body>
 
