@@ -1,8 +1,11 @@
 <?php
+
 include(__DIR__ . '/conn.php');
+
 ?>
 
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
@@ -14,9 +17,14 @@ include(__DIR__ . '/conn.php');
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>ABAA Entertainment</title>
+    <title>
+        ABAA Entertainment
+    </title>
 
-    <link rel="stylesheet" href="style.css">
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
 
     <link
         rel="stylesheet"
@@ -25,16 +33,16 @@ include(__DIR__ . '/conn.php');
 
 </head>
 
+
 <body>
 
 
-<!-- ==================================================
-     HEADER
-================================================== -->
-
 <header class="header">
 
-    <a href="index.php" class="logo">
+    <a
+        href="index.php"
+        class="logo"
+    >
 
         <img
             src="logo.png"
@@ -79,7 +87,10 @@ include(__DIR__ . '/conn.php');
      ABOUT
 ================================================== -->
 
-<section class="about-us" id="about">
+<section
+    class="about-us"
+    id="about"
+>
 
     <div class="about-content">
 
@@ -93,23 +104,22 @@ include(__DIR__ . '/conn.php');
             entertainment company committed to developing
             talent, producing high-quality entertainment,
             and creating meaningful opportunities within
-            the industry. Built on creativity,
-            professionalism, and innovation, ABAA
-            Entertainment provides a platform where artists,
-            performers, and creative professionals can
-            showcase their talents and reach wider audiences.
+            the industry.
+
+            <br><br>
+
+            Built on creativity, professionalism, and
+            innovation, ABAA Entertainment provides a
+            platform where artists, performers, and creative
+            professionals can showcase their talents and
+            reach wider audiences.
 
             <br><br>
 
             The company focuses on nurturing emerging talent,
             developing engaging entertainment projects, and
             building strong partnerships that contribute to
-            the growth of the entertainment community. With
-            a vision of becoming a trusted and influential
-            name in the industry, ABAA Entertainment
-            continues to pursue excellence while delivering
-            fresh, inspiring, and memorable entertainment
-            experiences.
+            the growth of the entertainment community.
 
         </p>
 
@@ -131,8 +141,7 @@ include(__DIR__ . '/conn.php');
                 type="video/mp4"
             >
 
-            Your browser does not support
-            the video tag.
+            Your browser does not support the video tag.
 
         </video>
 
@@ -141,14 +150,8 @@ include(__DIR__ . '/conn.php');
 </section>
 
 
-<!-- ==================================================
-     MAIN
-================================================== -->
-
 <main class="main-container">
 
-
-    <!-- BIG IMAGE -->
 
     <section class="big-box">
 
@@ -184,70 +187,106 @@ include(__DIR__ . '/conn.php');
         <div class="boxes">
 
 
-           <a href="service.php?service=led-wall" class="image-button">
+            <a
+                href="service.php?service=led-wall"
+                class="image-button"
+            >
 
-    <img src="service1.png" alt="LED Wall">
+                <img
+                    src="service1.png"
+                    alt="LED Wall"
+                >
 
-    <div class="image-title">
-        LED Wall
-    </div>
+                <div class="image-title">
+                    LED Wall
+                </div>
 
-</a>
-
-
-<a href="service.php?service=lights-sound" class="image-button">
-
-    <img src="service2.png" alt="Lights and Sound">
-
-    <div class="image-title">
-        Lights and Sound
-    </div>
-
-</a>
+            </a>
 
 
-<a href="service.php?service=live-feed" class="image-button">
+            <a
+                href="service.php?service=lights-sound"
+                class="image-button"
+            >
 
-    <img src="service3.png" alt="Live Feed">
+                <img
+                    src="service2.png"
+                    alt="Lights and Sound"
+                >
 
-    <div class="image-title">
-        Live Feed
-    </div>
+                <div class="image-title">
+                    Lights and Sound
+                </div>
 
-</a>
-
-
-<a href="service.php?service=stage" class="image-button">
-
-    <img src="service4.png" alt="Stage">
-
-    <div class="image-title">
-        Stage
-    </div>
-
-</a>
+            </a>
 
 
-<a href="service.php?service=music-studio" class="image-button">
+            <a
+                href="service.php?service=live-feed"
+                class="image-button"
+            >
 
-    <img src="service5.png" alt="Music Studio">
+                <img
+                    src="service3.png"
+                    alt="Live Feed"
+                >
 
-    <div class="image-title">
-        Music Studio
-    </div>
+                <div class="image-title">
+                    Live Feed
+                </div>
 
-</a>
+            </a>
 
 
-<a href="service.php?service=trusses" class="image-button">
+            <a
+                href="service.php?service=stage"
+                class="image-button"
+            >
 
-    <img src="service6.png" alt="Trusses">
+                <img
+                    src="service4.png"
+                    alt="Stage Production"
+                >
 
-    <div class="image-title">
-        Trusses
-    </div>
+                <div class="image-title">
+                    Stage
+                </div>
 
-</a>
+            </a>
+
+
+            <a
+                href="service.php?service=music-studio"
+                class="image-button"
+            >
+
+                <img
+                    src="service5.png"
+                    alt="Music Studio"
+                >
+
+                <div class="image-title">
+                    Music Studio
+                </div>
+
+            </a>
+
+
+            <a
+                href="service.php?service=trusses"
+                class="image-button"
+            >
+
+                <img
+                    src="service6.png"
+                    alt="Trusses"
+                >
+
+                <div class="image-title">
+                    Trusses
+                </div>
+
+            </a>
 
         </div>
 
@@ -280,7 +319,7 @@ include(__DIR__ . '/conn.php');
             <img
                 id="featuredImage"
                 src="event1.jpg"
-                alt="Grand Opening Event"
+                alt="Android18 x UYRE"
             >
 
 
@@ -290,7 +329,7 @@ include(__DIR__ . '/conn.php');
                 muted
                 loop
                 playsinline
-                style="display: none;"
+                style="display:none;"
             >
 
                 <source
@@ -315,8 +354,6 @@ include(__DIR__ . '/conn.php');
         </div>
 
 
-        <!-- THUMBNAILS -->
-
         <div class="event-thumbnails">
 
 
@@ -333,7 +370,7 @@ include(__DIR__ . '/conn.php');
 
                 <img
                     src="event1.jpg"
-                    alt="event1"
+                    alt="Android18 x UYRE"
                 >
 
                 <span>
@@ -372,14 +409,14 @@ include(__DIR__ . '/conn.php');
                 onclick="showEvent(
                     'image',
                     'event3.jpg',
-                    'Music Festival-Cavite',
+                    'Music Festival - Cavite',
                     this
                 )"
             >
 
                 <img
                     src="event3.jpg"
-                    alt="Music Festival-Cavite"
+                    alt="Music Festival - Cavite"
                 >
 
                 <span>
@@ -579,12 +616,10 @@ include(__DIR__ . '/conn.php');
             >
 
             <p>
-
                 Creating unforgettable events,
                 entertainment, and experiences
                 through creativity, technology,
                 and professional event services.
-
             </p>
 
         </div>
@@ -634,7 +669,7 @@ include(__DIR__ . '/conn.php');
             </a>
 
             <a href="service.php?service=stage">
-                Stage
+                Stage Production
             </a>
 
             <a href="service.php?service=music-studio">
@@ -656,7 +691,7 @@ include(__DIR__ . '/conn.php');
 
 
             <a
-                href="https://www.google.com/maps/place/ABAA+Entertainment/@14.4652755,121.1915078,19z/data=!3m1!4b1!4m6!3m5!1s0x3397c30041406d53:0x6d94a20f7677a37b!8m2!3d14.4652755!4d121.1921515!16s%2Fg%2F11zwzqbvvf?entry=ttu&g_ep=EgoyMDI2MDgxOS4wIKXMDSoASAFQAw%3D%3D"
+                href="https://www.google.com/maps/place/ABAA+Entertainment/@14.4652755,121.1915078,19z"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="contact-item"
@@ -665,7 +700,8 @@ include(__DIR__ . '/conn.php');
                 <i class="fa-solid fa-location-dot"></i>
 
                 <span>
-                    2F, Casa Ynares, P. Gomez, Libis, Binangonan, Rizal
+                    2F, Casa Ynares, P. Gomez,
+                    Libis, Binangonan, Rizal
                 </span>
 
             </a>
@@ -707,17 +743,19 @@ include(__DIR__ . '/conn.php');
                     rel="noopener noreferrer"
                     aria-label="Facebook"
                 >
+
                     <i class="fa-brands fa-facebook-f"></i>
+
                 </a>
 
 
                 <a
                     href="#"
-                    target="_blank"
-                    rel="noopener noreferrer"
                     aria-label="Instagram"
                 >
+
                     <i class="fa-brands fa-instagram"></i>
+
                 </a>
 
 
@@ -727,7 +765,9 @@ include(__DIR__ . '/conn.php');
                     rel="noopener noreferrer"
                     aria-label="TikTok"
                 >
+
                     <i class="fa-brands fa-tiktok"></i>
+
                 </a>
 
             </div>
@@ -754,12 +794,13 @@ include(__DIR__ . '/conn.php');
 
 
 <!-- ==================================================
-     BOOKING POPUP
+     BOOKING MODAL
 ================================================== -->
 
 <div
     class="booking-overlay"
     id="bookingModal"
+    aria-hidden="true"
 >
 
     <div class="booking-modal">
@@ -824,7 +865,7 @@ include(__DIR__ . '/conn.php');
                 <div class="form-group">
 
                     <label for="booking_phone">
-                       Contact Number
+                        Contact Number
                     </label>
 
                     <input
@@ -858,21 +899,27 @@ include(__DIR__ . '/conn.php');
 
                 </div>
 
-<div class="form-group">
 
-    <label for="booking_contact_person">
-        Contact Person
-    </label>
+                <div class="form-group">
 
-    <input
-        type="text"
-        id="booking_contact_person"
-        name="contact_person"
-        placeholder="Enter contact person's name"
-        required
-    >
+                    <label for="booking_contact_person">
+                        Contact Person
+                    </label>
 
-</div>
+                    <input
+                        type="text"
+                        id="booking_contact_person"
+                        name="contact_person"
+                        placeholder="Contact person's name"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="form-row">
 
                 <div class="form-group">
 
@@ -926,10 +973,6 @@ include(__DIR__ . '/conn.php');
 
                 </div>
 
-            </div>
-
-
-            <div class="form-row">
 
                 <div class="form-group">
 
@@ -946,22 +989,22 @@ include(__DIR__ . '/conn.php');
 
                 </div>
 
+            </div>
 
-                <div class="form-group">
 
-                    <label for="booking_company">
-                        Company Name
-                    </label>
+            <div class="form-group">
 
-                    <input
-                        type="text"
-                        id="booking_company"
-                        name="cname"
-                        placeholder="Enter company name"
-                        required
-                    >
+                <label for="booking_company">
+                    Company Name
+                </label>
 
-                </div>
+                <input
+                    type="text"
+                    id="booking_company"
+                    name="cname"
+                    placeholder="Enter company name"
+                    required
+                >
 
             </div>
 
@@ -990,7 +1033,7 @@ include(__DIR__ . '/conn.php');
                         LED Wall
                     </option>
 
-                    <option value="Lights and Sound">
+                    <option value="Lights & Sound">
                         Lights & Sound
                     </option>
 
@@ -1055,29 +1098,40 @@ include(__DIR__ . '/conn.php');
 </div>
 
 
-<!-- ==================================================
-     JAVASCRIPT
-================================================== -->
-
 <script>
 
-/* ==================================================
-   EVENT SWITCHER
-================================================== */
+/*
+|--------------------------------------------------------------------------
+| EVENT SWITCHER
+|--------------------------------------------------------------------------
+*/
 
-function showEvent(type, source, title, button) {
+function showEvent(
+    type,
+    source,
+    title,
+    button
+) {
 
     const image =
-        document.getElementById("featuredImage");
+        document.getElementById(
+            "featuredImage"
+        );
 
     const video =
-        document.getElementById("featuredVideo");
+        document.getElementById(
+            "featuredVideo"
+        );
 
     const videoSource =
-        document.getElementById("featuredVideoSource");
+        document.getElementById(
+            "featuredVideoSource"
+        );
 
     const featuredTitle =
-        document.getElementById("featuredTitle");
+        document.getElementById(
+            "featuredTitle"
+        );
 
 
     document
@@ -1099,8 +1153,6 @@ function showEvent(type, source, title, button) {
 
         video.pause();
 
-        video.currentTime = 0;
-
         video.style.display = "none";
 
         image.src = source;
@@ -1110,7 +1162,7 @@ function showEvent(type, source, title, button) {
     }
 
 
-    else if (type === "video") {
+    if (type === "video") {
 
         image.style.display = "none";
 
@@ -1120,78 +1172,118 @@ function showEvent(type, source, title, button) {
 
         video.style.display = "block";
 
-        video.play().catch(function() {
-
-            console.log(
-                "Video autoplay was blocked."
-            );
-
-        });
+        video.play().catch(
+            function() {}
+        );
 
     }
 
 }
 
 
-/* ==================================================
-   OPEN BOOKING MODAL
-================================================== */
+/*
+|--------------------------------------------------------------------------
+| OPEN BOOKING MODAL
+|--------------------------------------------------------------------------
+*/
 
 function openBookingModal(event) {
 
     if (event) {
+
         event.preventDefault();
+
     }
 
     const modal =
-        document.getElementById("bookingModal");
+        document.getElementById(
+            "bookingModal"
+        );
+
+    if (!modal) {
+
+        return;
+
+    }
 
     modal.classList.add("active");
 
-    document.body.style.overflow = "hidden";
+    modal.setAttribute(
+        "aria-hidden",
+        "false"
+    );
+
+    document.body.style.overflow =
+        "hidden";
 
 }
 
 
-/* ==================================================
-   CLOSE BOOKING MODAL
-================================================== */
+/*
+|--------------------------------------------------------------------------
+| CLOSE BOOKING MODAL
+|--------------------------------------------------------------------------
+*/
 
 function closeBookingModal() {
 
     const modal =
-        document.getElementById("bookingModal");
+        document.getElementById(
+            "bookingModal"
+        );
+
+    if (!modal) {
+
+        return;
+
+    }
 
     modal.classList.remove("active");
 
-    document.body.style.overflow = "";
+    modal.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+    document.body.style.overflow =
+        "";
 
 }
 
 
-/* ==================================================
-   CLICK OUTSIDE MODAL
-================================================== */
+/*
+|--------------------------------------------------------------------------
+| CLICK OUTSIDE
+|--------------------------------------------------------------------------
+*/
 
-document
-    .getElementById("bookingModal")
-    .addEventListener(
-        "click",
-        function(event) {
+document.addEventListener(
+    "click",
+    function(event) {
 
-            if (event.target === this) {
+        const modal =
+            document.getElementById(
+                "bookingModal"
+            );
 
-                closeBookingModal();
+        if (
+            modal &&
+            event.target === modal
+        ) {
 
-            }
+            closeBookingModal();
 
         }
-    );
+
+    }
+);
 
 
-/* ==================================================
-   ESC KEY
-================================================== */
+/*
+|--------------------------------------------------------------------------
+| ESC KEY
+|--------------------------------------------------------------------------
+*/
 
 document.addEventListener(
     "keydown",
@@ -1208,17 +1300,6 @@ document.addEventListener(
 
 </script>
 
-
-<?php
-    if (!method_exists($pdo, 'close')) {
-        class PDO_Close_Wrapper extends PDO {
-            public function close() {
-                // PDO automatically closes connections when the script ends, so we can safely leave this blank
-                return true;
-            }
-        }
-    }
-?>
 
 </body>
 
