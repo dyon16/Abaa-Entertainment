@@ -1918,7 +1918,6 @@ document.addEventListener(
 
 <?php
 
-$conn->close();
 
 ?>
 
