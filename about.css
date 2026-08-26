@@ -1,0 +1,2160 @@
+/* ==================================================
+   RESET
+================================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+/* ==================================================
+   HTML
+================================================== */
+
+html {
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+}
+
+html::-webkit-scrollbar {
+    width: 0;
+    display: none;
+}
+
+body {
+    scrollbar-width: none;
+}
+
+body::-webkit-scrollbar {
+    width: 0;
+    display: none;
+}
+
+
+/* ==================================================
+   BODY
+================================================== */
+
+body {
+
+    font-family: Arial, sans-serif;
+
+    background-image:
+
+        linear-gradient(
+            rgba(0, 0, 0, 0.90),
+            rgba(0, 0, 0, 0.90)
+        ),
+
+        url("background.jpg");
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+
+    min-height: 100vh;
+
+    padding-top: 150px;
+
+    color: white;
+}
+
+
+/* ==================================================
+   HEADER
+================================================== */
+
+.header {
+
+    width: 100%;
+    height: 150px;
+
+    background: rgba(0, 0, 0, 0.97);
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 50px;
+
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    z-index: 1000;
+
+    border-bottom: 3px solid #ff3d02;
+
+    box-shadow:
+        0 5px 20px rgba(0, 0, 0, 0.6);
+}
+
+
+/* ==================================================
+   LOGO
+================================================== */
+
+.logo {
+
+    display: flex;
+    align-items: center;
+
+    text-decoration: none;
+
+    transition: 0.3s;
+}
+
+.logo img {
+
+    width: 150px;
+    height: auto;
+
+    display: block;
+}
+
+.logo:hover {
+    transform: scale(1.05);
+}
+
+
+/* ==================================================
+   NAVIGATION
+================================================== */
+
+.header nav {
+
+    display: flex;
+    align-items: center;
+
+    gap: 40px;
+}
+
+.header nav a {
+
+    color: white;
+
+    text-decoration: none;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1px;
+
+    position: relative;
+
+    transition: 0.3s;
+}
+
+
+/* ==================================================
+   NAVIGATION UNDERLINE
+================================================== */
+
+.header nav a:not(.book-button)::after {
+
+    content: "";
+
+    position: absolute;
+
+    width: 0;
+
+    height: 3px;
+
+    background: #ff3d02;
+
+    left: 50%;
+
+    bottom: -10px;
+
+    transform: translateX(-50%);
+
+    transition: 0.3s;
+}
+
+
+.header nav a:not(.book-button):hover {
+
+    color: #ff3d02;
+}
+
+
+.header nav a:not(.book-button):hover::after {
+
+    width: 100%;
+}
+
+
+/* ==================================================
+   ACTIVE ABOUT
+================================================== */
+
+.header nav a.active {
+
+    color: #ff3d02;
+}
+
+
+.header nav a.active::after {
+
+    content: "";
+
+    position: absolute;
+
+    width: 100%;
+
+    height: 3px;
+
+    background: #ff3d02;
+
+    left: 50%;
+
+    bottom: -10px;
+
+    transform: translateX(-50%);
+}
+
+
+/* ==================================================
+   BOOK BUTTON
+================================================== */
+
+.header nav a.book-button {
+
+    color: white;
+
+    background: #ff3d02;
+
+    padding: 12px 30px;
+
+    border: 2px solid #ff3d02;
+
+    border-radius: 50px;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1px;
+
+    text-decoration: none;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    position: relative;
+
+    transition: all 0.3s ease;
+
+    box-shadow:
+        0 0 15px rgba(255, 61, 2, 0.35);
+}
+
+
+.header nav a.book-button::after {
+    display: none;
+}
+
+
+.header nav a.book-button:hover {
+
+    color: #ff3d02;
+
+    background: transparent;
+
+    border-color: #ff3d02;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 0 25px rgba(255, 61, 2, 0.65);
+}
+
+
+.header nav a.book-button:active {
+    transform: scale(0.95);
+}
+
+
+/* ==================================================
+   ABOUT HERO
+================================================== */
+
+.about-hero {
+
+    width: 100%;
+
+    min-height: 500px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 60px;
+
+    padding: 70px 7%;
+
+    position: relative;
+
+    background:
+
+        linear-gradient(
+            90deg,
+            rgba(0, 0, 0, 0.98),
+            rgba(0, 0, 0, 0.808),
+            rgba(0, 0, 0, 0.822)
+        ),
+
+        url("event10-img.jpg");
+
+    background-size: cover;
+
+    background-position: center;
+
+    border-bottom: 2px solid #222;
+}
+
+
+.about-hero::before {
+
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+
+    top: 0;
+
+    width: 6px;
+
+    height: 100%;
+
+    background: #ff3d02;
+}
+
+
+/* ==================================================
+   HERO CONTENT
+================================================== */
+
+.about-hero-content {
+
+    max-width: 800px;
+
+    position: relative;
+
+    z-index: 2;
+
+    flex: 1;
+}
+
+
+.small-title {
+
+    color: #ff3d02;
+
+    font-size: 15px;
+
+    font-weight: bold;
+
+    letter-spacing: 4px;
+
+    margin-bottom: 20px;
+}
+
+
+.about-hero h1 {
+
+    font-size: 65px;
+
+    line-height: 1.05;
+
+    font-weight: 900;
+
+    text-transform: uppercase;
+
+    letter-spacing: 2px;
+
+    margin-bottom: 25px;
+}
+
+
+.about-hero h1 span {
+
+    white-space: nowrap;
+}
+
+
+.hero-description {
+
+    max-width: 650px;
+
+    color: #ccc;
+
+    font-size: 19px;
+
+    line-height: 1.7;
+}
+
+
+/* ==================================================
+   QR CODE CONTAINER
+================================================== */
+
+.about-hero-qr {
+
+    width: 300px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    position: relative;
+
+    z-index: 2;
+}
+
+
+/* ==================================================
+   QR CARD
+================================================== */
+
+
+
+
+
+
+/* ==================================================
+   QR IMAGE
+================================================== */
+
+.qr-card img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
+    display: block;
+    background: white;
+    
+    border-radius: 30px;
+}
+
+.qr-card p {
+
+    margin-top: 12px;
+
+    color: #aaa;
+
+    font-size: 12px;
+
+    font-weight: bold;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1px;
+
+    text-align: center;
+}
+
+
+/* ==================================================
+   MAIN ABOUT PAGE
+================================================== */
+
+.about-page {
+
+    width: 95%;
+
+    max-width: 1400px;
+
+    margin: auto;
+}
+
+
+/* ==================================================
+   ABOUT COMPANY
+================================================== */
+
+.about-company {
+
+    display: grid;
+
+    grid-template-columns: 1.2fr 0.8fr;
+
+    gap: 70px;
+
+    align-items: center;
+
+    padding: 90px 5%;
+}
+
+
+.section-label {
+
+    display: inline-block;
+
+    color: #ff3d02;
+
+    font-size: 13px;
+
+    font-weight: bold;
+
+    letter-spacing: 3px;
+
+    margin-bottom: 12px;
+}
+
+
+.about-text h2 {
+
+    font-size: 45px;
+
+    text-transform: uppercase;
+
+    margin-bottom: 25px;
+
+    font-weight: 900;
+}
+
+
+.about-text p {
+
+    color: #aaa;
+
+    font-size: 17px;
+
+    line-height: 1.8;
+
+    margin-bottom: 18px;
+}
+
+
+/* ==================================================
+   ABOUT IMAGE
+================================================== */
+
+.about-image {
+
+    height: 450px;
+
+    background: #080808;
+
+    border: 2px solid #333;
+
+    border-radius: 5px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 0 30px rgba(255, 61, 2, 0.18);
+
+    transition: 0.3s;
+}
+
+
+.about-image:hover {
+
+    border-color: #ff3d02;
+
+    box-shadow:
+        0 0 40px rgba(255, 61, 2, 0.3);
+}
+
+
+.about-image img {
+
+    width: 75%;
+
+    height: auto;
+
+    object-fit: contain;
+}
+
+
+/* ==================================================
+   MISSION
+================================================== */
+
+.mission-section {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 25px;
+
+    padding: 20px 5% 90px;
+}
+
+
+.info-card {
+
+    padding: 40px 30px;
+
+    background:
+
+        linear-gradient(
+            135deg,
+            rgba(15, 15, 15, 0.98),
+            rgba(25, 8, 4, 0.95)
+        );
+
+    border: 1px solid #292929;
+
+    border-radius: 5px;
+
+    text-align: center;
+
+    transition: 0.3s;
+}
+
+
+.info-card:hover {
+
+    transform: translateY(-8px);
+
+    border-color: #ff3d02;
+
+    box-shadow:
+        0 15px 35px rgba(255, 61, 2, 0.2);
+}
+
+
+.info-icon {
+
+    width: 65px;
+
+    height: 65px;
+
+    margin: 0 auto 20px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #160704;
+
+    border: 2px solid #6b1b08;
+
+    color: #ff3d02;
+
+    font-size: 25px;
+}
+
+
+.info-card h3 {
+
+    font-size: 22px;
+
+    text-transform: uppercase;
+
+    margin-bottom: 15px;
+}
+
+
+.info-card p {
+
+    color: #999;
+
+    font-size: 15px;
+
+    line-height: 1.7;
+}
+
+
+/* ==================================================
+   WHAT WE DO
+================================================== */
+
+.what-we-do {
+
+    padding: 80px 5%;
+
+    background: rgba(0, 0, 0, 0.45);
+
+    border-top: 1px solid #222;
+
+    border-bottom: 1px solid #222;
+}
+
+
+.section-heading {
+
+    text-align: center;
+
+    max-width: 750px;
+
+    margin: 0 auto 50px;
+}
+
+
+.section-heading h2 {
+
+    font-size: 42px;
+
+    text-transform: uppercase;
+
+    font-weight: 900;
+
+    margin-bottom: 15px;
+}
+
+
+.section-heading h2::after {
+
+    content: "";
+
+    display: block;
+
+    width: 80px;
+
+    height: 4px;
+
+    background: #ff3d02;
+
+    margin: 15px auto;
+}
+
+
+.section-heading p {
+
+    color: #999;
+
+    font-size: 16px;
+
+    line-height: 1.7;
+}
+
+
+/* ==================================================
+   SERVICE GRID
+================================================== */
+
+.service-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 25px;
+}
+
+
+.service-card {
+
+    padding: 35px 30px;
+
+    background: #080808;
+
+    border: 1px solid #292929;
+
+    border-radius: 5px;
+
+    transition: 0.3s;
+}
+
+
+.service-card:hover {
+
+    border-color: #ff3d02;
+
+    transform: translateY(-6px);
+
+    box-shadow:
+        0 12px 30px rgba(255, 61, 2, 0.2);
+}
+
+
+.service-card > i {
+
+    color: #ff3d02;
+
+    font-size: 30px;
+
+    margin-bottom: 20px;
+}
+
+
+.service-card h3 {
+
+    font-size: 20px;
+
+    text-transform: uppercase;
+
+    margin-bottom: 12px;
+}
+
+
+.service-card p {
+
+    color: #999;
+
+    font-size: 14px;
+
+    line-height: 1.7;
+}
+
+
+/* ==================================================
+   WHY US
+================================================== */
+
+.why-us {
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 70px;
+
+    align-items: center;
+
+    padding: 100px 5%;
+}
+
+
+.why-image {
+
+    height: 500px;
+
+    overflow: hidden;
+
+    border-radius: 5px;
+
+    border: 2px solid #333;
+}
+
+
+.why-image img {
+
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: cover;
+
+    transition: 0.5s;
+}
+
+
+.why-image:hover {
+
+    border-color: #ff3d02;
+}
+
+
+.why-image:hover img {
+
+    transform: scale(1.05);
+}
+
+
+.why-content h2 {
+
+    font-size: 42px;
+
+    line-height: 1.15;
+
+    text-transform: uppercase;
+
+    margin-bottom: 20px;
+}
+
+
+.why-content > p {
+
+    color: #aaa;
+
+    font-size: 16px;
+
+    line-height: 1.8;
+
+    margin-bottom: 30px;
+}
+
+
+.feature {
+
+    display: flex;
+
+    gap: 18px;
+
+    margin-bottom: 22px;
+}
+
+
+.feature > i {
+
+    width: 35px;
+
+    height: 35px;
+
+    min-width: 35px;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: #ff3d02;
+
+    color: white;
+
+    font-size: 13px;
+}
+
+
+.feature h4 {
+
+    font-size: 17px;
+
+    margin-bottom: 5px;
+}
+
+
+.feature p {
+
+    color: #888;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+}
+
+
+/* ==================================================
+   CTA
+================================================== */
+
+.about-cta {
+
+    margin: 0 5% 90px;
+
+    padding: 70px 30px;
+
+    text-align: center;
+
+    background:
+
+        linear-gradient(
+            135deg,
+            rgba(20, 7, 4, 0.98),
+            rgba(5, 5, 5, 0.98)
+        );
+
+    border: 1px solid #333;
+
+    border-top: 3px solid #ff3d02;
+
+    border-radius: 5px;
+}
+
+
+.about-cta h2 {
+
+    font-size: 40px;
+
+    text-transform: uppercase;
+
+    margin-bottom: 15px;
+}
+
+
+.about-cta p {
+
+    color: #999;
+
+    font-size: 16px;
+
+    line-height: 1.7;
+
+    margin-bottom: 30px;
+}
+
+
+.cta-button {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 14px 28px;
+
+    background: #ff3d02;
+
+    border: 2px solid #8c2409;
+
+    border-radius: 50px;
+
+    color: white;
+
+    text-decoration: none;
+
+    font-weight: bold;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1px;
+
+    transition: 0.3s;
+
+    cursor: pointer;
+}
+
+
+.cta-button:hover {
+
+    background: #d83200;
+
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 8px 25px rgba(255, 61, 2, 0.35);
+}
+
+
+/* ==================================================
+   FOOTER
+================================================== */
+
+.footer {
+
+    width: 100%;
+
+    background:
+
+        linear-gradient(
+            135deg,
+            #050505,
+            #120704
+        );
+
+    color: white;
+
+    border-top: 3px solid #ff3d02;
+
+    box-shadow:
+        0 -10px 40px rgba(0, 0, 0, 0.6);
+}
+
+
+.footer-container {
+
+    width: 95%;
+
+    max-width: 1400px;
+
+    margin: auto;
+
+    padding: 55px 20px 45px;
+
+    display: grid;
+
+    grid-template-columns:
+        2fr 1fr 1.3fr 1.5fr;
+
+    gap: 50px;
+}
+
+
+.footer-section {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+}
+
+
+.footer-brand img {
+
+    width: 150px;
+
+    height: auto;
+
+    margin-bottom: 5px;
+}
+
+
+.footer-brand p {
+
+    max-width: 350px;
+
+    color: #aaa;
+
+    font-size: 15px;
+
+    line-height: 1.7;
+}
+
+
+.footer-section h3 {
+
+    position: relative;
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1.5px;
+
+    margin-bottom: 10px;
+
+    color: white;
+}
+
+
+.footer-section h3::after {
+
+    content: "";
+
+    display: block;
+
+    width: 40px;
+
+    height: 3px;
+
+    background: #ff3d02;
+
+    margin-top: 8px;
+}
+
+
+.footer-section > a {
+
+    width: fit-content;
+
+    color: #aaa;
+
+    text-decoration: none;
+
+    font-size: 15px;
+
+    transition: 0.3s;
+}
+
+
+.footer-section > a:hover {
+
+    color: #ff3d02;
+
+    transform: translateX(5px);
+}
+
+
+/* ==================================================
+   CONTACT
+================================================== */
+
+.contact-item {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 14px;
+
+    color: #aaa;
+
+    font-size: 15px;
+
+    line-height: 1.6;
+
+    margin-bottom: 5px;
+
+    text-decoration: none;
+}
+
+
+.contact-item i {
+
+    width: 22px;
+
+    min-width: 22px;
+
+    height: 22px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    color: #ff3d02;
+
+    font-size: 17px;
+
+    margin-top: 2px;
+}
+
+
+.contact-item span {
+
+    flex: 1;
+
+    color: #aaa;
+
+    transition: 0.3s;
+}
+
+
+.contact-item:hover span {
+
+    color: white;
+}
+
+
+/* ==================================================
+   SOCIAL
+================================================== */
+
+.social-links {
+
+    display: flex;
+
+    gap: 12px;
+
+    margin-top: 10px;
+}
+
+
+.social-links a {
+
+    width: 40px;
+
+    height: 40px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    color: #aaa;
+
+    background: #080808;
+
+    border: 1px solid #333;
+
+    border-radius: 50%;
+
+    text-decoration: none;
+
+    font-size: 17px;
+
+    transition: 0.3s;
+}
+
+
+.social-links a:hover {
+
+    color: white;
+
+    background: #ff3d02;
+
+    border-color: #ff3d02;
+
+    transform: translateY(-4px);
+}
+
+
+/* ==================================================
+   FOOTER BOTTOM
+================================================== */
+
+.footer-bottom {
+
+    width: 100%;
+
+    padding: 20px 5%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    border-top: 1px solid #222;
+
+    background: #030303;
+}
+
+
+.footer-bottom p {
+
+    color: #666;
+
+    font-size: 13px;
+
+    letter-spacing: 0.5px;
+}
+
+
+.footer-bottom p:last-child {
+
+    color: #ff3d02;
+
+    font-weight: bold;
+
+    text-transform: uppercase;
+}
+
+
+/* ==================================================
+   BOOKING MODAL
+================================================== */
+
+.booking-overlay {
+    position: fixed;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    background: rgba(0, 0, 0, 0.90);
+
+    backdrop-filter: blur(8px);
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    z-index: 9999;
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    transition:
+        opacity 0.3s ease,
+        visibility 0.3s ease;
+
+    overflow-y: auto;
+}
+
+.booking-overlay.active {
+    opacity: 1;
+
+    visibility: visible;
+}
+
+
+/* ==================================================
+   BOOKING MODAL BOX
+================================================== */
+
+.booking-modal {
+    width: 100%;
+
+    max-width: 850px;
+
+    max-height: 92vh;
+
+    overflow-y: auto;
+
+    position: relative;
+
+    background:
+        linear-gradient(
+            135deg,
+            #080808,
+            #160704
+        );
+
+    border: 1px solid #333;
+
+    border-top: 4px solid #ff3d02;
+
+    border-radius: 8px;
+
+    padding: 40px;
+
+    box-shadow:
+        0 20px 80px rgba(0, 0, 0, 0.95),
+        0 0 40px rgba(255, 61, 2, 0.18);
+
+    transform: translateY(30px) scale(0.96);
+
+    transition:
+        transform 0.3s ease;
+}
+
+.booking-overlay.active .booking-modal {
+    transform: translateY(0) scale(1);
+}
+
+
+/* ==================================================
+   BOOKING CLOSE
+================================================== */
+
+.booking-close {
+    position: absolute;
+
+    top: 18px;
+    right: 18px;
+
+    width: 40px;
+    height: 40px;
+
+    border: 1px solid #333;
+
+    border-radius: 50%;
+
+    background: #0b0b0b;
+
+    color: #aaa;
+
+    font-size: 18px;
+
+    cursor: pointer;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    transition: 0.3s;
+}
+
+.booking-close:hover {
+    color: white;
+
+    background: #ff3d02;
+
+    border-color: #ff3d02;
+
+    transform: rotate(90deg);
+}
+
+
+/* ==================================================
+   BOOKING HEADER
+================================================== */
+
+.booking-header {
+    padding-right: 50px;
+
+    margin-bottom: 30px;
+
+    border-bottom: 1px solid #292929;
+
+    padding-bottom: 25px;
+}
+
+.booking-label {
+    display: inline-block;
+
+    color: #ff3d02;
+
+    font-size: 12px;
+
+    font-weight: bold;
+
+    letter-spacing: 3px;
+
+    margin-bottom: 10px;
+}
+
+.booking-header h2 {
+    color: white;
+
+    font-size: 38px;
+
+    font-weight: 900;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1px;
+
+    margin-bottom: 10px;
+}
+
+.booking-header p {
+    color: #999;
+
+    font-size: 15px;
+
+    line-height: 1.6;
+}
+
+
+/* ==================================================
+   BOOKING FORM
+================================================== */
+
+.booking-form {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 20px;
+}
+
+.form-row {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 18px;
+}
+
+.form-group {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+}
+
+.form-group label {
+    color: #ddd;
+
+    font-size: 13px;
+
+    font-weight: bold;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.8px;
+}
+
+
+/* ==================================================
+   INPUTS
+================================================== */
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+
+    border: 1px solid #333;
+
+    border-radius: 4px;
+
+    background: #050505;
+
+    color: white;
+
+    padding: 13px 15px;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 14px;
+
+    outline: none;
+
+    transition:
+        border-color 0.3s,
+        box-shadow 0.3s,
+        background 0.3s;
+}
+
+.form-group input,
+.form-group select {
+    height: 48px;
+}
+
+.form-group textarea {
+    min-height: 120px;
+
+    resize: vertical;
+
+    line-height: 1.5;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: #666;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #ff3d02;
+
+    background: #090909;
+
+    box-shadow:
+        0 0 0 2px rgba(255, 61, 2, 0.12),
+        0 0 15px rgba(255, 61, 2, 0.08);
+}
+
+.form-group select {
+    cursor: pointer;
+}
+
+.form-group select option {
+    background: #080808;
+
+    color: white;
+}
+
+.form-group input[type="date"],
+.form-group input[type="number"] {
+    color-scheme: dark;
+}
+
+
+/* ==================================================
+   BOOKING SUBMIT
+================================================== */
+
+.booking-submit {
+    width: 100%;
+
+    min-height: 52px;
+
+    margin-top: 5px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 12px;
+
+    border: 2px solid #ff3d02;
+
+    border-radius: 50px;
+
+    background: #ff3d02;
+
+    color: white;
+
+    font-size: 14px;
+
+    font-weight: bold;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1px;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+
+    box-shadow:
+        0 0 20px rgba(255, 61, 2, 0.25);
+}
+
+.booking-submit:hover {
+    background: transparent;
+
+    color: #ff3d02;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 0 30px rgba(255, 61, 2, 0.4);
+}
+
+.booking-submit:active {
+    transform: scale(0.98);
+}
+
+.booking-submit i {
+    transition: 0.3s;
+}
+
+.booking-submit:hover i {
+    transform: translateX(5px);
+}
+
+
+
+/* ==================================================
+   TABLET
+================================================== */
+
+@media (max-width: 1000px) {
+
+    /* ABOUT COMPANY */
+
+    .about-company {
+
+        grid-template-columns: 1fr;
+
+        gap: 40px;
+    }
+
+
+    /* MISSION */
+
+    .mission-section {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+
+    /* SERVICES */
+
+    .service-grid {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+
+    /* WHY US */
+
+    .why-us {
+
+        grid-template-columns: 1fr;
+
+        gap: 40px;
+    }
+
+
+    /* FOOTER */
+
+    .footer-container {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+
+        gap: 40px;
+    }
+
+
+    /* HERO */
+
+    .about-hero {
+
+        gap: 35px;
+
+        padding-left: 5%;
+
+        padding-right: 5%;
+    }
+
+
+    .about-hero h1 {
+
+        font-size: 48px;
+    }
+
+
+    .about-hero-qr {
+
+        width: 240px;
+    }
+
+
+    .qr-card {
+
+        width: 210px;
+
+        padding: 15px;
+    }
+
+}
+
+
+/* ==================================================
+   MOBILE
+================================================== */
+
+@media (max-width: 600px) {
+
+    body {
+
+        padding-top: 120px;
+    }
+
+
+    /* ==================================================
+       HEADER
+    ================================================== */
+
+    .header {
+
+        height: 120px;
+
+        padding: 0 20px;
+    }
+
+
+    .logo img {
+
+        width: 110px;
+    }
+
+
+    .header nav {
+
+        gap: 10px;
+    }
+
+
+    .header nav a {
+
+        font-size: 9px;
+
+        letter-spacing: 0;
+    }
+
+
+    .header nav a.book-button {
+
+        padding: 7px 14px;
+
+        font-size: 9px;
+
+        border-width: 1px;
+
+        border-radius: 50px;
+    }
+
+
+    /* ==================================================
+       HERO
+    ================================================== */
+
+    .about-hero {
+
+        min-height: auto;
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 35px;
+
+        padding: 50px 25px 60px;
+    }
+
+
+    .about-hero-content {
+
+        width: 100%;
+
+        max-width: 100%;
+    }
+
+
+    .about-hero h1 {
+
+        font-size: 34px;
+
+        line-height: 1.1;
+    }
+
+
+    .about-hero h1 span {
+
+        white-space: nowrap;
+    }
+
+
+    .hero-description {
+
+        font-size: 15px;
+    }
+
+
+    /* ==================================================
+       MOBILE QR
+    ================================================== */
+
+    .about-hero-qr {
+
+        width: 100%;
+
+        display: flex;
+
+        justify-content: center;
+
+        margin-top: 5px;
+    }
+
+
+    .qr-card {
+
+        width: 210px;
+
+        padding: 15px;
+    }
+
+
+    .qr-card p {
+
+        font-size: 11px;
+    }
+
+
+    /* ==================================================
+       COMPANY
+    ================================================== */
+
+    .about-company {
+
+        padding: 60px 5%;
+
+        gap: 35px;
+    }
+
+
+    .about-text h2 {
+
+        font-size: 30px;
+    }
+
+
+    .about-text p {
+
+        font-size: 15px;
+    }
+
+
+    .about-image {
+
+        height: 300px;
+    }
+
+
+    /* ==================================================
+       MISSION
+    ================================================== */
+
+    .mission-section {
+
+        grid-template-columns: 1fr;
+
+        padding-bottom: 60px;
+    }
+
+
+    /* ==================================================
+       SERVICES
+    ================================================== */
+
+    .what-we-do {
+
+        padding: 60px 5%;
+    }
+
+
+    .section-heading h2 {
+
+        font-size: 30px;
+    }
+
+
+    .service-grid {
+
+        grid-template-columns: 1fr;
+
+        gap: 15px;
+    }
+
+
+    /* ==================================================
+       WHY
+    ================================================== */
+
+    .why-us {
+
+        padding: 60px 5%;
+    }
+
+
+    .why-image {
+
+        height: 350px;
+    }
+
+
+    .why-content h2 {
+
+        font-size: 30px;
+    }
+
+
+    /* ==================================================
+       CTA
+    ================================================== */
+
+    .about-cta {
+
+        margin: 0 5% 60px;
+
+        padding: 50px 20px;
+    }
+
+
+    .about-cta h2 {
+
+        font-size: 28px;
+    }
+
+
+    /* ==================================================
+       FOOTER
+    ================================================== */
+
+    .footer-container {
+
+        width: 94%;
+
+        padding: 40px 10px;
+
+        grid-template-columns: 1fr;
+
+        gap: 35px;
+    }
+
+
+    .footer-brand img {
+
+        width: 130px;
+    }
+
+
+    .footer-brand p {
+
+        font-size: 14px;
+    }
+
+
+    .footer-section h3 {
+
+        font-size: 16px;
+    }
+
+
+    .footer-section > a,
+    .contact-item {
+
+        font-size: 14px;
+    }
+
+
+    .footer-bottom {
+
+        flex-direction: column;
+
+        text-align: center;
+
+        padding: 20px;
+    }
+
+
+    .footer-bottom p {
+
+        font-size: 11px;
+    }
+
+
+    /* ==================================================
+       MOBILE BOOKING MODAL
+    ================================================== */
+
+    .booking-modal {
+
+        padding: 10px;
+
+        align-items: center;
+
+        justify-content: center;
+    }
+
+
+    .booking-modal-content {
+
+        width: 100%;
+
+        max-height: 96vh;
+
+        padding: 30px 20px;
+
+        border-top-width: 3px;
+    }
+
+
+    .booking-close {
+
+        top: 12px;
+
+        right: 12px;
+
+        width: 36px;
+
+        height: 36px;
+
+        font-size: 16px;
+    }
+
+
+    .booking-header {
+
+        padding-right: 40px;
+
+        margin-bottom: 25px;
+
+        padding-bottom: 20px;
+    }
+
+
+    .booking-header h2 {
+
+        font-size: 27px;
+    }
+
+
+    .booking-header p {
+
+        font-size: 13px;
+    }
+
+
+    .booking-submit {
+
+        font-size: 12px;
+    }
+
+}
