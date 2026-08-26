@@ -7,22 +7,19 @@
   },
   "routes": [
     {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/about\\.php$",
+      "src": "/about.php",
       "dest": "/api/about.php"
     },
     {
-      "src": "/service\\.php$",
+      "src": "/service.php",
       "dest": "/api/service.php"
     },
     {
-      "src": "/booking\\.php$",
+      "src": "/booking.php",
       "dest": "/api/booking.php"
     },
     {
-      "src": "/index\\.php$",
+      "src": "/index.php",
       "dest": "/api/index.php"
     }
   ]
