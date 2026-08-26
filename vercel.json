@@ -7,19 +7,19 @@
   },
   "routes": [
     {
-      "src": "/about.php",
+      "src": "/about",
       "dest": "/api/about.php"
     },
     {
-      "src": "/service.php",
+      "src": "/service",
       "dest": "/api/service.php"
     },
     {
-      "src": "/booking.php",
+      "src": "/booking",
       "dest": "/api/booking.php"
     },
     {
-      "src": "/index.php",
+      "src": "/",
       "dest": "/api/index.php"
     }
   ]
