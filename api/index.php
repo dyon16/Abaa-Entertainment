@@ -40,12 +40,12 @@ include(__DIR__ . '/conn.php');
 <header class="header">
 
     <a
-        href="/api/index.php"
+        href="/"
         class="logo"
     >
 
         <img
-            src="logo.png"
+            src="/logo.png"
             alt="ABAA Entertainment Logo"
         >
 
@@ -54,19 +54,19 @@ include(__DIR__ . '/conn.php');
 
     <nav>
 
-        <a href="/api/index.php">
+        <a href="/">
             Home
         </a>
 
-        <a href="#events">
+        <a href="/#events">
             Events
         </a>
 
-        <a href="#services">
+        <a href="/#services">
             Services
         </a>
 
-        <a href="/api/about.php">
+        <a href="/about">
             About
         </a>
 
@@ -83,80 +83,17 @@ include(__DIR__ . '/conn.php');
 </header>
 
 
-<!-- ==================================================
-     ABOUT
-================================================== -->
-
-<section
-    class="about-us"
-    id="about"
->
-
-    <div class="about-content">
-
-        <h1>
-            ABAA Entertainment
-        </h1>
-
-        <p>
-
-            ABAA Entertainment is a forward-thinking
-            entertainment company committed to developing
-            talent, producing high-quality entertainment,
-            and creating meaningful opportunities within
-            the industry.
-
-            <br><br>
-
-            Built on creativity, professionalism, and
-            innovation, ABAA Entertainment provides a
-            platform where artists, performers, and creative
-            professionals can showcase their talents and
-            reach wider audiences.
-
-            <br><br>
-
-            The company focuses on nurturing emerging talent,
-            developing engaging entertainment projects, and
-            building strong partnerships that contribute to
-            the growth of the entertainment community.
-
-        </p>
-
-    </div>
-
-
-    <div class="about-video">
-
-        <video
-            controls
-            autoplay
-            muted
-            loop
-            playsinline
-        >
-
-            <source
-                src="ads.mp4"
-                type="video/mp4"
-            >
-
-            Your browser does not support the video tag.
-
-        </video>
-
-    </div>
-
-</section>
-
-
 <main class="main-container">
 
+
+    <!-- ==================================================
+         HERO / BIG BOX
+    ================================================== -->
 
     <section class="big-box">
 
         <img
-            src="logo.png"
+            src="/logo.png"
             alt="ABAA Entertainment"
         >
 
@@ -188,12 +125,12 @@ include(__DIR__ . '/conn.php');
 
 
             <a
-                href="/api/service.php?service=led-wall"
+                href="/service?service=led-wall"
                 class="image-button"
             >
 
                 <img
-                    src="service1.png"
+                    src="/service1.png"
                     alt="LED Wall"
                 >
 
@@ -205,12 +142,12 @@ include(__DIR__ . '/conn.php');
 
 
             <a
-                href="/api/service.php?service=lights-sound"
+                href="/service?service=lights-sound"
                 class="image-button"
             >
 
                 <img
-                    src="service2.png"
+                    src="/service2.png"
                     alt="Lights and Sound"
                 >
 
@@ -222,12 +159,12 @@ include(__DIR__ . '/conn.php');
 
 
             <a
-                href="/api/service.php?service=live-feed"
+                href="/service?service=live-feed"
                 class="image-button"
             >
 
                 <img
-                    src="service3.png"
+                    src="/service3.png"
                     alt="Live Feed"
                 >
 
@@ -239,12 +176,12 @@ include(__DIR__ . '/conn.php');
 
 
             <a
-                href="/api/service.php?service=stage"
+                href="/service?service=stage"
                 class="image-button"
             >
 
                 <img
-                    src="service4.png"
+                    src="/service4.png"
                     alt="Stage Production"
                 >
 
@@ -256,12 +193,12 @@ include(__DIR__ . '/conn.php');
 
 
             <a
-                href="/api/service.php?service=music-studio"
+                href="/service?service=music-studio"
                 class="image-button"
             >
 
                 <img
-                    src="service5.png"
+                    src="/service5.png"
                     alt="Music Studio"
                 >
 
@@ -273,12 +210,12 @@ include(__DIR__ . '/conn.php');
 
 
             <a
-                href="/api/service.php?service=trusses"
+                href="/service?service=trusses"
                 class="image-button"
             >
 
                 <img
-                    src="service6.png"
+                    src="/service6.png"
                     alt="Trusses"
                 >
 
@@ -318,7 +255,7 @@ include(__DIR__ . '/conn.php');
 
             <img
                 id="featuredImage"
-                src="event1.jpg"
+                src="/event1.jpg"
                 alt="Android18 x UYRE"
             >
 
@@ -362,14 +299,14 @@ include(__DIR__ . '/conn.php');
                 class="event-thumbnail active"
                 onclick="showEvent(
                     'image',
-                    'event1.jpg',
+                    '/event1.jpg',
                     'Android18 x UYRE',
                     this
                 )"
             >
 
                 <img
-                    src="event1.jpg"
+                    src="/event1.jpg"
                     alt="Android18 x UYRE"
                 >
 
@@ -385,14 +322,14 @@ include(__DIR__ . '/conn.php');
                 class="event-thumbnail"
                 onclick="showEvent(
                     'image',
-                    'event2.jpg',
+                    '/event2.jpg',
                     'Android18 x UYRE',
                     this
                 )"
             >
 
                 <img
-                    src="event2.jpg"
+                    src="/event2.jpg"
                     alt="Android18 x UYRE"
                 >
 
@@ -408,14 +345,14 @@ include(__DIR__ . '/conn.php');
                 class="event-thumbnail"
                 onclick="showEvent(
                     'image',
-                    'event3.jpg',
+                    '/event3.jpg',
                     'Music Festival - Cavite',
                     this
                 )"
             >
 
                 <img
-                    src="event3.jpg"
+                    src="/event3.jpg"
                     alt="Music Festival - Cavite"
                 >
 
@@ -431,14 +368,14 @@ include(__DIR__ . '/conn.php');
                 class="event-thumbnail"
                 onclick="showEvent(
                     'image',
-                    'event4.jpg',
+                    '/event4.jpg',
                     'Wofex',
                     this
                 )"
             >
 
                 <img
-                    src="event4.jpg"
+                    src="/event4.jpg"
                     alt="Wofex"
                 >
 
@@ -454,14 +391,14 @@ include(__DIR__ . '/conn.php');
                 class="event-thumbnail"
                 onclick="showEvent(
                     'image',
-                    'event5.jpg',
+                    '/event5.jpg',
                     'Grand Youth Day',
                     this
                 )"
             >
 
                 <img
-                    src="event5.jpg"
+                    src="/event5.jpg"
                     alt="Grand Youth Day"
                 >
 
@@ -477,14 +414,14 @@ include(__DIR__ . '/conn.php');
                 class="event-thumbnail"
                 onclick="showEvent(
                     'image',
-                    'event6.jpg',
+                    '/event6.jpg',
                     'FirstFilm Project',
                     this
                 )"
             >
 
                 <img
-                    src="event6.jpg"
+                    src="/event6.jpg"
                     alt="FirstFilm Project"
                 >
 
@@ -500,14 +437,14 @@ include(__DIR__ . '/conn.php');
                 class="event-thumbnail"
                 onclick="showEvent(
                     'image',
-                    'event7.jpg',
+                    '/event7.jpg',
                     'Concert Event',
                     this
                 )"
             >
 
                 <img
-                    src="event7.jpg"
+                    src="/event7.jpg"
                     alt="Concert Event"
                 >
 
@@ -523,14 +460,14 @@ include(__DIR__ . '/conn.php');
                 class="event-thumbnail"
                 onclick="showEvent(
                     'image',
-                    'event8.jpg',
+                    '/event8.jpg',
                     'Product Launch',
                     this
                 )"
             >
 
                 <img
-                    src="event8.jpg"
+                    src="/event8.jpg"
                     alt="Product Launch"
                 >
 
@@ -546,14 +483,14 @@ include(__DIR__ . '/conn.php');
                 class="event-thumbnail"
                 onclick="showEvent(
                     'image',
-                    'event9.jpg',
+                    '/event9.jpg',
                     'Festival Celebration',
                     this
                 )"
             >
 
                 <img
-                    src="event9.jpg"
+                    src="/event9.jpg"
                     alt="Festival Celebration"
                 >
 
@@ -569,7 +506,7 @@ include(__DIR__ . '/conn.php');
                 class="event-thumbnail"
                 onclick="showEvent(
                     'video',
-                    'event10.mp4',
+                    '/event10.mp4',
                     'Live Event Highlights',
                     this
                 )"
@@ -578,7 +515,7 @@ include(__DIR__ . '/conn.php');
                 <div class="video-thumbnail">
 
                     <img
-                        src="event10-img.jpg"
+                        src="/event10-img.jpg"
                         alt="Live Event Highlights"
                     >
 
@@ -611,7 +548,7 @@ include(__DIR__ . '/conn.php');
         <div class="footer-section footer-brand">
 
             <img
-                src="logo.png"
+                src="/logo.png"
                 alt="ABAA Entertainment Logo"
             >
 
@@ -631,19 +568,19 @@ include(__DIR__ . '/conn.php');
                 Quick Links
             </h3>
 
-            <a href="/api/index.php">
+            <a href="/">
                 Home
             </a>
 
-            <a href="#events">
+            <a href="/#events">
                 Events
             </a>
 
-            <a href="#services">
+            <a href="/#services">
                 Services
             </a>
 
-            <a href="/api/about.php">
+            <a href="/about">
                 About Us
             </a>
 
@@ -656,27 +593,27 @@ include(__DIR__ . '/conn.php');
                 Our Services
             </h3>
 
-            <a href="/api/service.php?service=led-wall">
+            <a href="/service?service=led-wall">
                 LED Wall
             </a>
 
-            <a href="/api/service.php?service=lights-sound">
+            <a href="/service?service=lights-sound">
                 Lights & Sound
             </a>
 
-            <a href="/api/service.php?service=live-feed">
+            <a href="/service?service=live-feed">
                 Live Feed
             </a>
 
-            <a href="/api/service.php?service=stage">
+            <a href="/service?service=stage">
                 Stage Production
             </a>
 
-            <a href="/api/service.php?service=music-studio">
+            <a href="/service?service=music-studio">
                 Music Studio
             </a>
 
-            <a href="/api/service.php?service=trusses">
+            <a href="/service?service=trusses">
                 Trusses
             </a>
 
@@ -837,7 +774,7 @@ include(__DIR__ . '/conn.php');
 
 
         <form
-            action="booking.php"
+            action="/booking"
             method="POST"
             class="booking-form"
         >
@@ -1099,6 +1036,7 @@ include(__DIR__ . '/conn.php');
 
 
 <script>
+
 
 /*
 |--------------------------------------------------------------------------
