@@ -188,7 +188,7 @@ include(__DIR__ . '/conn.php');
 
 
             <a
-                href="/service.php?service=led-wall"
+                href="/api/service.php?service=led-wall"
                 class="image-button"
             >
 
@@ -205,7 +205,7 @@ include(__DIR__ . '/conn.php');
 
 
             <a
-                href="/service.php?service=lights-sound"
+                href="/api/service.php?service=lights-sound"
                 class="image-button"
             >
 
@@ -222,7 +222,7 @@ include(__DIR__ . '/conn.php');
 
 
             <a
-                href="/service.php?service=live-feed"
+                href="/api/service.php?service=live-feed"
                 class="image-button"
             >
 
@@ -239,7 +239,7 @@ include(__DIR__ . '/conn.php');
 
 
             <a
-                href="/service.php?service=stage"
+                href="/api/service.php?service=stage"
                 class="image-button"
             >
 
@@ -256,7 +256,7 @@ include(__DIR__ . '/conn.php');
 
 
             <a
-                href="/service.php?service=music-studio"
+                href="/api/service.php?service=music-studio"
                 class="image-button"
             >
 
@@ -273,7 +273,7 @@ include(__DIR__ . '/conn.php');
 
 
             <a
-                href="/service.php?service=trusses"
+                href="/api/service.php?service=trusses"
                 class="image-button"
             >
 
@@ -631,7 +631,7 @@ include(__DIR__ . '/conn.php');
                 Quick Links
             </h3>
 
-            <a href="/index.php">
+            <a href="/api/index.php">
                 Home
             </a>
 
@@ -643,7 +643,7 @@ include(__DIR__ . '/conn.php');
                 Services
             </a>
 
-            <a href="/about.php">
+            <a href="/api/about.php">
                 About Us
             </a>
 
@@ -656,27 +656,27 @@ include(__DIR__ . '/conn.php');
                 Our Services
             </h3>
 
-            <a href="/service.php?service=led-wall">
+            <a href="/api/service.php?service=led-wall">
                 LED Wall
             </a>
 
-            <a href="/service.php?service=lights-sound">
+            <a href="/api/service.php?service=lights-sound">
                 Lights & Sound
             </a>
 
-            <a href="/service.php?service=live-feed">
+            <a href="/api/service.php?service=live-feed">
                 Live Feed
             </a>
 
-            <a href="/service.php?service=stage">
+            <a href="/api/service.php?service=stage">
                 Stage Production
             </a>
 
-            <a href="/service.php?service=music-studio">
+            <a href="/api/service.php?service=music-studio">
                 Music Studio
             </a>
 
-            <a href="/service.php?service=trusses">
+            <a href="/api/service.php?service=trusses">
                 Trusses
             </a>
 
