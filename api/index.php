@@ -40,7 +40,7 @@ include(__DIR__ . '/conn.php');
 <header class="header">
 
     <a
-        href="/index.php"
+        href="index.php"
         class="logo"
     >
 
@@ -54,7 +54,7 @@ include(__DIR__ . '/conn.php');
 
     <nav>
 
-        <a href="/index.php">
+        <a href="index.php">
             Home
         </a>
 
@@ -66,7 +66,7 @@ include(__DIR__ . '/conn.php');
             Services
         </a>
 
-        <a href="/about.php">
+        <a href="about.php">
             About
         </a>
 
