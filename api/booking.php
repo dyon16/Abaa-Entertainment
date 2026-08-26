@@ -1,6 +1,6 @@
 <?php
 
-include "conn.php";
+include(__DIR__ . '/conn.php');
 
 /* ==================================================
    ONLY ACCEPT POST REQUESTS
