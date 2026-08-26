@@ -2,7 +2,7 @@
 $host = "://aivencloud.com";
 $user = "avnadmin";
 $database = "defaultdb";
-$port = 10837;
+$port = 11063;
 $password = getenv('DB_PASSWORD'); 
 
 try {
