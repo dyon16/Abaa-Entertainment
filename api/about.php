@@ -23,7 +23,7 @@ include(__DIR__ . '/conn.php');
 
     <link
         rel="stylesheet"
-        href="about.css"
+        href="/style.css"
     >
 
     <link
@@ -40,12 +40,12 @@ include(__DIR__ . '/conn.php');
 <header class="header">
 
     <a
-        href="index.php"
+        href="/"
         class="logo"
     >
 
         <img
-            src="logo.png"
+            src="/logo.png"
             alt="ABAA Entertainment Logo"
         >
 
@@ -54,22 +54,19 @@ include(__DIR__ . '/conn.php');
 
     <nav>
 
-        <a href="index.php">
+        <a href="/">
             Home
         </a>
 
-        <a href="index.php#events">
+        <a href="/#events">
             Events
         </a>
 
-        <a href="index.php#services">
+        <a href="/#services">
             Services
         </a>
 
-        <a
-            href="about.php"
-            class="active"
-        >
+        <a href="/about">
             About
         </a>
 
@@ -86,434 +83,76 @@ include(__DIR__ . '/conn.php');
 </header>
 
 
-<section class="about-hero">
+<!-- ==================================================
+     ABOUT
+================================================== -->
 
-    <div class="about-hero-content">
+<section
+    class="about-us"
+    id="about"
+>
 
-        <p class="small-title">
-            ABOUT ABAA ENTERTAINMENT
-        </p>
+    <div class="about-content">
 
         <h1>
-
-            <span>
-                Powered by Passion.
-            </span>
-
-            <br>
-
-            <span>
-                Driven by Excellence.
-            </span>
-
+            ABAA Entertainment
         </h1>
 
-        <p class="hero-description">
+        <p>
 
-            We create unforgettable experiences through
-            creativity, technology, passion, and professional
-            event production.
+            ABAA Entertainment is a forward-thinking
+            entertainment company committed to developing
+            talent, producing high-quality entertainment,
+            and creating meaningful opportunities within
+            the industry.
+
+            <br><br>
+
+            Built on creativity, professionalism, and
+            innovation, ABAA Entertainment provides a
+            platform where artists, performers, and creative
+            professionals can showcase their talents and
+            reach wider audiences.
+
+            <br><br>
+
+            The company focuses on nurturing emerging talent,
+            developing engaging entertainment projects, and
+            building strong partnerships that contribute to
+            the growth of the entertainment community.
 
         </p>
 
     </div>
 
 
-    <div class="about-hero-qr">
+    <div class="about-video">
 
-        <div class="qr-card">
+        <video
+            controls
+            autoplay
+            muted
+            loop
+            playsinline
+        >
 
-            <img
-                src="qrcode.png"
-                alt="ABAA Entertainment QR Code"
+            <source
+                src="/ads.mp4"
+                type="video/mp4"
             >
 
-            <p>
-                Scan to connect with us
-            </p>
+            Your browser does not support the video tag.
 
-        </div>
+        </video>
 
     </div>
 
 </section>
 
 
-<main class="about-page">
-
-
-    <section class="about-company">
-
-        <div class="about-text">
-
-            <span class="section-label">
-                WHO WE ARE
-            </span>
-
-            <h2>
-                ABAA Entertainment
-            </h2>
-
-            <p>
-                ABAA Entertainment is a forward-thinking
-                entertainment company committed to developing
-                talent, producing high-quality entertainment,
-                and creating meaningful opportunities within
-                the industry.
-            </p>
-
-            <p>
-                Built on creativity, professionalism, and
-                innovation, ABAA Entertainment provides a
-                platform where artists, performers, event
-                professionals, and creative individuals can
-                showcase their talents and reach wider audiences.
-            </p>
-
-            <p>
-                We believe that every event should be more
-                than just a gathering. It should be an
-                experience that people remember.
-            </p>
-
-        </div>
-
-
-        <div class="about-image">
-
-            <img
-                src="logo.png"
-                alt="ABAA Entertainment"
-            >
-
-        </div>
-
-    </section>
-
-
-    <section class="mission-section">
-
-
-        <div class="info-card">
-
-            <div class="info-icon">
-                <i class="fa-solid fa-bullseye"></i>
-            </div>
-
-            <h3>
-                Our Mission
-            </h3>
-
-            <p>
-                To deliver professional, creative, and
-                high-quality entertainment services while
-                providing opportunities for artists and
-                creative professionals to grow and succeed.
-            </p>
-
-        </div>
-
-
-        <div class="info-card">
-
-            <div class="info-icon">
-                <i class="fa-solid fa-eye"></i>
-            </div>
-
-            <h3>
-                Our Vision
-            </h3>
-
-            <p>
-                To become a trusted and influential
-                entertainment company known for excellence,
-                innovation, and unforgettable experiences.
-            </p>
-
-        </div>
-
-
-        <div class="info-card">
-
-            <div class="info-icon">
-                <i class="fa-solid fa-star"></i>
-            </div>
-
-            <h3>
-                Our Values
-            </h3>
-
-            <p>
-                Creativity, professionalism, teamwork,
-                innovation, integrity, and dedication
-                guide everything we do.
-            </p>
-
-        </div>
-
-    </section>
-
-
-    <section
-        class="what-we-do"
-        id="services"
-    >
-
-        <div class="section-heading">
-
-            <span class="section-label">
-                WHAT WE DO
-            </span>
-
-            <h2>
-                Creating Experiences
-            </h2>
-
-            <p>
-                From technical production to live
-                entertainment, we provide the tools
-                and expertise needed to bring events
-                to life.
-            </p>
-
-        </div>
-
-
-        <div class="service-grid">
-
-
-            <div class="service-card">
-
-                <i class="fa-solid fa-display"></i>
-
-                <h3>
-                    LED Wall
-                </h3>
-
-                <p>
-                    High-quality LED wall solutions
-                    for concerts, corporate events,
-                    celebrations, and productions.
-                </p>
-
-            </div>
-
-
-            <div class="service-card">
-
-                <i class="fa-solid fa-lightbulb"></i>
-
-                <h3>
-                    Lights & Sound
-                </h3>
-
-                <p>
-                    Professional lighting and sound
-                    production designed to enhance
-                    every event.
-                </p>
-
-            </div>
-
-
-            <div class="service-card">
-
-                <i class="fa-solid fa-video"></i>
-
-                <h3>
-                    Live Feed
-                </h3>
-
-                <p>
-                    Reliable live video production
-                    and projection solutions for
-                    large-scale events.
-                </p>
-
-            </div>
-
-
-            <div class="service-card">
-
-                <i class="fa-solid fa-layer-group"></i>
-
-                <h3>
-                    Stage Production
-                </h3>
-
-                <p>
-                    Complete stage production and
-                    technical support for memorable
-                    performances.
-                </p>
-
-            </div>
-
-
-            <div class="service-card">
-
-                <i class="fa-solid fa-music"></i>
-
-                <h3>
-                    Music Studio
-                </h3>
-
-                <p>
-                    Creative spaces and professional
-                    equipment for music and audio
-                    production.
-                </p>
-
-            </div>
-
-
-            <div class="service-card">
-
-                <i class="fa-solid fa-cubes"></i>
-
-                <h3>
-                    Trusses
-                </h3>
-
-                <p>
-                    Safe and professional truss
-                    solutions for lighting, LED walls,
-                    and event equipment.
-                </p>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <section class="why-us">
-
-        <div class="why-image">
-
-            <img
-                src="event5.jpg"
-                alt="ABAA Entertainment Event"
-            >
-
-        </div>
-
-
-        <div class="why-content">
-
-            <span class="section-label">
-                WHY ABAA ENTERTAINMENT
-            </span>
-
-            <h2>
-                Built For Unforgettable Events
-            </h2>
-
-            <p>
-                We combine creativity, technology,
-                and professional event production
-                to create experiences that leave
-                a lasting impression.
-            </p>
-
-
-            <div class="feature">
-
-                <i class="fa-solid fa-check"></i>
-
-                <div>
-
-                    <h4>
-                        Professional Production
-                    </h4>
-
-                    <p>
-                        Reliable equipment and experienced
-                        event professionals.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="feature">
-
-                <i class="fa-solid fa-check"></i>
-
-                <div>
-
-                    <h4>
-                        Creative Solutions
-                    </h4>
-
-                    <p>
-                        Customized entertainment solutions
-                        designed around your event.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="feature">
-
-                <i class="fa-solid fa-check"></i>
-
-                <div>
-
-                    <h4>
-                        Memorable Experiences
-                    </h4>
-
-                    <p>
-                        We focus on creating events that
-                        audiences will remember.
-                    </p>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <section class="about-cta">
-
-        <span class="section-label">
-            LET'S WORK TOGETHER
-        </span>
-
-        <h2>
-            Ready To Create Something Amazing?
-        </h2>
-
-        <p>
-            LET ABAA ENTERTAINMENT HELP BRING YOUR NEXT
-            EVENT, PERFORMANCE, OR PROJECT TO LIFE.
-        </p>
-
-
-        <a
-            href="#"
-            class="cta-button"
-            onclick="openBookingModal(event)"
-        >
-
-            Book An Event
-
-            <i class="fa-solid fa-arrow-right"></i>
-
-        </a>
-
-    </section>
-
-</main>
-
+<!-- ==================================================
+     FOOTER
+================================================== -->
 
 <footer class="footer">
 
@@ -523,7 +162,7 @@ include(__DIR__ . '/conn.php');
         <div class="footer-section footer-brand">
 
             <img
-                src="logo.png"
+                src="/logo.png"
                 alt="ABAA Entertainment Logo"
             >
 
@@ -543,19 +182,19 @@ include(__DIR__ . '/conn.php');
                 Quick Links
             </h3>
 
-            <a href="index.php">
+            <a href="/">
                 Home
             </a>
 
-            <a href="index.php#events">
+            <a href="/#events">
                 Events
             </a>
 
-            <a href="#services">
+            <a href="/#services">
                 Services
             </a>
 
-            <a href="about.php">
+            <a href="/about">
                 About Us
             </a>
 
@@ -568,27 +207,27 @@ include(__DIR__ . '/conn.php');
                 Our Services
             </h3>
 
-            <a href="service.php?service=led-wall">
+            <a href="/service?service=led-wall">
                 LED Wall
             </a>
 
-            <a href="service.php?service=lights-sound">
+            <a href="/service?service=lights-sound">
                 Lights & Sound
             </a>
 
-            <a href="service.php?service=live-feed">
+            <a href="/service?service=live-feed">
                 Live Feed
             </a>
 
-            <a href="service.php?service=stage">
+            <a href="/service?service=stage">
                 Stage Production
             </a>
 
-            <a href="service.php?service=music-studio">
+            <a href="/service?service=music-studio">
                 Music Studio
             </a>
 
-            <a href="service.php?service=trusses">
+            <a href="/service?service=trusses">
                 Trusses
             </a>
 
@@ -612,8 +251,8 @@ include(__DIR__ . '/conn.php');
                 <i class="fa-solid fa-location-dot"></i>
 
                 <span>
-                    2F, Casa Ynares, P. Gomez, Libis,
-                    Binangonan, Rizal
+                    2F, Casa Ynares, P. Gomez,
+                    Libis, Binangonan, Rizal
                 </span>
 
             </a>
@@ -749,23 +388,22 @@ include(__DIR__ . '/conn.php');
 
 
         <form
-            action="booking.php"
+            action="/booking"
             method="POST"
             class="booking-form"
         >
-
 
             <div class="form-row">
 
                 <div class="form-group">
 
-                    <label for="about_booking_name">
+                    <label for="booking_name">
                         Full Name
                     </label>
 
                     <input
                         type="text"
-                        id="about_booking_name"
+                        id="booking_name"
                         name="name"
                         placeholder="Enter your full name"
                         required
@@ -776,13 +414,13 @@ include(__DIR__ . '/conn.php');
 
                 <div class="form-group">
 
-                    <label for="about_booking_phone">
+                    <label for="booking_phone">
                         Contact Number
                     </label>
 
                     <input
                         type="tel"
-                        id="about_booking_phone"
+                        id="booking_phone"
                         name="phone"
                         placeholder="09XX XXX XXXX"
                         required
@@ -797,13 +435,13 @@ include(__DIR__ . '/conn.php');
 
                 <div class="form-group">
 
-                    <label for="about_booking_email">
+                    <label for="booking_email">
                         Email Address
                     </label>
 
                     <input
                         type="email"
-                        id="about_booking_email"
+                        id="booking_email"
                         name="email"
                         placeholder="your@email.com"
                         required
@@ -814,13 +452,13 @@ include(__DIR__ . '/conn.php');
 
                 <div class="form-group">
 
-                    <label for="about_booking_contact">
+                    <label for="booking_contact_person">
                         Contact Person
                     </label>
 
                     <input
                         type="text"
-                        id="about_booking_contact"
+                        id="booking_contact_person"
                         name="contact_person"
                         placeholder="Contact person's name"
                         required
@@ -835,12 +473,12 @@ include(__DIR__ . '/conn.php');
 
                 <div class="form-group">
 
-                    <label for="about_booking_event">
+                    <label for="booking_event">
                         Event Type
                     </label>
 
                     <select
-                        id="about_booking_event"
+                        id="booking_event"
                         name="event_type"
                         required
                     >
@@ -888,13 +526,13 @@ include(__DIR__ . '/conn.php');
 
                 <div class="form-group">
 
-                    <label for="about_booking_date">
+                    <label for="booking_date">
                         Event Date
                     </label>
 
                     <input
                         type="date"
-                        id="about_booking_date"
+                        id="booking_date"
                         name="event_date"
                         required
                     >
@@ -906,13 +544,13 @@ include(__DIR__ . '/conn.php');
 
             <div class="form-group">
 
-                <label for="about_booking_company">
+                <label for="booking_company">
                     Company Name
                 </label>
 
                 <input
                     type="text"
-                    id="about_booking_company"
+                    id="booking_company"
                     name="cname"
                     placeholder="Enter company name"
                     required
@@ -923,12 +561,12 @@ include(__DIR__ . '/conn.php');
 
             <div class="form-group">
 
-                <label for="about_booking_service">
+                <label for="booking_service">
                     Service Needed
                 </label>
 
                 <select
-                    id="about_booking_service"
+                    id="booking_service"
                     name="service"
                     required
                 >
@@ -976,12 +614,12 @@ include(__DIR__ . '/conn.php');
 
             <div class="form-group">
 
-                <label for="about_booking_message">
+                <label for="booking_message">
                     Event Details
                 </label>
 
                 <textarea
-                    id="about_booking_message"
+                    id="booking_message"
                     name="message"
                     rows="4"
                     placeholder="Tell us about your event, location, preferred setup, budget, or other requirements..."
