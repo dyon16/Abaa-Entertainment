@@ -1210,7 +1210,7 @@ document.addEventListener(
 
 
 <?php
-$conn->close();
+
 ?>
 
 </body>
