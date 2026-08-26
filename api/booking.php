@@ -9,7 +9,7 @@ include(__DIR__ . '/conn.php');
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
 
-    header("Location: index.php");
+    header("Location: /api/index.php");
     exit;
 
 }
@@ -367,7 +367,7 @@ try {
         </p>
 
         <a
-            href="index.php"
+            href="/api/index.php"
             class="back-button"
         >
             Back To Home
