@@ -621,7 +621,7 @@ include(__DIR__ . '/conn.php');
                 Our Services
             </h3>
 
-            <a href="service.php?service=led-wal">
+            <a href="service.php?service=led-wall">
                 LED Wall
             </a>
 
