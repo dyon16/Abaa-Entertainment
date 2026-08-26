@@ -1,5 +1,5 @@
 <?php
-include(_DIR_ . '/conn.php');
+include(__DIR__ . '/conn.php');
 ?>
 
 <!DOCTYPE html>
