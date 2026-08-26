@@ -1,5 +1,5 @@
 <?php
-include "conn.php";
+include(__DIR__ . '/conn.php');
 
 $services = [
 
