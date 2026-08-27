@@ -5,6 +5,7 @@ include(__DIR__ . '/conn.php');
 ?>
 
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
@@ -20,10 +21,6 @@ include(__DIR__ . '/conn.php');
         About Us | ABAA Entertainment
     </title>
 
-    <!-- IMPORTANT:
-         about.php is inside /api/
-         but about.css is in the root
-    -->
     <link
         rel="stylesheet"
         href="/about.css"
@@ -39,10 +36,6 @@ include(__DIR__ . '/conn.php');
 
 <body>
 
-
-<!-- ==================================================
-     HEADER
-================================================== -->
 
 <header class="header">
 
@@ -119,21 +112,12 @@ include(__DIR__ . '/conn.php');
 
     </div>
 
-
 </section>
 
 
 
-<!-- ==================================================
-     MAIN ABOUT PAGE
-================================================== -->
-
 <main class="about-page">
 
-
-    <!-- ==================================================
-         ABOUT COMPANY
-    ================================================== -->
 
     <section class="about-company">
 
@@ -184,10 +168,6 @@ include(__DIR__ . '/conn.php');
     </section>
 
 
-
-    <!-- ==================================================
-         MISSION & VISION
-    ================================================== -->
 
     <section class="mission-section">
 
@@ -251,10 +231,6 @@ include(__DIR__ . '/conn.php');
     </section>
 
 
-
-    <!-- ==================================================
-         WHAT WE DO
-    ================================================== -->
 
     <section
         class="what-we-do"
@@ -390,10 +366,6 @@ include(__DIR__ . '/conn.php');
 
 
 
-    <!-- ==================================================
-         WHY CHOOSE US
-    ================================================== -->
-
     <section class="why-us">
 
         <div class="why-image">
@@ -489,10 +461,6 @@ include(__DIR__ . '/conn.php');
 
 
 
-    <!-- ==================================================
-         CALL TO ACTION
-    ================================================== -->
-
     <section class="about-cta">
 
         <span class="section-label">
@@ -504,8 +472,8 @@ include(__DIR__ . '/conn.php');
         </h2>
 
         <p>
-            Let ABAA Entertainment help bring your next
-            event, performance, or project to life.
+            LET ABAA ENTERTAINMENT HELP BRING YOUR NEXT
+            EVENT, PERFORMANCE, OR PROJECT TO LIFE.
         </p>
 
 
@@ -536,8 +504,6 @@ include(__DIR__ . '/conn.php');
     <div class="footer-container">
 
 
-        <!-- COMPANY -->
-
         <div class="footer-section footer-brand">
 
             <img
@@ -554,9 +520,6 @@ include(__DIR__ . '/conn.php');
 
         </div>
 
-
-
-        <!-- QUICK LINKS -->
 
         <div class="footer-section">
 
@@ -583,9 +546,6 @@ include(__DIR__ . '/conn.php');
         </div>
 
 
-
-        <!-- SERVICES -->
-
         <div class="footer-section">
 
             <h3>
@@ -605,7 +565,7 @@ include(__DIR__ . '/conn.php');
             </a>
 
             <a href="/service?service=stage">
-                Stage
+                Stage Production
             </a>
 
             <a href="/service?service=music-studio">
@@ -618,9 +578,6 @@ include(__DIR__ . '/conn.php');
 
         </div>
 
-
-
-        <!-- CONTACT -->
 
         <div class="footer-section">
 
@@ -699,7 +656,7 @@ include(__DIR__ . '/conn.php');
 
 
                 <a
-                    href="https://www.tiktok.com/@markebpmbta?_r=1&_t=ZS-99DpdJXY5sDh"
+                    href="https://www.tiktok.com/@markebpmbta?_r=1&_t=ZS-99DpdJXY5sD"
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="TikTok"
@@ -715,9 +672,6 @@ include(__DIR__ . '/conn.php');
 
     </div>
 
-
-
-    <!-- FOOTER BOTTOM -->
 
     <div class="footer-bottom">
 
@@ -737,7 +691,7 @@ include(__DIR__ . '/conn.php');
 
 
 <!-- ==================================================
-     BOOKING POPUP
+     BOOKING MODAL
 ================================================== -->
 
 <div
@@ -779,11 +733,13 @@ include(__DIR__ . '/conn.php');
         </div>
 
 
+
         <form
             action="/booking"
             method="POST"
             class="booking-form"
         >
+
 
             <div class="form-row">
 
@@ -823,6 +779,7 @@ include(__DIR__ . '/conn.php');
             </div>
 
 
+
             <div class="form-row">
 
                 <div class="form-group">
@@ -859,6 +816,7 @@ include(__DIR__ . '/conn.php');
                 </div>
 
             </div>
+
 
 
             <div class="form-row">
@@ -923,15 +881,20 @@ include(__DIR__ . '/conn.php');
                     </label>
 
                     <input
-                        type="date"
+                        type="text"
                         id="booking_date"
                         name="event_date"
+                        placeholder="MM/DD/YYYY"
+                        maxlength="10"
+                        inputmode="numeric"
+                        pattern="(0[1-9]|1[0-2])\/(0[1-9]|[12][0-9]|3[01])\/[0-9]{4}"
                         required
                     >
 
                 </div>
 
             </div>
+
 
 
             <div class="form-group">
@@ -951,57 +914,130 @@ include(__DIR__ . '/conn.php');
             </div>
 
 
+
+            <!-- ==================================================
+                 MULTIPLE SERVICES
+            ================================================== -->
+
             <div class="form-group">
 
-                <label for="booking_service">
-                    Service Needed
+                <label>
+                    Services Needed
                 </label>
 
-                <select
-                    id="booking_service"
-                    name="service"
-                    required
-                >
 
-                    <option
-                        value=""
-                        disabled
-                        selected
-                    >
-                        Select a service
-                    </option>
+                <div class="service-checkboxes">
 
-                    <option value="LED Wall">
-                        LED Wall
-                    </option>
 
-                    <option value="Lights & Sound">
-                        Lights & Sound
-                    </option>
+                    <label class="service-checkbox">
 
-                    <option value="Live Feed">
-                        Live Feed
-                    </option>
+                        <input
+                            type="checkbox"
+                            name="service[]"
+                            value="LED Wall"
+                        >
 
-                    <option value="Stage Production">
-                        Stage Production
-                    </option>
+                        <span>
+                            LED Wall
+                        </span>
 
-                    <option value="Music Studio">
-                        Music Studio
-                    </option>
+                    </label>
 
-                    <option value="Trusses">
-                        Trusses
-                    </option>
 
-                    <option value="Full Event Production">
-                        Full Event Production
-                    </option>
+                    <label class="service-checkbox">
 
-                </select>
+                        <input
+                            type="checkbox"
+                            name="service[]"
+                            value="Lights & Sound"
+                        >
+
+                        <span>
+                            Lights & Sound
+                        </span>
+
+                    </label>
+
+
+                    <label class="service-checkbox">
+
+                        <input
+                            type="checkbox"
+                            name="service[]"
+                            value="Live Feed"
+                        >
+
+                        <span>
+                            Live Feed
+                        </span>
+
+                    </label>
+
+
+                    <label class="service-checkbox">
+
+                        <input
+                            type="checkbox"
+                            name="service[]"
+                            value="Stage Production"
+                        >
+
+                        <span>
+                            Stage Production
+                        </span>
+
+                    </label>
+
+
+                    <label class="service-checkbox">
+
+                        <input
+                            type="checkbox"
+                            name="service[]"
+                            value="Music Studio"
+                        >
+
+                        <span>
+                            Music Studio
+                        </span>
+
+                    </label>
+
+
+                    <label class="service-checkbox">
+
+                        <input
+                            type="checkbox"
+                            name="service[]"
+                            value="Trusses"
+                        >
+
+                        <span>
+                            Trusses
+                        </span>
+
+                    </label>
+
+
+                    <label class="service-checkbox">
+
+                        <input
+                            type="checkbox"
+                            name="service[]"
+                            value="Full Event Production"
+                        >
+
+                        <span>
+                            Full Event Production
+                        </span>
+
+                    </label>
+
+
+                </div>
 
             </div>
+
 
 
             <div class="form-group">
@@ -1018,6 +1054,7 @@ include(__DIR__ . '/conn.php');
                 ></textarea>
 
             </div>
+
 
 
             <button
@@ -1041,64 +1078,165 @@ include(__DIR__ . '/conn.php');
 
 
 
-<!-- ==================================================
-     JAVASCRIPT
-================================================== -->
-
 <script>
+
+
+/*
+|--------------------------------------------------------------------------
+| DATE FORMATTER
+|--------------------------------------------------------------------------
+*/
+
+const bookingDate =
+    document.getElementById("booking_date");
+
+
+if (bookingDate) {
+
+    bookingDate.addEventListener(
+        "input",
+        function(event) {
+
+            let value =
+                event.target.value.replace(
+                    /\D/g,
+                    ""
+                );
+
+
+            if (value.length > 8) {
+
+                value =
+                    value.substring(0, 8);
+
+            }
+
+
+            if (value.length > 4) {
+
+                value =
+                    value.substring(0, 2)
+                    + "/"
+                    + value.substring(2, 4)
+                    + "/"
+                    + value.substring(4);
+
+            }
+            else if (value.length > 2) {
+
+                value =
+                    value.substring(0, 2)
+                    + "/"
+                    + value.substring(2);
+
+            }
+
+
+            event.target.value = value;
+
+        }
+    );
+
+}
+
+
+
+/*
+|--------------------------------------------------------------------------
+| OPEN BOOKING MODAL
+|--------------------------------------------------------------------------
+*/
 
 function openBookingModal(event) {
 
     if (event) {
+
         event.preventDefault();
+
     }
+
 
     const modal =
-        document.getElementById("bookingModal");
+        document.getElementById(
+            "bookingModal"
+        );
+
 
     if (!modal) {
+
         return;
+
     }
 
+
     modal.classList.add("active");
+
 
     modal.setAttribute(
         "aria-hidden",
         "false"
     );
 
+
     document.body.style.overflow =
         "hidden";
+
 }
 
+
+
+/*
+|--------------------------------------------------------------------------
+| CLOSE BOOKING MODAL
+|--------------------------------------------------------------------------
+*/
 
 function closeBookingModal() {
 
     const modal =
-        document.getElementById("bookingModal");
+        document.getElementById(
+            "bookingModal"
+        );
+
 
     if (!modal) {
+
         return;
+
     }
 
+
     modal.classList.remove("active");
+
 
     modal.setAttribute(
         "aria-hidden",
         "true"
     );
 
+
     document.body.style.overflow =
         "";
+
 }
 
+
+
+/*
+|--------------------------------------------------------------------------
+| CLICK OUTSIDE
+|--------------------------------------------------------------------------
+*/
 
 document.addEventListener(
     "click",
     function(event) {
 
         const modal =
-            document.getElementById("bookingModal");
+            document.getElementById(
+                "bookingModal"
+            );
+
 
         if (
             modal &&
@@ -1112,6 +1250,13 @@ document.addEventListener(
     }
 );
 
+
+
+/*
+|--------------------------------------------------------------------------
+| ESC KEY
+|--------------------------------------------------------------------------
+*/
 
 document.addEventListener(
     "keydown",
@@ -1133,7 +1278,9 @@ document.addEventListener(
 <?php
 
 if (isset($conn)) {
+
     $conn->close();
+
 }
 
 ?>
