@@ -999,22 +999,19 @@ include(__DIR__ . '/conn.php');
 
                 <div class="form-group">
 
-                    <label for="booking_date">
-                        Event Date
-                    </label>
+    <label for="booking_date">
+        Event Date
+    </label>
 
-                    <input
-                        type="text"
-                        id="booking_date"
-                        name="event_date"
-                        placeholder="MM/DD/YYYY"
-                        maxlength="10"
-                        inputmode="numeric"
-                        pattern="(0[1-9]|1[0-2])\/(0[1-9]|[12][0-9]|3[01])\/[0-9]{4}"
-                        required
-                    >
+    <input
+        type="date"
+        id="booking_date"
+        name="event_date"
+        required
+    >
 
-                </div>
+</div>
+
 
             </div>
 
@@ -1286,63 +1283,6 @@ function showEvent(
 
 
 
-/*
-|--------------------------------------------------------------------------
-| DATE FORMATTER
-|--------------------------------------------------------------------------
-*/
-
-const bookingDate =
-    document.getElementById("booking_date");
-
-
-if (bookingDate) {
-
-    bookingDate.addEventListener(
-        "input",
-        function(event) {
-
-            let value =
-                event.target.value.replace(
-                    /\D/g,
-                    ""
-                );
-
-
-            if (value.length > 8) {
-
-                value =
-                    value.substring(0, 8);
-
-            }
-
-
-            if (value.length > 4) {
-
-                value =
-                    value.substring(0, 2)
-                    + "/"
-                    + value.substring(2, 4)
-                    + "/"
-                    + value.substring(4);
-
-            }
-            else if (value.length > 2) {
-
-                value =
-                    value.substring(0, 2)
-                    + "/"
-                    + value.substring(2);
-
-            }
-
-
-            event.target.value = value;
-
-        }
-    );
-
-}
 
 
 
