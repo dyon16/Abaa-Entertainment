@@ -137,15 +137,11 @@ $service = $services[$serviceKey];
     </title>
 
 
-    <!-- MAIN CSS -->
-
     <link
         rel="stylesheet"
         href="/style.css"
     >
 
-
-    <!-- FONT AWESOME -->
 
     <link
         rel="stylesheet"
@@ -205,12 +201,6 @@ $service = $services[$serviceKey];
         }
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | SERVICE IMAGE
-        |--------------------------------------------------------------------------
-        */
-
         .service-image {
 
             width: 100%;
@@ -236,7 +226,6 @@ $service = $services[$serviceKey];
         .service-image img {
 
             width: 100%;
-
             height: 100%;
 
             display: block;
@@ -268,12 +257,6 @@ $service = $services[$serviceKey];
 
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | SERVICE CONTENT
-        |--------------------------------------------------------------------------
-        */
 
         .service-content {
 
@@ -373,12 +356,6 @@ $service = $services[$serviceKey];
         }
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | SERVICE LIST
-        |--------------------------------------------------------------------------
-        */
-
         .service-list {
 
             list-style:
@@ -435,12 +412,6 @@ $service = $services[$serviceKey];
 
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | BUTTONS
-        |--------------------------------------------------------------------------
-        */
 
         .service-buttons {
 
@@ -567,12 +538,6 @@ $service = $services[$serviceKey];
 
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | OTHER SERVICES
-        |--------------------------------------------------------------------------
-        */
 
         .other-services {
 
@@ -980,12 +945,7 @@ $service = $services[$serviceKey];
 <body>
 
 
-<!-- ==================================================
-     HEADER
-================================================== -->
-
 <header class="header">
-
 
     <a
         href="/"
@@ -1006,21 +966,17 @@ $service = $services[$serviceKey];
             Home
         </a>
 
-
         <a href="/#events">
             Events
         </a>
-
 
         <a href="/#services">
             Services
         </a>
 
-
         <a href="/about">
             About
         </a>
-
 
         <a
             href="#"
@@ -1036,19 +992,11 @@ $service = $services[$serviceKey];
 
 
 
-<!-- ==================================================
-     SERVICE PAGE
-================================================== -->
-
 <main class="service-page">
 
 
     <section class="service-hero">
 
-
-        <!-- ==================================================
-             IMAGE
-        ================================================== -->
 
         <div class="service-image">
 
@@ -1060,13 +1008,7 @@ $service = $services[$serviceKey];
         </div>
 
 
-
-        <!-- ==================================================
-             CONTENT
-        ================================================== -->
-
         <div class="service-content">
-
 
             <span class="service-label">
                 ABAA Entertainment Service
@@ -1106,7 +1048,6 @@ $service = $services[$serviceKey];
 
             <div class="service-buttons">
 
-
                 <a
                     href="#"
                     class="service-book-button"
@@ -1139,12 +1080,7 @@ $service = $services[$serviceKey];
 
 
 
-    <!-- ==================================================
-         OTHER SERVICES
-    ================================================== -->
-
     <section class="other-services">
-
 
         <h2>
             Other Services
@@ -1152,7 +1088,6 @@ $service = $services[$serviceKey];
 
 
         <div class="other-services-grid">
-
 
             <?php foreach ($services as $key => $item): ?>
 
@@ -1169,9 +1104,7 @@ $service = $services[$serviceKey];
                         >
 
                         <span>
-
                             <?= htmlspecialchars($item["title"]) ?>
-
                         </span>
 
                     </a>
@@ -1188,64 +1121,45 @@ $service = $services[$serviceKey];
 
 
 
-<!-- ==================================================
-     FOOTER
-================================================== -->
-
 <footer class="footer">
-
 
     <div class="footer-container">
 
 
-        <!-- BRAND -->
-
         <div class="footer-section footer-brand">
-
 
             <img
                 src="/logo.png"
                 alt="ABAA Entertainment Logo"
             >
 
-
             <p>
-
                 Creating unforgettable events,
                 entertainment, and experiences
                 through creativity, technology,
                 and professional event services.
-
             </p>
 
         </div>
 
 
-
-        <!-- QUICK LINKS -->
-
         <div class="footer-section">
-
 
             <h3>
                 Quick Links
             </h3>
 
-
             <a href="/">
                 Home
             </a>
-
 
             <a href="/#events">
                 Events
             </a>
 
-
             <a href="/#services">
                 Services
             </a>
-
 
             <a href="/about">
                 About Us
@@ -1254,16 +1168,11 @@ $service = $services[$serviceKey];
         </div>
 
 
-
-        <!-- SERVICES -->
-
         <div class="footer-section">
-
 
             <h3>
                 Our Services
             </h3>
-
 
             <?php foreach ($services as $key => $item): ?>
 
@@ -1277,15 +1186,10 @@ $service = $services[$serviceKey];
 
             <?php endforeach; ?>
 
-
         </div>
 
 
-
-        <!-- CONTACT -->
-
         <div class="footer-section">
-
 
             <h3>
                 Contact Us
@@ -1302,10 +1206,8 @@ $service = $services[$serviceKey];
                 <i class="fa-solid fa-location-dot"></i>
 
                 <span>
-
                     2F, Casa Ynares, P. Gomez,
                     Libis, Binangonan, Rizal
-
                 </span>
 
             </a>
@@ -1339,11 +1241,7 @@ $service = $services[$serviceKey];
             </a>
 
 
-
-            <!-- SOCIAL -->
-
             <div class="social-links">
-
 
                 <a
                     href="https://www.facebook.com/ABAAEntertainment"
@@ -1352,9 +1250,7 @@ $service = $services[$serviceKey];
                     aria-label="Facebook"
                 >
 
-                    <i
-                        class="fa-brands fa-facebook-f"
-                    ></i>
+                    <i class="fa-brands fa-facebook-f"></i>
 
                 </a>
 
@@ -1364,9 +1260,7 @@ $service = $services[$serviceKey];
                     aria-label="Instagram"
                 >
 
-                    <i
-                        class="fa-brands fa-instagram"
-                    ></i>
+                    <i class="fa-brands fa-instagram"></i>
 
                 </a>
 
@@ -1378,12 +1272,9 @@ $service = $services[$serviceKey];
                     aria-label="TikTok"
                 >
 
-                    <i
-                        class="fa-brands fa-tiktok"
-                    ></i>
+                    <i class="fa-brands fa-tiktok"></i>
 
                 </a>
-
 
             </div>
 
@@ -1392,26 +1283,16 @@ $service = $services[$serviceKey];
     </div>
 
 
-
-    <!-- FOOTER BOTTOM -->
-
     <div class="footer-bottom">
 
-
         <p>
-
             © 2026 ABAA Entertainment.
             All Rights Reserved.
-
         </p>
-
 
         <p>
-
             Entertainment • Events • Experiences
-
         </p>
-
 
     </div>
 
@@ -1428,7 +1309,6 @@ $service = $services[$serviceKey];
     id="bookingModal"
     aria-hidden="true"
 >
-
 
     <div class="booking-modal">
 
@@ -1447,31 +1327,22 @@ $service = $services[$serviceKey];
 
         <div class="booking-header">
 
-
             <span class="booking-label">
                 ABAA ENTERTAINMENT
             </span>
-
 
             <h2>
                 Book An Event
             </h2>
 
-
             <p>
-
                 Tell us about your event and our team
                 will get back to you.
-
             </p>
 
         </div>
 
 
-
-        <!-- ==================================================
-             BOOKING FORM
-        ================================================== -->
 
         <form
             action="/booking"
@@ -1485,11 +1356,9 @@ $service = $services[$serviceKey];
 
                 <div class="form-group">
 
-
                     <label for="booking_name">
                         Full Name
                     </label>
-
 
                     <input
                         type="text"
@@ -1502,14 +1371,11 @@ $service = $services[$serviceKey];
                 </div>
 
 
-
                 <div class="form-group">
-
 
                     <label for="booking_phone">
                         Phone Number
                     </label>
-
 
                     <input
                         type="tel"
@@ -1530,11 +1396,9 @@ $service = $services[$serviceKey];
 
                 <div class="form-group">
 
-
                     <label for="booking_email">
                         Email Address
                     </label>
-
 
                     <input
                         type="email"
@@ -1547,14 +1411,11 @@ $service = $services[$serviceKey];
                 </div>
 
 
-
                 <div class="form-group">
-
 
                     <label for="booking_contact_person">
                         Contact Person
                     </label>
-
 
                     <input
                         type="text"
@@ -1575,18 +1436,15 @@ $service = $services[$serviceKey];
 
                 <div class="form-group">
 
-
                     <label for="booking_event">
                         Event Type
                     </label>
-
 
                     <select
                         id="booking_event"
                         name="event_type"
                         required
                     >
-
 
                         <option
                             value=""
@@ -1596,41 +1454,33 @@ $service = $services[$serviceKey];
                             Select event type
                         </option>
 
-
                         <option value="Birthday">
                             Birthday
                         </option>
-
 
                         <option value="Wedding">
                             Wedding
                         </option>
 
-
                         <option value="Concert">
                             Concert
                         </option>
-
 
                         <option value="Corporate Event">
                             Corporate Event
                         </option>
 
-
                         <option value="Festival">
                             Festival
                         </option>
-
 
                         <option value="Product Launch">
                             Product Launch
                         </option>
 
-
                         <option value="Other">
                             Other
                         </option>
-
 
                     </select>
 
@@ -1638,18 +1488,24 @@ $service = $services[$serviceKey];
 
 
 
-                <div class="form-group">
+                <!-- ==================================================
+                     DATE - MM/DD/YYYY
+                ================================================== -->
 
+                <div class="form-group">
 
                     <label for="booking_date">
                         Event Date
                     </label>
 
-
                     <input
-                        type="date"
+                        type="text"
                         id="booking_date"
                         name="event_date"
+                        placeholder="MM/DD/YYYY"
+                        maxlength="10"
+                        inputmode="numeric"
+                        pattern="(0[1-9]|1[0-2])\/(0[1-9]|[12][0-9]|3[01])\/[0-9]{4}"
                         required
                     >
 
@@ -1661,11 +1517,9 @@ $service = $services[$serviceKey];
 
             <div class="form-group">
 
-
                 <label for="booking_company">
                     Company Name
                 </label>
-
 
                 <input
                     type="text"
@@ -1679,50 +1533,56 @@ $service = $services[$serviceKey];
 
 
 
+            <!-- ==================================================
+                 MULTIPLE SERVICES
+            ================================================== -->
+
             <div class="form-group">
 
-
-                <label for="booking_service">
-                    Service Needed
+                <label>
+                    Services Needed
                 </label>
 
 
-                <select
-                    id="booking_service"
-                    name="service"
-                    required
-                >
-
-
-                    <option
-                        value=""
-                        disabled
-                        <?= $serviceKey === "" ? "selected" : "" ?>
-                    >
-                        Select a service
-                    </option>
+                <div class="service-checkboxes">
 
 
                     <?php foreach ($services as $key => $item): ?>
 
-                        <option
-                            value="<?= htmlspecialchars($item["title"]) ?>"
-                            <?= $key === $serviceKey ? "selected" : "" ?>
-                        >
+                        <label class="service-checkbox">
 
-                            <?= htmlspecialchars($item["title"]) ?>
+                            <input
+                                type="checkbox"
+                                name="service[]"
+                                value="<?= htmlspecialchars($item["title"]) ?>"
+                                <?= $key === $serviceKey ? "checked" : "" ?>
+                            >
 
-                        </option>
+                            <span>
+                                <?= htmlspecialchars($item["title"]) ?>
+                            </span>
+
+                        </label>
 
                     <?php endforeach; ?>
 
 
-                    <option value="Full Event Production">
-                        Full Event Production
-                    </option>
+                    <label class="service-checkbox">
+
+                        <input
+                            type="checkbox"
+                            name="service[]"
+                            value="Full Event Production"
+                        >
+
+                        <span>
+                            Full Event Production
+                        </span>
+
+                    </label>
 
 
-                </select>
+                </div>
 
             </div>
 
@@ -1730,11 +1590,9 @@ $service = $services[$serviceKey];
 
             <div class="form-group">
 
-
                 <label for="booking_message">
                     Event Details
                 </label>
-
 
                 <textarea
                     id="booking_message"
@@ -1756,10 +1614,7 @@ $service = $services[$serviceKey];
                     Submit Booking Request
                 </span>
 
-
-                <i
-                    class="fa-solid fa-arrow-right"
-                ></i>
+                <i class="fa-solid fa-arrow-right"></i>
 
             </button>
 
@@ -1772,11 +1627,67 @@ $service = $services[$serviceKey];
 
 
 
-<!-- ==================================================
-     JAVASCRIPT
-================================================== -->
-
 <script>
+
+
+/*
+|--------------------------------------------------------------------------
+| DATE FORMATTER
+|--------------------------------------------------------------------------
+*/
+
+const bookingDate =
+    document.getElementById("booking_date");
+
+
+if (bookingDate) {
+
+    bookingDate.addEventListener(
+        "input",
+        function(event) {
+
+            let value =
+                event.target.value.replace(
+                    /\D/g,
+                    ""
+                );
+
+
+            if (value.length > 8) {
+
+                value =
+                    value.substring(0, 8);
+
+            }
+
+
+            if (value.length > 4) {
+
+                value =
+                    value.substring(0, 2)
+                    + "/"
+                    + value.substring(2, 4)
+                    + "/"
+                    + value.substring(4);
+
+            }
+            else if (value.length > 2) {
+
+                value =
+                    value.substring(0, 2)
+                    + "/"
+                    + value.substring(2);
+
+            }
+
+
+            event.target.value = value;
+
+        }
+    );
+
+}
+
 
 
 /*
@@ -1915,11 +1826,6 @@ document.addEventListener(
 </script>
 
 
-
-<?php
-
-
-?>
 
 </body>
 
