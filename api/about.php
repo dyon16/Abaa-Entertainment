@@ -504,8 +504,8 @@ include(__DIR__ . '/conn.php');
         </h2>
 
         <p>
-            LET ABAA ENTERTAINMENT HELP BRING YOUR NEXT
-            EVENT, PERFORMANCE, OR PROJECT TO LIFE.
+            Let ABAA Entertainment help bring your next
+            event, performance, or project to life.
         </p>
 
 
