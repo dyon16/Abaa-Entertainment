@@ -9,7 +9,7 @@ include(__DIR__ . '/conn.php');
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
 
-    header("Location: /api/index.php");
+    header("Location: /");
     exit;
 
 }
@@ -20,14 +20,108 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
 ================================================== */
 
 $name = trim($_POST["name"] ?? "");
+
 $phone = trim($_POST["phone"] ?? "");
+
 $email = trim($_POST["email"] ?? "");
+
 $event_type = trim($_POST["event_type"] ?? "");
+
 $event_date = trim($_POST["event_date"] ?? "");
+
 $cname = trim($_POST["cname"] ?? "");
-$contact_person = trim($_POST["contact_person"] ?? "");
-$service = trim($_POST["service"] ?? "");
+
+$contact_person = trim(
+    $_POST["contact_person"] ?? ""
+);
+
 $message = trim($_POST["message"] ?? "");
+
+
+/*
+|--------------------------------------------------------------------------
+| GET MULTIPLE SERVICES
+|--------------------------------------------------------------------------
+*/
+
+$selectedServices =
+    $_POST["service"] ?? [];
+
+
+/*
+|--------------------------------------------------------------------------
+| MAKE SURE SERVICES ARE AN ARRAY
+|--------------------------------------------------------------------------
+*/
+
+if (!is_array($selectedServices)) {
+
+    $selectedServices = [
+        $selectedServices
+    ];
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| CLEAN SERVICES
+|--------------------------------------------------------------------------
+*/
+
+$selectedServices =
+    array_map(
+        "trim",
+        $selectedServices
+    );
+
+
+$selectedServices =
+    array_filter(
+        $selectedServices,
+        function ($service) {
+
+            return $service !== "";
+
+        }
+    );
+
+
+/*
+|--------------------------------------------------------------------------
+| REMOVE DUPLICATES
+|--------------------------------------------------------------------------
+*/
+
+$selectedServices =
+    array_unique(
+        $selectedServices
+    );
+
+
+/*
+|--------------------------------------------------------------------------
+| CONVERT SERVICES TO STRING
+|--------------------------------------------------------------------------
+|
+| Example:
+|
+| LED Wall
+| Lights & Sound
+| Live Feed
+|
+| becomes:
+|
+| LED Wall, Lights & Sound, Live Feed
+|
+|--------------------------------------------------------------------------
+*/
+
+$service =
+    implode(
+        ", ",
+        $selectedServices
+    );
 
 
 /* ==================================================
@@ -45,7 +139,9 @@ if (
     $service === ""
 ) {
 
-    die("Please complete all required fields.");
+    die(
+        "Please complete all required fields."
+    );
 
 }
 
@@ -54,76 +150,157 @@ if (
    VALIDATE EMAIL
 ================================================== */
 
-if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+if (
+    !filter_var(
+        $email,
+        FILTER_VALIDATE_EMAIL
+    )
+) {
 
-    die("Please enter a valid email address.");
+    die(
+        "Please enter a valid email address."
+    );
 
 }
 
 
 /* ==================================================
-   VALIDATE EVENT DATE
+   VALIDATE DATE
 ================================================== */
 
-$dateObject = DateTime::createFromFormat(
-    "Y-m-d",
-    $event_date
-);
+$dateObject =
+    DateTime::createFromFormat(
+        "m/d/Y",
+        $event_date
+    );
+
+
+$dateErrors =
+    DateTime::getLastErrors();
+
+
+/*
+|--------------------------------------------------------------------------
+| VALIDATE DATE ERRORS
+|--------------------------------------------------------------------------
+*/
 
 if (
     !$dateObject ||
-    $dateObject->format("Y-m-d") !== $event_date
+    (
+        $dateErrors !== false &&
+        (
+            $dateErrors["warning_count"] > 0 ||
+            $dateErrors["error_count"] > 0
+        )
+    )
 ) {
 
-    die("Please enter a valid event date.");
+    die(
+        "Please enter a valid event date in MM/DD/YYYY format."
+    );
 
 }
+
+
+/*
+|--------------------------------------------------------------------------
+| MAKE SURE THE DATE MATCHES EXACTLY
+|--------------------------------------------------------------------------
+*/
+
+if (
+    $dateObject->format("m/d/Y")
+    !== $event_date
+) {
+
+    die(
+        "Please enter a valid event date in MM/DD/YYYY format."
+    );
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| CONVERT DATE FOR MYSQL
+|--------------------------------------------------------------------------
+|
+| Customer enters:
+|
+| 08/27/2026
+|
+| Database receives:
+|
+| 2026-08-27
+|
+|--------------------------------------------------------------------------
+*/
+
+$event_date =
+    $dateObject->format("Y-m-d");
 
 
 /* ==================================================
    INSERT BOOKING
 ================================================== */
 
-$sql = "INSERT INTO bookings
-        (
-            name,
-            phone,
-            email,
-            event_type,
-            event_date,
-            cname,
-            contact_person,
-            service,
-            message
-        )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+$sql = "
+    INSERT INTO bookings
+    (
+        name,
+        phone,
+        email,
+        event_type,
+        event_date,
+        cname,
+        contact_person,
+        service,
+        message
+    )
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+";
 
 
 try {
 
-    $stmt = $pdo->prepare($sql);
+    $stmt =
+        $pdo->prepare($sql);
+
 
     $stmt->execute([
+
         $name,
+
         $phone,
+
         $email,
+
         $event_type,
+
         $event_date,
+
         $cname,
+
         $contact_person,
+
         $service,
+
         $message
+
     ]);
 
 } catch (PDOException $e) {
 
     error_log(
-        "Booking insert failed: " . $e->getMessage()
+        "Booking insert failed: "
+        . $e->getMessage()
     );
 
+
     die(
-        "Something went wrong while submitting your booking. " .
-        "Please try again later."
+        "Something went wrong while submitting your booking. "
+        . "Please try again later."
     );
 
 }
@@ -147,13 +324,19 @@ try {
         Booking Submitted | ABAA Entertainment
     </title>
 
+
     <style>
 
         * {
+
             margin: 0;
+
             padding: 0;
+
             box-sizing: border-box;
+
         }
+
 
         body {
 
@@ -162,6 +345,7 @@ try {
             display: flex;
 
             align-items: center;
+
             justify-content: center;
 
             padding: 20px;
@@ -178,9 +362,10 @@ try {
                     rgba(0, 0, 0, 0.92),
                     rgba(0, 0, 0, 0.92)
                 ),
-                url("background.jpg");
+                url("/background.jpg");
 
             background-size: cover;
+
             background-position: center;
 
         }
@@ -189,6 +374,7 @@ try {
         .success-box {
 
             width: 100%;
+
             max-width: 550px;
 
             padding: 50px 35px;
@@ -202,12 +388,14 @@ try {
                     #160704
                 );
 
-            border: 1px solid #333;
+            border:
+                1px solid #333;
 
             border-top:
                 4px solid #ff3d02;
 
-            border-radius: 8px;
+            border-radius:
+                8px;
 
             box-shadow:
                 0 20px 70px
@@ -222,6 +410,7 @@ try {
         .success-icon {
 
             width: 75px;
+
             height: 75px;
 
             margin:
@@ -230,79 +419,103 @@ try {
             display: flex;
 
             align-items: center;
+
             justify-content: center;
 
-            border-radius: 50%;
+            border-radius:
+                50%;
 
-            background: #ff3d02;
+            background:
+                #ff3d02;
 
-            color: white;
+            color:
+                white;
 
-            font-size: 35px;
+            font-size:
+                35px;
 
-            font-weight: bold;
+            font-weight:
+                bold;
 
         }
 
 
         .success-box h1 {
 
-            font-size: 32px;
+            font-size:
+                32px;
 
-            text-transform: uppercase;
+            text-transform:
+                uppercase;
 
-            margin-bottom: 15px;
+            margin-bottom:
+                15px;
 
         }
 
 
         .success-box p {
 
-            color: #aaa;
+            color:
+                #aaa;
 
-            font-size: 16px;
+            font-size:
+                16px;
 
-            line-height: 1.7;
+            line-height:
+                1.7;
 
-            margin-bottom: 30px;
+            margin-bottom:
+                30px;
 
         }
 
 
         .back-button {
 
-            display: inline-block;
+            display:
+                inline-block;
 
             padding:
                 14px 28px;
 
-            background: #ff3d02;
+            background:
+                #ff3d02;
 
-            color: white;
+            color:
+                white;
 
-            text-decoration: none;
+            text-decoration:
+                none;
 
-            font-weight: bold;
+            font-weight:
+                bold;
 
-            text-transform: uppercase;
+            text-transform:
+                uppercase;
 
-            letter-spacing: 1px;
+            letter-spacing:
+                1px;
 
-            border-radius: 50px;
+            border-radius:
+                50px;
 
             border:
                 2px solid #ff3d02;
 
-            transition: 0.3s;
+            transition:
+                0.3s;
 
         }
 
 
         .back-button:hover {
 
-            background: transparent;
+            background:
+                transparent;
 
-            color: #ff3d02;
+            color:
+                #ff3d02;
 
             transform:
                 translateY(-2px);
@@ -319,15 +532,19 @@ try {
 
             }
 
+
             .success-box h1 {
 
-                font-size: 25px;
+                font-size:
+                    25px;
 
             }
 
+
             .success-box p {
 
-                font-size: 14px;
+                font-size:
+                    14px;
 
             }
 
@@ -340,19 +557,24 @@ try {
 
 <body>
 
+
     <div class="success-box">
+
 
         <div class="success-icon">
             ✓
         </div>
 
+
         <h1>
             Booking Submitted!
         </h1>
 
+
         <p>
 
             Thank you,
+
             <strong>
                 <?= htmlspecialchars($name) ?>
             </strong>.
@@ -366,14 +588,17 @@ try {
 
         </p>
 
+
         <a
-            href="/api/index.php"
+            href="/"
             class="back-button"
         >
             Back To Home
         </a>
 
+
     </div>
+
 
 </body>
 
