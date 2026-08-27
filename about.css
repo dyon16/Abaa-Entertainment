@@ -13,13 +13,13 @@ html {
     scrollbar-width: none;
 }
 
-html::-webkit-scrollbar,
-body::-webkit-scrollbar {
+html::-webkit-scrollbar {
     display: none;
 }
 
 body {
-    scrollbar-width: none;
+    margin: 0;
+    min-height: 100vh;
 
     font-family: Arial, sans-serif;
 
@@ -30,14 +30,12 @@ body {
             rgba(0, 0, 0, 0.90),
             rgba(0, 0, 0, 0.90)
         ),
-        url("background.jpg");
+        url("/background.jpg");
 
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
-
-    min-height: 100vh;
 
     padding-top: 150px;
 
@@ -50,12 +48,13 @@ body {
 ================================================== */
 
 .header {
-    width: 100%;
-    height: 150px;
-
     position: fixed;
+
     top: 0;
     left: 0;
+
+    width: 100%;
+    height: 150px;
 
     z-index: 1000;
 
@@ -63,7 +62,7 @@ body {
     align-items: center;
     justify-content: space-between;
 
-    padding: 0 clamp(20px, 4vw, 50px);
+    padding: 0 clamp(20px, 5vw, 50px);
 
     background: rgba(0, 0, 0, 0.97);
 
@@ -108,7 +107,7 @@ body {
     display: flex;
     align-items: center;
 
-    gap: clamp(15px, 3vw, 40px);
+    gap: clamp(12px, 3vw, 40px);
 }
 
 .header nav a {
@@ -118,7 +117,7 @@ body {
 
     text-decoration: none;
 
-    font-size: clamp(12px, 1.2vw, 16px);
+    font-size: clamp(11px, 1.2vw, 16px);
 
     font-weight: bold;
 
@@ -126,19 +125,26 @@ body {
 
     letter-spacing: 1px;
 
+    white-space: nowrap;
+
     transition: 0.3s;
 }
+
+
+/* ==================================================
+   NAV UNDERLINE
+================================================== */
 
 .header nav a:not(.book-button)::after {
     content: "";
 
     position: absolute;
 
-    width: 0;
-    height: 3px;
-
     left: 50%;
     bottom: -10px;
+
+    width: 0;
+    height: 3px;
 
     background: #ff3d02;
 
@@ -157,7 +163,7 @@ body {
 
 
 /* ==================================================
-   ACTIVE LINK
+   ACTIVE NAV
 ================================================== */
 
 .header nav a.active {
@@ -169,11 +175,11 @@ body {
 
     position: absolute;
 
-    width: 100%;
-    height: 3px;
-
     left: 50%;
     bottom: -10px;
+
+    width: 100%;
+    height: 3px;
 
     background: #ff3d02;
 
@@ -201,32 +207,16 @@ body {
 
     border-radius: 50px;
 
-    font-size: clamp(11px, 1.1vw, 16px);
-
-    font-weight: bold;
-
-    text-transform: uppercase;
-
-    letter-spacing: 1px;
-
-    text-decoration: none;
-
     box-shadow:
         0 0 15px rgba(255, 61, 2, 0.35);
 
-    transition: all 0.3s ease;
-}
-
-.header nav a.book-button::after {
-    display: none;
+    transition: 0.3s;
 }
 
 .header nav a.book-button:hover {
     color: #ff3d02;
 
     background: transparent;
-
-    border-color: #ff3d02;
 
     transform: translateY(-2px);
 
@@ -244,34 +234,32 @@ body {
 ================================================== */
 
 .about-hero {
+    position: relative;
+
     width: 100%;
 
     min-height: 500px;
 
     display: flex;
-
     align-items: center;
     justify-content: space-between;
 
-    gap: clamp(35px, 5vw, 70px);
+    gap: clamp(30px, 5vw, 60px);
 
     padding:
-        clamp(50px, 7vw, 90px)
+        clamp(50px, 7vw, 70px)
         clamp(5%, 7vw, 8%);
-
-    position: relative;
 
     background:
         linear-gradient(
             90deg,
             rgba(0, 0, 0, 0.98),
-            rgba(0, 0, 0, 0.82),
+            rgba(0, 0, 0, 0.81),
             rgba(0, 0, 0, 0.82)
         ),
-        url("event10-img.jpg");
+        url("/event10-img.jpg");
 
     background-size: cover;
-
     background-position: center;
 
     border-bottom: 2px solid #222;
@@ -282,8 +270,8 @@ body {
 
     position: absolute;
 
-    top: 0;
     left: 0;
+    top: 0;
 
     width: 6px;
     height: 100%;
@@ -297,18 +285,16 @@ body {
 ================================================== */
 
 .about-hero-content {
-    flex: 1;
-
-    max-width: 800px;
-
     position: relative;
 
     z-index: 2;
+
+    flex: 1;
+
+    max-width: 800px;
 }
 
 .small-title {
-    display: inline-block;
-
     margin-bottom: 20px;
 
     color: #ff3d02;
@@ -322,8 +308,6 @@ body {
 
 .about-hero h1 {
     margin-bottom: 25px;
-
-    color: white;
 
     font-size: clamp(38px, 5vw, 65px);
 
@@ -345,29 +329,29 @@ body {
 
     color: #ccc;
 
-    font-size: clamp(15px, 1.6vw, 19px);
+    font-size: clamp(15px, 1.5vw, 19px);
 
     line-height: 1.7;
 }
 
 
 /* ==================================================
-   QR CODE
+   QR
 ================================================== */
 
 .about-hero-qr {
-    width: clamp(200px, 22vw, 300px);
-
-    flex-shrink: 0;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
     position: relative;
 
     z-index: 2;
+
+    flex-shrink: 0;
+
+    width: clamp(180px, 22vw, 300px);
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
 }
 
 .qr-card {
@@ -375,14 +359,16 @@ body {
 
     padding: 15px;
 
-    background: rgba(0, 0, 0, 0.55);
+    text-align: center;
+
+    background: rgba(0, 0, 0, 0.45);
 
     border: 1px solid #333;
 
     border-radius: 10px;
 
     box-shadow:
-        0 0 30px rgba(255, 61, 2, 0.15);
+        0 0 25px rgba(255, 61, 2, 0.15);
 }
 
 .qr-card img {
@@ -390,11 +376,9 @@ body {
 
     aspect-ratio: 1 / 1;
 
-    object-fit: contain;
-
     display: block;
 
-    padding: 8px;
+    object-fit: contain;
 
     background: white;
 
@@ -413,13 +397,11 @@ body {
     text-transform: uppercase;
 
     letter-spacing: 1px;
-
-    text-align: center;
 }
 
 
 /* ==================================================
-   MAIN ABOUT PAGE
+   MAIN
 ================================================== */
 
 .about-page {
@@ -438,15 +420,17 @@ body {
 
     grid-template-columns:
         minmax(0, 1.2fr)
-        minmax(300px, 0.8fr);
+        minmax(280px, 0.8fr);
 
-    gap: clamp(40px, 6vw, 80px);
+    gap: clamp(40px, 6vw, 70px);
 
     align-items: center;
 
-    padding:
-        clamp(60px, 8vw, 100px)
-        5%;
+    padding: clamp(60px, 8vw, 90px) 5%;
+}
+
+.about-text {
+    min-width: 0;
 }
 
 .section-label {
@@ -466,13 +450,11 @@ body {
 .about-text h2 {
     margin-bottom: 25px;
 
-    color: white;
-
     font-size: clamp(30px, 4vw, 45px);
 
-    text-transform: uppercase;
-
     font-weight: 900;
+
+    text-transform: uppercase;
 }
 
 .about-text p {
@@ -480,7 +462,7 @@ body {
 
     color: #aaa;
 
-    font-size: clamp(15px, 1.5vw, 17px);
+    font-size: clamp(15px, 1.4vw, 17px);
 
     line-height: 1.8;
 }
@@ -492,11 +474,9 @@ body {
 
 .about-image {
     width: 100%;
-
     height: clamp(300px, 35vw, 450px);
 
     display: flex;
-
     align-items: center;
     justify-content: center;
 
@@ -522,7 +502,8 @@ body {
 }
 
 .about-image img {
-    width: 75%;
+    width: min(75%, 350px);
+
     height: auto;
 
     object-fit: contain;
@@ -541,14 +522,13 @@ body {
 
     gap: 25px;
 
-    padding:
-        20px
-        5%
-        90px;
+    padding: 20px 5% 90px;
 }
 
 .info-card {
     padding: 40px 30px;
+
+    text-align: center;
 
     background:
         linear-gradient(
@@ -560,8 +540,6 @@ body {
     border: 1px solid #292929;
 
     border-radius: 5px;
-
-    text-align: center;
 
     transition: 0.3s;
 }
@@ -582,27 +560,24 @@ body {
     margin: 0 auto 20px;
 
     display: flex;
-
     align-items: center;
     justify-content: center;
 
-    border-radius: 50%;
+    color: #ff3d02;
+
+    font-size: 25px;
 
     background: #160704;
 
     border: 2px solid #6b1b08;
 
-    color: #ff3d02;
-
-    font-size: 25px;
+    border-radius: 50%;
 }
 
 .info-card h3 {
     margin-bottom: 15px;
 
-    color: white;
-
-    font-size: 22px;
+    font-size: clamp(18px, 2vw, 22px);
 
     text-transform: uppercase;
 }
@@ -621,9 +596,7 @@ body {
 ================================================== */
 
 .what-we-do {
-    padding:
-        clamp(60px, 8vw, 90px)
-        5%;
+    padding: clamp(60px, 8vw, 80px) 5%;
 
     background: rgba(0, 0, 0, 0.45);
 
@@ -641,8 +614,6 @@ body {
 
 .section-heading h2 {
     margin-bottom: 15px;
-
-    color: white;
 
     font-size: clamp(30px, 4vw, 42px);
 
@@ -674,7 +645,7 @@ body {
 
 
 /* ==================================================
-   SERVICE GRID
+   SERVICES
 ================================================== */
 
 .service-grid {
@@ -687,6 +658,8 @@ body {
 }
 
 .service-card {
+    min-width: 0;
+
     padding: 35px 30px;
 
     background: #080808;
@@ -699,17 +672,15 @@ body {
 }
 
 .service-card:hover {
-    border-color: #ff3d02;
-
     transform: translateY(-6px);
+
+    border-color: #ff3d02;
 
     box-shadow:
         0 12px 30px rgba(255, 61, 2, 0.2);
 }
 
 .service-card > i {
-    display: block;
-
     margin-bottom: 20px;
 
     color: #ff3d02;
@@ -719,8 +690,6 @@ body {
 
 .service-card h3 {
     margin-bottom: 12px;
-
-    color: white;
 
     font-size: 20px;
 
@@ -746,18 +715,15 @@ body {
     grid-template-columns:
         repeat(2, minmax(0, 1fr));
 
-    gap: clamp(40px, 6vw, 80px);
+    gap: clamp(40px, 6vw, 70px);
 
     align-items: center;
 
-    padding:
-        clamp(60px, 9vw, 110px)
-        5%;
+    padding: clamp(60px, 9vw, 100px) 5%;
 }
 
 .why-image {
     width: 100%;
-
     height: clamp(350px, 40vw, 500px);
 
     overflow: hidden;
@@ -788,8 +754,6 @@ body {
 
 .why-content h2 {
     margin-bottom: 20px;
-
-    color: white;
 
     font-size: clamp(30px, 4vw, 42px);
 
@@ -822,17 +786,14 @@ body {
     height: 35px;
 
     display: flex;
-
     align-items: center;
     justify-content: center;
 
-    border-radius: 50%;
+    color: white;
 
     background: #ff3d02;
 
-    color: white;
-
-    font-size: 13px;
+    border-radius: 50%;
 }
 
 .feature h4 {
@@ -855,14 +816,9 @@ body {
 ================================================== */
 
 .about-cta {
-    margin:
-        0
-        5%
-        clamp(60px, 8vw, 90px);
+    margin: 0 5% 90px;
 
-    padding:
-        clamp(50px, 7vw, 80px)
-        30px;
+    padding: clamp(50px, 7vw, 70px) 30px;
 
     text-align: center;
 
@@ -883,15 +839,13 @@ body {
 .about-cta h2 {
     margin-bottom: 15px;
 
-    color: white;
-
     font-size: clamp(28px, 4vw, 40px);
 
     text-transform: uppercase;
 }
 
 .about-cta p {
-    max-width: 700px;
+    max-width: 800px;
 
     margin: 0 auto 30px;
 
@@ -912,13 +866,13 @@ body {
 
     padding: 14px 28px;
 
+    color: white;
+
     background: #ff3d02;
 
     border: 2px solid #8c2409;
 
     border-radius: 50px;
-
-    color: white;
 
     text-decoration: none;
 
@@ -927,8 +881,6 @@ body {
     text-transform: uppercase;
 
     letter-spacing: 1px;
-
-    cursor: pointer;
 
     transition: 0.3s;
 }
@@ -957,8 +909,6 @@ body {
             #120704
         );
 
-    color: white;
-
     border-top: 3px solid #ff3d02;
 
     box-shadow:
@@ -986,6 +936,8 @@ body {
     flex-direction: column;
 
     gap: 12px;
+
+    min-width: 0;
 }
 
 .footer-brand img {
@@ -1063,8 +1015,6 @@ body {
 
     gap: 14px;
 
-    margin-bottom: 5px;
-
     color: #aaa;
 
     font-size: 15px;
@@ -1080,7 +1030,6 @@ body {
     height: 22px;
 
     display: flex;
-
     align-items: center;
     justify-content: center;
 
@@ -1111,6 +1060,8 @@ body {
 .social-links {
     display: flex;
 
+    flex-wrap: wrap;
+
     gap: 12px;
 
     margin-top: 10px;
@@ -1121,7 +1072,6 @@ body {
     height: 40px;
 
     display: flex;
-
     align-items: center;
     justify-content: center;
 
@@ -1135,8 +1085,6 @@ body {
 
     text-decoration: none;
 
-    font-size: 17px;
-
     transition: 0.3s;
 }
 
@@ -1148,9 +1096,6 @@ body {
     border-color: #ff3d02;
 
     transform: translateY(-4px);
-
-    box-shadow:
-        0 5px 15px rgba(255, 61, 2, 0.4);
 }
 
 
@@ -1193,10 +1138,402 @@ body {
 
 
 /* ==================================================
+   BOOKING OVERLAY
+================================================== */
+
+.booking-overlay {
+    position: fixed;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    z-index: 9999;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background: rgba(0, 0, 0, 0.90);
+
+    backdrop-filter: blur(8px);
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    overflow-y: auto;
+
+    transition:
+        opacity 0.3s ease,
+        visibility 0.3s ease;
+}
+
+.booking-overlay.active {
+    opacity: 1;
+
+    visibility: visible;
+}
+
+
+/* ==================================================
+   BOOKING MODAL
+================================================== */
+
+.booking-modal {
+    position: relative;
+
+    width: min(100%, 850px);
+
+    max-height: 92vh;
+
+    overflow-y: auto;
+
+    padding: 40px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #080808,
+            #160704
+        );
+
+    border: 1px solid #333;
+
+    border-top: 4px solid #ff3d02;
+
+    border-radius: 8px;
+
+    box-shadow:
+        0 20px 80px rgba(0, 0, 0, 0.95),
+        0 0 40px rgba(255, 61, 2, 0.18);
+
+    transform: translateY(30px) scale(0.96);
+
+    transition:
+        transform 0.3s ease;
+}
+
+.booking-overlay.active .booking-modal {
+    transform: translateY(0) scale(1);
+}
+
+
+/* ==================================================
+   BOOKING CLOSE
+================================================== */
+
+.booking-close {
+    position: absolute;
+
+    top: 18px;
+    right: 18px;
+
+    width: 40px;
+    height: 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #aaa;
+
+    background: #0b0b0b;
+
+    border: 1px solid #333;
+
+    border-radius: 50%;
+
+    font-size: 18px;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+.booking-close:hover {
+    color: white;
+
+    background: #ff3d02;
+
+    border-color: #ff3d02;
+
+    transform: rotate(90deg);
+}
+
+
+/* ==================================================
+   BOOKING HEADER
+================================================== */
+
+.booking-header {
+    padding-right: 50px;
+    padding-bottom: 25px;
+
+    margin-bottom: 30px;
+
+    border-bottom: 1px solid #292929;
+}
+
+.booking-label {
+    display: inline-block;
+
+    margin-bottom: 10px;
+
+    color: #ff3d02;
+
+    font-size: 12px;
+
+    font-weight: bold;
+
+    letter-spacing: 3px;
+}
+
+.booking-header h2 {
+    margin-bottom: 10px;
+
+    color: white;
+
+    font-size: clamp(27px, 4vw, 38px);
+
+    font-weight: 900;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1px;
+}
+
+.booking-header p {
+    color: #999;
+
+    font-size: 15px;
+
+    line-height: 1.6;
+}
+
+
+/* ==================================================
+   BOOKING FORM
+================================================== */
+
+.booking-form {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 20px;
+}
+
+.form-row {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 18px;
+}
+
+.form-group {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+    min-width: 0;
+}
+
+.form-group label {
+    color: #ddd;
+
+    font-size: 13px;
+
+    font-weight: bold;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.8px;
+}
+
+
+/* ==================================================
+   FORM INPUTS
+================================================== */
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    max-width: 100%;
+
+    padding: 13px 15px;
+
+    color: white;
+
+    background: #050505;
+
+    border: 1px solid #333;
+
+    border-radius: 4px;
+
+    outline: none;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 14px;
+
+    transition:
+        border-color 0.3s,
+        box-shadow 0.3s,
+        background 0.3s;
+}
+
+.form-group input,
+.form-group select {
+    height: 48px;
+}
+
+.form-group textarea {
+    min-height: 120px;
+
+    resize: vertical;
+
+    line-height: 1.5;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: #666;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #ff3d02;
+
+    background: #090909;
+
+    box-shadow:
+        0 0 0 2px rgba(255, 61, 2, 0.12),
+        0 0 15px rgba(255, 61, 2, 0.08);
+}
+
+.form-group select {
+    cursor: pointer;
+}
+
+.form-group select option {
+    color: white;
+
+    background: #080808;
+}
+
+.form-group input[type="date"] {
+    color-scheme: dark;
+}
+
+
+/* ==================================================
+   BOOKING SUBMIT
+================================================== */
+
+.booking-submit {
+    width: 100%;
+
+    min-height: 52px;
+
+    margin-top: 5px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 12px;
+
+    color: white;
+
+    background: #ff3d02;
+
+    border: 2px solid #ff3d02;
+
+    border-radius: 50px;
+
+    font-size: 14px;
+
+    font-weight: bold;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1px;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+
+    box-shadow:
+        0 0 20px rgba(255, 61, 2, 0.25);
+}
+
+.booking-submit:hover {
+    color: #ff3d02;
+
+    background: transparent;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 0 30px rgba(255, 61, 2, 0.4);
+}
+
+.booking-submit:active {
+    transform: scale(0.98);
+}
+
+.booking-submit i {
+    transition: 0.3s;
+}
+
+.booking-submit:hover i {
+    transform: translateX(5px);
+}
+
+
+/* ==================================================
+   LARGE TABLET
+================================================== */
+
+@media (max-width: 1100px) {
+
+    .header {
+        padding: 0 30px;
+    }
+
+    .header nav {
+        gap: 20px;
+    }
+
+    .about-company {
+        gap: 40px;
+    }
+
+    .footer-container {
+        grid-template-columns:
+            repeat(2, 1fr);
+
+        gap: 40px;
+    }
+}
+
+
+/* ==================================================
    TABLET
 ================================================== */
 
-@media (max-width: 1000px) {
+@media (max-width: 900px) {
 
     body {
         padding-top: 120px;
@@ -1204,38 +1541,61 @@ body {
 
     .header {
         height: 120px;
+
+        padding: 0 25px;
+    }
+
+    .header nav {
+        gap: 14px;
+    }
+
+    .header nav a {
+        font-size: 11px;
+    }
+
+    .header nav a.book-button {
+        padding: 9px 18px;
     }
 
     .about-hero {
-        gap: 35px;
+        min-height: auto;
 
-        padding-left: 5%;
-        padding-right: 5%;
+        flex-direction: column;
+
+        align-items: center;
+
+        text-align: center;
+
+        padding: 60px 6%;
     }
 
-    .about-hero h1 {
-        font-size: 48px;
+    .about-hero-content {
+        width: 100%;
+    }
+
+    .hero-description {
+        margin: auto;
     }
 
     .about-hero-qr {
-        width: 240px;
+        width: 230px;
     }
 
     .about-company {
         grid-template-columns: 1fr;
 
-        gap: 40px;
+        padding: 70px 5%;
     }
 
     .about-image {
-        max-width: 600px;
-
-        margin: auto;
+        height: 380px;
     }
 
     .mission-section {
         grid-template-columns:
             repeat(2, minmax(0, 1fr));
+
+        padding-bottom: 70px;
     }
 
     .service-grid {
@@ -1250,16 +1610,11 @@ body {
     }
 
     .why-image {
-        max-width: 700px;
-
-        margin: auto;
+        height: 400px;
     }
 
-    .footer-container {
-        grid-template-columns:
-            repeat(2, 1fr);
-
-        gap: 40px;
+    .about-cta {
+        margin-bottom: 70px;
     }
 }
 
@@ -1271,7 +1626,7 @@ body {
 @media (max-width: 600px) {
 
     body {
-        padding-top: 100px;
+        padding-top: 105px;
 
         background-attachment: scroll;
     }
@@ -1280,7 +1635,7 @@ body {
     /* HEADER */
 
     .header {
-        height: 100px;
+        height: 105px;
 
         padding: 0 15px;
     }
@@ -1299,6 +1654,13 @@ body {
         letter-spacing: 0;
     }
 
+    .header nav a:not(.book-button)::after,
+    .header nav a.active::after {
+        bottom: -6px;
+
+        height: 2px;
+    }
+
     .header nav a.book-button {
         padding: 7px 11px;
 
@@ -1311,36 +1673,27 @@ body {
     /* HERO */
 
     .about-hero {
-        min-height: auto;
+        padding: 45px 20px 50px;
 
-        flex-direction: column;
-
-        align-items: flex-start;
-
-        gap: 35px;
-
-        padding:
-            50px
-            25px
-            60px;
+        gap: 30px;
     }
 
-    .about-hero-content {
-        width: 100%;
-
-        max-width: 100%;
+    .about-hero::before {
+        width: 4px;
     }
 
     .small-title {
+        margin-bottom: 15px;
+
         font-size: 10px;
 
         letter-spacing: 2px;
     }
 
     .about-hero h1 {
-        font-size: 34px;
+        font-size: 30px;
 
-        line-height: 1.1;
+        line-height: 1.15;
 
         letter-spacing: 1px;
     }
@@ -1350,51 +1703,56 @@ body {
     }
 
     .hero-description {
-        font-size: 15px;
+        font-size: 14px;
+
+        line-height: 1.7;
     }
 
-
-    /* QR */
-
     .about-hero-qr {
-        width: 100%;
-
-        justify-content: center;
-
-        margin-top: 5px;
+        width: 190px;
     }
 
     .qr-card {
-        width: 210px;
+        padding: 10px;
+    }
 
-        padding: 15px;
+    .qr-card img {
+        border-radius: 15px;
     }
 
     .qr-card p {
-        font-size: 11px;
+        font-size: 9px;
     }
 
 
     /* COMPANY */
 
     .about-company {
-        padding:
-            60px
-            5%;
+        padding: 50px 5%;
 
-        gap: 35px;
+        gap: 30px;
+    }
+
+    .section-label {
+        font-size: 10px;
+
+        letter-spacing: 2px;
     }
 
     .about-text h2 {
-        font-size: 30px;
+        font-size: 28px;
+
+        line-height: 1.15;
     }
 
     .about-text p {
-        font-size: 15px;
+        font-size: 14px;
+
+        line-height: 1.7;
     }
 
     .about-image {
-        height: 300px;
+        height: 280px;
     }
 
 
@@ -1403,24 +1761,36 @@ body {
     .mission-section {
         grid-template-columns: 1fr;
 
-        padding-bottom: 60px;
+        gap: 15px;
+
+        padding: 10px 5% 50px;
     }
 
     .info-card {
-        padding: 35px 25px;
+        padding: 30px 20px;
+    }
+
+    .info-card h3 {
+        font-size: 19px;
+    }
+
+    .info-card p {
+        font-size: 14px;
     }
 
 
     /* SERVICES */
 
     .what-we-do {
-        padding:
-            60px
-            5%;
+        padding: 50px 5%;
+    }
+
+    .section-heading {
+        margin-bottom: 30px;
     }
 
     .section-heading h2 {
-        font-size: 30px;
+        font-size: 28px;
     }
 
     .section-heading p {
@@ -1430,46 +1800,61 @@ body {
     .service-grid {
         grid-template-columns: 1fr;
 
-        gap: 15px;
+        gap: 12px;
+    }
+
+    .service-card {
+        padding: 28px 22px;
+    }
+
+    .service-card > i {
+        font-size: 27px;
     }
 
 
-    /* WHY US */
+    /* WHY */
 
     .why-us {
-        padding:
-            60px
-            5%;
+        padding: 50px 5%;
+
+        gap: 30px;
     }
 
     .why-image {
-        height: 350px;
+        height: 300px;
     }
 
     .why-content h2 {
-        font-size: 30px;
+        font-size: 29px;
     }
 
     .why-content > p {
+        font-size: 14px;
+    }
+
+    .feature {
+        gap: 12px;
+    }
+
+    .feature h4 {
         font-size: 15px;
+    }
+
+    .feature p {
+        font-size: 13px;
     }
 
 
     /* CTA */
 
     .about-cta {
-        margin:
-            0
-            5%
-            60px;
+        margin: 0 5% 50px;
 
-        padding:
-            50px
-            20px;
+        padding: 45px 20px;
     }
 
     .about-cta h2 {
-        font-size: 28px;
+        font-size: 26px;
     }
 
     .about-cta p {
@@ -1477,7 +1862,9 @@ body {
     }
 
     .cta-button {
-        padding: 13px 22px;
+        width: 100%;
+
+        padding: 13px 20px;
 
         font-size: 12px;
     }
@@ -1488,13 +1875,11 @@ body {
     .footer-container {
         width: 94%;
 
-        padding:
-            40px
-            10px;
-
         grid-template-columns: 1fr;
 
-        gap: 35px;
+        gap: 30px;
+
+        padding: 40px 10px;
     }
 
     .footer-brand img {
@@ -1502,51 +1887,150 @@ body {
     }
 
     .footer-brand p {
-        font-size: 14px;
+        font-size: 13px;
     }
 
     .footer-section h3 {
-        font-size: 16px;
+        font-size: 15px;
     }
 
     .footer-section > a,
     .contact-item {
-        font-size: 14px;
-    }
-
-    .social-links a {
-        width: 38px;
-        height: 38px;
-
-        font-size: 16px;
+        font-size: 13px;
     }
 
     .footer-bottom {
         flex-direction: column;
 
-        text-align: center;
+        padding: 18px 15px;
 
-        padding: 20px 15px;
+        text-align: center;
     }
 
     .footer-bottom p {
+        font-size: 10px;
+    }
+
+
+    /* ==================================================
+       BOOKING POPUP - MOBILE
+    ================================================== */
+
+    .booking-overlay {
+        align-items: flex-start;
+
+        padding: 10px;
+
+        overflow-y: auto;
+    }
+
+    .booking-modal {
+        width: 100%;
+
+        max-width: 100%;
+
+        max-height: calc(100vh - 20px);
+
+        margin: auto 0;
+
+        padding: 30px 18px;
+
+        border-top-width: 3px;
+
+        border-radius: 7px;
+
+        overflow-y: auto;
+
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .booking-close {
+        top: 10px;
+        right: 10px;
+
+        width: 35px;
+        height: 35px;
+
+        font-size: 15px;
+    }
+
+    .booking-header {
+        padding-right: 40px;
+
+        margin-bottom: 22px;
+
+        padding-bottom: 18px;
+    }
+
+    .booking-label {
+        font-size: 9px;
+
+        letter-spacing: 2px;
+    }
+
+    .booking-header h2 {
+        font-size: 25px;
+    }
+
+    .booking-header p {
+        font-size: 12px;
+    }
+
+    .booking-form {
+        gap: 16px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+
+        gap: 16px;
+    }
+
+    .form-group {
+        gap: 6px;
+    }
+
+    .form-group label {
+        font-size: 11px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        font-size: 13px;
+    }
+
+    .form-group input,
+    .form-group select {
+        height: 46px;
+    }
+
+    .form-group textarea {
+        min-height: 110px;
+    }
+
+    .booking-submit {
+        min-height: 48px;
+
+        padding: 12px;
+
         font-size: 11px;
     }
 }
 
 
 /* ==================================================
-   SMALL MOBILE
+   VERY SMALL PHONES
 ================================================== */
 
-@media (max-width: 400px) {
+@media (max-width: 380px) {
 
     .header {
         padding: 0 10px;
     }
 
     .logo img {
-        width: 78px;
+        width: 75px;
     }
 
     .header nav {
@@ -1563,28 +2047,15 @@ body {
         font-size: 7px;
     }
 
-    .about-hero {
-        padding-left: 20px;
-        padding-right: 20px;
-    }
-
     .about-hero h1 {
-        font-size: 29px;
+        font-size: 27px;
     }
 
-    .qr-card {
-        width: 190px;
+    .booking-modal {
+        padding: 28px 14px;
     }
 
-    .about-image {
-        height: 270px;
-    }
-
-    .why-image {
-        height: 300px;
-    }
-
-    .about-cta h2 {
-        font-size: 25px;
+    .booking-header h2 {
+        font-size: 22px;
     }
 }
