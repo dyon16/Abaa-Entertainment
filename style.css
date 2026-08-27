@@ -2226,4 +2226,122 @@ body {
     .booking-header h2 {
         font-size: 22px;
     }
+}/* ==================================================
+   BOOKING SERVICE CHECKBOXES
+================================================== */
+
+.service-checkboxes {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 12px;
+
+    margin-top: 8px;
+
 }
+
+
+.service-checkbox {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 13px 15px;
+
+    color: #ddd;
+
+    background: #080808;
+
+    border: 1px solid #333;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+
+}
+
+
+.service-checkbox:hover {
+
+    color: white;
+
+    border-color:
+        #ff3d02;
+
+    background:
+        #120704;
+
+}
+
+
+.service-checkbox input {
+
+    width: 18px;
+
+    height: 18px;
+
+    margin: 0;
+
+    accent-color:
+        #ff3d02;
+
+    cursor: pointer;
+
+}
+
+
+.service-checkbox span {
+
+    cursor: pointer;
+
+}
+
+
+.service-checkbox:has(
+    input:checked
+) {
+
+    color: white;
+
+    border-color:
+        #ff3d02;
+
+    background:
+        rgba(
+            255,
+            61,
+            2,
+            0.10
+        );
+
+    box-shadow:
+        0 0 12px
+        rgba(
+            255,
+            61,
+            2,
+            0.12
+        );
+
+}
+
+
+@media (max-width: 600px) {
+
+    .service-checkboxes {
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+}
+
