@@ -291,7 +291,8 @@ body {
 
     flex: 1;
 
-    max-width: 800px;
+    width: 100%;
+    max-width: 1000px;
 }
 
 .small-title {
@@ -335,69 +336,6 @@ body {
 }
 
 
-/* ==================================================
-   QR
-================================================== */
-
-.about-hero-qr {
-    position: relative;
-
-    z-index: 2;
-
-    flex-shrink: 0;
-
-    width: clamp(180px, 22vw, 300px);
-
-    display: flex;
-
-    justify-content: center;
-    align-items: center;
-}
-
-.qr-card {
-    width: 100%;
-
-    padding: 15px;
-
-    text-align: center;
-
-    background: rgba(0, 0, 0, 0.45);
-
-    border: 1px solid #333;
-
-    border-radius: 10px;
-
-    box-shadow:
-        0 0 25px rgba(255, 61, 2, 0.15);
-}
-
-.qr-card img {
-    width: 100%;
-
-    aspect-ratio: 1 / 1;
-
-    display: block;
-
-    object-fit: contain;
-
-    background: white;
-
-    border-radius: 20px;
-}
-
-.qr-card p {
-    margin-top: 12px;
-
-    color: #aaa;
-
-    font-size: 12px;
-
-    font-weight: bold;
-
-    text-transform: uppercase;
-
-    letter-spacing: 1px;
-}
 
 
 /* ==================================================
@@ -1577,9 +1515,7 @@ body {
         margin: auto;
     }
 
-    .about-hero-qr {
-        width: 230px;
-    }
+    
 
     .about-company {
         grid-template-columns: 1fr;
@@ -1708,21 +1644,7 @@ body {
         line-height: 1.7;
     }
 
-    .about-hero-qr {
-        width: 190px;
-    }
-
-    .qr-card {
-        padding: 10px;
-    }
-
-    .qr-card img {
-        border-radius: 15px;
-    }
-
-    .qr-card p {
-        font-size: 9px;
-    }
+  
 
 
     /* COMPANY */
