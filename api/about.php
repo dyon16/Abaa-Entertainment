@@ -120,27 +120,6 @@ include(__DIR__ . '/conn.php');
     </div>
 
 
-    <!-- ==================================================
-         QR CODE
-    ================================================== -->
-
-    <div class="about-hero-qr">
-
-        <div class="qr-card">
-
-            <img
-                src="/qrcode.png"
-                alt="ABAA Entertainment QR Code"
-            >
-
-            <p>
-                Scan to connect with us
-            </p>
-
-        </div>
-
-    </div>
-
 </section>
 
 
