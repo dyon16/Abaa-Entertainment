@@ -170,7 +170,7 @@ if (
 
 $dateObject =
     DateTime::createFromFormat(
-        "m/d/Y",
+        "Y-m-d",
         $event_date
     );
 
@@ -197,7 +197,7 @@ if (
 ) {
 
     die(
-        "Please enter a valid event date in MM/DD/YYYY format."
+        "Please enter a valid event date."
     );
 
 }
@@ -210,12 +210,12 @@ if (
 */
 
 if (
-    $dateObject->format("m/d/Y")
+    $dateObject->format("Y-m-d")
     !== $event_date
 ) {
 
     die(
-        "Please enter a valid event date in MM/DD/YYYY format."
+        "Please enter a valid event date."
     );
 
 }
@@ -223,12 +223,12 @@ if (
 
 /*
 |--------------------------------------------------------------------------
-| CONVERT DATE FOR MYSQL
+| DATE IS ALREADY MYSQL FORMAT
 |--------------------------------------------------------------------------
 |
-| Customer enters:
+| Date picker sends:
 |
-| 08/27/2026
+| 2026-08-27
 |
 | Database receives:
 |
@@ -237,8 +237,6 @@ if (
 |--------------------------------------------------------------------------
 */
 
-$event_date =
-    $dateObject->format("Y-m-d");
 
 
 /* ==================================================
