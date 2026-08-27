@@ -82,6 +82,8 @@ include(__DIR__ . '/conn.php');
 
 </header>
 
+
+
 <!-- ==================================================
      ABOUT
 ================================================== -->
@@ -155,12 +157,10 @@ include(__DIR__ . '/conn.php');
 
 </section>
 
+
+
 <main class="main-container">
 
-
-    <!-- ==================================================
-         HERO / BIG BOX
-    ================================================== -->
 
     <section class="big-box">
 
@@ -170,6 +170,7 @@ include(__DIR__ . '/conn.php');
         >
 
     </section>
+
 
 
     <!-- ==================================================
@@ -300,6 +301,7 @@ include(__DIR__ . '/conn.php');
         </div>
 
     </section>
+
 
 
     <!-- ==================================================
@@ -608,6 +610,7 @@ include(__DIR__ . '/conn.php');
 </main>
 
 
+
 <!-- ==================================================
      FOOTER
 ================================================== -->
@@ -802,6 +805,7 @@ include(__DIR__ . '/conn.php');
 </footer>
 
 
+
 <!-- ==================================================
      BOOKING MODAL
 ================================================== -->
@@ -845,6 +849,7 @@ include(__DIR__ . '/conn.php');
         </div>
 
 
+
         <form
             action="/booking"
             method="POST"
@@ -853,6 +858,7 @@ include(__DIR__ . '/conn.php');
 
 
             <div class="form-row">
+
 
                 <div class="form-group">
 
@@ -890,7 +896,9 @@ include(__DIR__ . '/conn.php');
             </div>
 
 
+
             <div class="form-row">
+
 
                 <div class="form-group">
 
@@ -928,7 +936,9 @@ include(__DIR__ . '/conn.php');
             </div>
 
 
+
             <div class="form-row">
+
 
                 <div class="form-group">
 
@@ -983,6 +993,10 @@ include(__DIR__ . '/conn.php');
                 </div>
 
 
+                <!-- ==================================================
+                     MM/DD/YYYY DATE
+                ================================================== -->
+
                 <div class="form-group">
 
                     <label for="booking_date">
@@ -990,15 +1004,20 @@ include(__DIR__ . '/conn.php');
                     </label>
 
                     <input
-                        type="date"
+                        type="text"
                         id="booking_date"
                         name="event_date"
+                        placeholder="MM/DD/YYYY"
+                        maxlength="10"
+                        inputmode="numeric"
+                        pattern="(0[1-9]|1[0-2])\/(0[1-9]|[12][0-9]|3[01])\/[0-9]{4}"
                         required
                     >
 
                 </div>
 
             </div>
+
 
 
             <div class="form-group">
@@ -1018,57 +1037,130 @@ include(__DIR__ . '/conn.php');
             </div>
 
 
+
+            <!-- ==================================================
+                 MULTIPLE SERVICES
+            ================================================== -->
+
             <div class="form-group">
 
-                <label for="booking_service">
-                    Service Needed
+                <label>
+                    Services Needed
                 </label>
 
-                <select
-                    id="booking_service"
-                    name="service"
-                    required
-                >
 
-                    <option
-                        value=""
-                        disabled
-                        selected
-                    >
-                        Select a service
-                    </option>
+                <div class="service-checkboxes">
 
-                    <option value="LED Wall">
-                        LED Wall
-                    </option>
 
-                    <option value="Lights & Sound">
-                        Lights & Sound
-                    </option>
+                    <label class="service-checkbox">
 
-                    <option value="Live Feed">
-                        Live Feed
-                    </option>
+                        <input
+                            type="checkbox"
+                            name="service[]"
+                            value="LED Wall"
+                        >
 
-                    <option value="Stage Production">
-                        Stage Production
-                    </option>
+                        <span>
+                            LED Wall
+                        </span>
 
-                    <option value="Music Studio">
-                        Music Studio
-                    </option>
+                    </label>
 
-                    <option value="Trusses">
-                        Trusses
-                    </option>
 
-                    <option value="Full Event Production">
-                        Full Event Production
-                    </option>
+                    <label class="service-checkbox">
 
-                </select>
+                        <input
+                            type="checkbox"
+                            name="service[]"
+                            value="Lights & Sound"
+                        >
+
+                        <span>
+                            Lights & Sound
+                        </span>
+
+                    </label>
+
+
+                    <label class="service-checkbox">
+
+                        <input
+                            type="checkbox"
+                            name="service[]"
+                            value="Live Feed"
+                        >
+
+                        <span>
+                            Live Feed
+                        </span>
+
+                    </label>
+
+
+                    <label class="service-checkbox">
+
+                        <input
+                            type="checkbox"
+                            name="service[]"
+                            value="Stage Production"
+                        >
+
+                        <span>
+                            Stage Production
+                        </span>
+
+                    </label>
+
+
+                    <label class="service-checkbox">
+
+                        <input
+                            type="checkbox"
+                            name="service[]"
+                            value="Music Studio"
+                        >
+
+                        <span>
+                            Music Studio
+                        </span>
+
+                    </label>
+
+
+                    <label class="service-checkbox">
+
+                        <input
+                            type="checkbox"
+                            name="service[]"
+                            value="Trusses"
+                        >
+
+                        <span>
+                            Trusses
+                        </span>
+
+                    </label>
+
+
+                    <label class="service-checkbox">
+
+                        <input
+                            type="checkbox"
+                            name="service[]"
+                            value="Full Event Production"
+                        >
+
+                        <span>
+                            Full Event Production
+                        </span>
+
+                    </label>
+
+
+                </div>
 
             </div>
+
 
 
             <div class="form-group">
@@ -1085,6 +1177,7 @@ include(__DIR__ . '/conn.php');
                 ></textarea>
 
             </div>
+
 
 
             <button
@@ -1105,6 +1198,7 @@ include(__DIR__ . '/conn.php');
     </div>
 
 </div>
+
 
 
 <script>
@@ -1191,6 +1285,67 @@ function showEvent(
 }
 
 
+
+/*
+|--------------------------------------------------------------------------
+| DATE FORMATTER
+|--------------------------------------------------------------------------
+*/
+
+const bookingDate =
+    document.getElementById("booking_date");
+
+
+if (bookingDate) {
+
+    bookingDate.addEventListener(
+        "input",
+        function(event) {
+
+            let value =
+                event.target.value.replace(
+                    /\D/g,
+                    ""
+                );
+
+
+            if (value.length > 8) {
+
+                value =
+                    value.substring(0, 8);
+
+            }
+
+
+            if (value.length > 4) {
+
+                value =
+                    value.substring(0, 2)
+                    + "/"
+                    + value.substring(2, 4)
+                    + "/"
+                    + value.substring(4);
+
+            }
+            else if (value.length > 2) {
+
+                value =
+                    value.substring(0, 2)
+                    + "/"
+                    + value.substring(2);
+
+            }
+
+
+            event.target.value = value;
+
+        }
+    );
+
+}
+
+
+
 /*
 |--------------------------------------------------------------------------
 | OPEN BOOKING MODAL
@@ -1205,10 +1360,12 @@ function openBookingModal(event) {
 
     }
 
+
     const modal =
         document.getElementById(
             "bookingModal"
         );
+
 
     if (!modal) {
 
@@ -1216,17 +1373,21 @@ function openBookingModal(event) {
 
     }
 
+
     modal.classList.add("active");
+
 
     modal.setAttribute(
         "aria-hidden",
         "false"
     );
 
+
     document.body.style.overflow =
         "hidden";
 
 }
+
 
 
 /*
@@ -1242,23 +1403,28 @@ function closeBookingModal() {
             "bookingModal"
         );
 
+
     if (!modal) {
 
         return;
 
     }
 
+
     modal.classList.remove("active");
+
 
     modal.setAttribute(
         "aria-hidden",
         "true"
     );
 
+
     document.body.style.overflow =
         "";
 
 }
+
 
 
 /*
@@ -1276,6 +1442,7 @@ document.addEventListener(
                 "bookingModal"
             );
 
+
         if (
             modal &&
             event.target === modal
@@ -1287,6 +1454,7 @@ document.addEventListener(
 
     }
 );
+
 
 
 /*
