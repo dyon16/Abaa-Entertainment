@@ -8,30 +8,38 @@
     box-sizing: border-box;
 }
 
-
-/* ==================================================
-   HTML
-================================================== */
-
 html {
     scroll-behavior: smooth;
     scrollbar-width: none;
 }
 
-html::-webkit-scrollbar {
-    width: 0;
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
     display: none;
 }
 
 body {
     scrollbar-width: none;
-}
+    font-family: Arial, sans-serif;
+    color: white;
 
-body::-webkit-scrollbar {
-    width: 0;
-    display: none;
-}
+    background:
+        linear-gradient(
+            rgba(0, 0, 0, 0.90),
+            rgba(0, 0, 0, 0.90)
+        ),
+        url("background.jpg");
 
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+
+    min-height: 100vh;
+    padding-top: 150px;
+
+    overflow-x: hidden;
+}
 
 
 /* ==================================================
@@ -46,33 +54,6 @@ body::-webkit-scrollbar {
 
 
 /* ==================================================
-   BODY
-================================================== */
-
-body {
-    font-family: Arial, sans-serif;
-
-    background-image:
-        linear-gradient(
-            rgba(0, 0, 0, 0.90),
-            rgba(0, 0, 0, 0.90)
-        ),
-        url("background.jpg");
-
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-
-    min-height: 100vh;
-
-    padding-top: 150px;
-
-    color: white;
-}
-
-
-/* ==================================================
    HEADER
 ================================================== */
 
@@ -80,20 +61,18 @@ body {
     width: 100%;
     height: 150px;
 
-    background: rgba(0, 0, 0, 0.97);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
 
     display: flex;
     align-items: center;
     justify-content: space-between;
 
-    padding: 0 50px;
+    padding: 0 clamp(20px, 4vw, 50px);
 
-    position: fixed;
-
-    top: 0;
-    left: 0;
-
-    z-index: 1000;
+    background: rgba(0, 0, 0, 0.97);
 
     border-bottom: 3px solid #ff3d02;
 
@@ -116,7 +95,7 @@ body {
 }
 
 .logo img {
-    width: 150px;
+    width: clamp(100px, 10vw, 150px);
     height: auto;
     display: block;
 }
@@ -133,32 +112,23 @@ body {
 .header nav {
     display: flex;
     align-items: center;
-
-    gap: 40px;
+    gap: clamp(15px, 3vw, 40px);
 }
 
 .header nav a {
-    color: white;
+    position: relative;
 
+    color: white;
     text-decoration: none;
 
-    font-size: 16px;
-
+    font-size: clamp(12px, 1.2vw, 16px);
     font-weight: bold;
 
     text-transform: uppercase;
-
     letter-spacing: 1px;
-
-    position: relative;
 
     transition: 0.3s;
 }
-
-
-/* ==================================================
-   NAVIGATION UNDERLINE
-================================================== */
 
 .header nav a:not(.book-button)::after {
     content: "";
@@ -168,10 +138,10 @@ body {
     width: 0;
     height: 3px;
 
-    background: #ff3d02;
-
     left: 50%;
     bottom: -10px;
+
+    background: #ff3d02;
 
     transform: translateX(-50%);
 
@@ -192,55 +162,39 @@ body {
 ================================================== */
 
 .header nav a.book-button {
-    color: white;
-
-    background: #ff3d02;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 
     padding: 12px 30px;
 
-    border: 2px solid #ff3d02;
+    color: white;
+    background: #ff3d02;
 
+    border: 2px solid #ff3d02;
     border-radius: 50px;
 
-    font-size: 16px;
-
+    font-size: clamp(11px, 1.1vw, 16px);
     font-weight: bold;
 
     text-transform: uppercase;
-
     letter-spacing: 1px;
 
     text-decoration: none;
 
-    display: inline-flex;
-
-    align-items: center;
-    justify-content: center;
-
-    position: relative;
-
-    transition: all 0.3s ease;
-
     box-shadow:
         0 0 15px rgba(255, 61, 2, 0.35);
+
+    transition: all 0.3s ease;
 }
-
-
-/* REMOVE UNDERLINE */
 
 .header nav a.book-button::after {
     display: none;
 }
 
-
-/* BOOK HOVER */
-
 .header nav a.book-button:hover {
     color: #ff3d02;
-
     background: transparent;
-
-    border-color: #ff3d02;
 
     transform: translateY(-2px);
 
@@ -248,34 +202,27 @@ body {
         0 0 25px rgba(255, 61, 2, 0.65);
 }
 
-
-/* BOOK CLICK */
-
 .header nav a.book-button:active {
     transform: scale(0.95);
 }
 
 
 /* ==================================================
-   ABOUT
+   ABOUT SECTION
 ================================================== */
 
 .about-us {
-    width: 95%;
+    width: min(95%, 1400px);
 
-    margin: 25px auto;
+    margin: 30px auto;
 
-    padding: 35px 40px;
+    padding: clamp(25px, 4vw, 45px);
 
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
 
-    gap: 50px;
-
-    color: white;
+    gap: clamp(30px, 5vw, 60px);
 
     background:
         linear-gradient(
@@ -285,7 +232,6 @@ body {
         );
 
     border-left: 5px solid #ff3d02;
-
     border-radius: 5px;
 
     box-shadow:
@@ -298,29 +244,24 @@ body {
 }
 
 .about-content h1 {
-    font-size: 52px;
+    margin-bottom: 15px;
 
+    color: white;
+
+    font-size: clamp(32px, 4vw, 52px);
     font-weight: 900;
 
     text-transform: uppercase;
-
     letter-spacing: 2px;
-
-    margin-bottom: 15px;
-
-    text-align: left;
-
-    color: white;
 }
 
 .about-content p {
-    font-size: 19px;
+    color: #cfcfcf;
 
+    font-size: clamp(15px, 1.5vw, 19px);
     line-height: 1.8;
 
     letter-spacing: 0.3px;
-
-    color: #cfcfcf;
 
     text-align: justify;
 }
@@ -331,16 +272,15 @@ body {
 ================================================== */
 
 .about-video {
-    width: 400px;
+    width: min(400px, 35vw);
     height: 550px;
 
     flex-shrink: 0;
 
     overflow: hidden;
 
-    border-radius: 8px;
-
     border: 2px solid #ff3d02;
+    border-radius: 8px;
 
     background: #000;
 
@@ -372,16 +312,12 @@ body {
 ================================================== */
 
 .main-container {
-    width: 95%;
-
-    max-width: 1400px;
+    width: min(95%, 1400px);
 
     margin: 40px auto;
 
     display: flex;
-
     flex-direction: column;
-
     align-items: center;
 
     gap: 40px;
@@ -393,14 +329,14 @@ body {
 ================================================== */
 
 .big-box {
-    width: 750px;
-    height: 600px;
+    width: min(750px, 100%);
+    aspect-ratio: 750 / 600;
 
     overflow: hidden;
 
-    border-radius: 5px;
-
     position: relative;
+
+    border-radius: 5px;
 
     box-shadow:
         0 0 25px rgba(255, 61, 2, 0.25);
@@ -417,9 +353,9 @@ body {
     width: 100%;
     height: 100%;
 
-    object-fit: cover;
-
     display: block;
+
+    object-fit: cover;
 
     transition: 0.6s;
 }
@@ -436,27 +372,21 @@ body {
 .events {
     width: 100%;
 
-    padding: 40px;
+    padding: clamp(25px, 4vw, 40px);
 
     text-align: center;
-
-    color: white;
-
-    border-radius: 5px;
 }
 
 .events h2 {
-    font-size: 42px;
-
-    font-weight: 900;
-
-    text-transform: uppercase;
-
-    letter-spacing: 3px;
-
     margin-bottom: 10px;
 
     color: white;
+
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 900;
+
+    text-transform: uppercase;
+    letter-spacing: 3px;
 }
 
 .events h2::after {
@@ -467,19 +397,20 @@ body {
     width: 80px;
     height: 4px;
 
-    background: #ff3d02;
-
     margin: 12px auto;
+
+    background: #ff3d02;
 }
 
 .events-description {
+    max-width: 800px;
+
+    margin: 0 auto 35px;
+
     color: #aaa;
 
-    font-size: 17px;
-
+    font-size: clamp(14px, 1.5vw, 17px);
     line-height: 1.6;
-
-    margin-bottom: 35px;
 }
 
 
@@ -488,23 +419,19 @@ body {
 ================================================== */
 
 .featured-event {
-    width: 850px;
-
-    max-width: 100%;
-
-    height: 560px;
+    width: min(850px, 100%);
+    aspect-ratio: 850 / 560;
 
     margin: 0 auto 30px;
+
+    position: relative;
+
+    overflow: hidden;
 
     background: #080808;
 
     border: 2px solid #333;
-
     border-radius: 5px;
-
-    overflow: hidden;
-
-    position: relative;
 
     box-shadow:
         0 0 25px rgba(255, 61, 2, 0.25);
@@ -519,26 +446,18 @@ body {
         0 15px 40px rgba(255, 61, 2, 0.35);
 }
 
-.featured-event > img {
-    width: 100%;
-    height: 100%;
-
-    object-fit: cover;
-
-    display: block;
-
-    transition: 0.5s;
-}
-
+.featured-event > img,
 .featured-event > video {
     width: 100%;
     height: 100%;
 
-    object-fit: cover;
-
     display: block;
 
-    background: black;
+    object-fit: cover;
+}
+
+.featured-event > img {
+    transition: 0.5s;
 }
 
 .featured-title {
@@ -558,12 +477,10 @@ body {
 
     color: white;
 
-    font-size: 24px;
-
+    font-size: clamp(16px, 2vw, 24px);
     font-weight: bold;
 
     text-transform: uppercase;
-
     letter-spacing: 1px;
 
     text-align: left;
@@ -578,9 +495,7 @@ body {
     width: 100%;
 
     display: flex;
-
     justify-content: center;
-
     align-items: stretch;
 
     gap: 15px;
@@ -594,17 +509,16 @@ body {
 
     padding: 0;
 
-    border: 2px solid #333;
-
-    border-radius: 5px;
-
-    background: #080808;
+    position: relative;
 
     overflow: hidden;
 
     cursor: pointer;
 
-    position: relative;
+    background: #080808;
+
+    border: 2px solid #333;
+    border-radius: 5px;
 
     transition:
         transform 0.3s,
@@ -618,9 +532,9 @@ body {
     width: 100%;
     height: 82px;
 
-    object-fit: cover;
-
     display: block;
+
+    object-fit: cover;
 
     filter: brightness(0.65);
 
@@ -632,22 +546,18 @@ body {
     height: 36px;
 
     display: flex;
-
     align-items: center;
     justify-content: center;
 
     padding: 5px;
 
+    color: #aaa;
     background: #080808;
 
-    color: #aaa;
-
     font-size: 11px;
-
     font-weight: bold;
 
     text-transform: uppercase;
-
     letter-spacing: 0.5px;
 }
 
@@ -662,7 +572,6 @@ body {
 
 .event-thumbnail:hover > img {
     filter: brightness(1);
-
     transform: scale(1.05);
 }
 
@@ -695,7 +604,6 @@ body {
     height: 82px;
 
     position: relative;
-
     overflow: hidden;
 }
 
@@ -703,9 +611,9 @@ body {
     width: 100%;
     height: 100%;
 
-    object-fit: cover;
-
     display: block;
+
+    object-fit: cover;
 
     filter: brightness(0.65);
 
@@ -718,15 +626,14 @@ body {
     top: 50%;
     left: 50%;
 
-    transform: translate(-50%, -50%);
-
     width: 40px;
     height: 40px;
 
     display: flex;
-
     align-items: center;
     justify-content: center;
+
+    transform: translate(-50%, -50%);
 
     border-radius: 50%;
 
@@ -742,7 +649,6 @@ body {
 
 .event-thumbnail:hover .video-thumbnail img {
     filter: brightness(1);
-
     transform: scale(1.05);
 }
 
@@ -754,27 +660,21 @@ body {
 .services {
     width: 100%;
 
-    padding: 40px;
+    padding: clamp(25px, 4vw, 40px);
 
     text-align: center;
-
-    color: white;
-
-    border-radius: 5px;
 }
 
 .services h2 {
-    font-size: 42px;
-
-    font-weight: 900;
-
-    text-transform: uppercase;
-
-    letter-spacing: 3px;
-
     margin-bottom: 10px;
 
     color: white;
+
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 900;
+
+    text-transform: uppercase;
+    letter-spacing: 3px;
 }
 
 .services h2::after {
@@ -785,19 +685,20 @@ body {
     width: 80px;
     height: 4px;
 
-    background: #ff3d02;
-
     margin: 12px auto;
+
+    background: #ff3d02;
 }
 
 .services-description {
+    max-width: 800px;
+
+    margin: 0 auto 35px;
+
     color: #aaa;
 
-    font-size: 17px;
-
+    font-size: clamp(14px, 1.5vw, 17px);
     line-height: 1.6;
-
-    margin-bottom: 35px;
 }
 
 
@@ -811,7 +712,7 @@ body {
     display: grid;
 
     grid-template-columns:
-        repeat(3, 360px);
+        repeat(3, minmax(0, 360px));
 
     gap: 30px;
 
@@ -819,29 +720,27 @@ body {
 }
 
 .image-button {
-    width: 360px;
+    width: 100%;
     height: 520px;
 
     display: flex;
-
     flex-direction: column;
+
+    position: relative;
 
     overflow: hidden;
 
-    border: 2px solid #333;
+    background: #080808;
 
+    border: 2px solid #333;
     border-radius: 5px;
 
-    background: #080808;
+    text-decoration: none;
 
     transition:
         transform 0.3s,
         border-color 0.3s,
         box-shadow 0.3s;
-
-    text-decoration: none;
-
-    position: relative;
 }
 
 .image-button::before {
@@ -855,31 +754,32 @@ body {
     width: 0;
     height: 4px;
 
+    z-index: 2;
+
     background: #ff3d02;
 
     transition: 0.3s;
-
-    z-index: 2;
 }
 
 .image-button img {
     width: 100%;
-    height: 450px;
-
-    object-fit: cover;
+    height: calc(100% - 70px);
 
     display: block;
 
-    transition: 0.5s;
+    object-fit: cover;
 
     filter: brightness(0.8);
+
+    transition: 0.5s;
 }
 
 .image-title {
     height: 70px;
 
-    display: flex;
+    flex-shrink: 0;
 
+    display: flex;
     align-items: center;
     justify-content: center;
 
@@ -887,12 +787,10 @@ body {
 
     color: white;
 
-    font-size: 20px;
-
+    font-size: clamp(14px, 1.5vw, 20px);
     font-weight: bold;
 
     text-transform: uppercase;
-
     letter-spacing: 1px;
 
     border-top: 1px solid #222;
@@ -951,9 +849,7 @@ body {
 }
 
 .footer-container {
-    width: 95%;
-
-    max-width: 1400px;
+    width: min(95%, 1400px);
 
     margin: auto;
 
@@ -969,7 +865,6 @@ body {
 
 .footer-section {
     display: flex;
-
     flex-direction: column;
 
     gap: 12px;
@@ -977,7 +872,6 @@ body {
 
 .footer-brand img {
     width: 150px;
-
     height: auto;
 
     margin-bottom: 5px;
@@ -989,24 +883,19 @@ body {
     color: #aaa;
 
     font-size: 15px;
-
     line-height: 1.7;
 }
 
 .footer-section h3 {
-    position: relative;
-
-    font-size: 18px;
-
-    font-weight: bold;
-
-    text-transform: uppercase;
-
-    letter-spacing: 1.5px;
-
     margin-bottom: 10px;
 
     color: white;
+
+    font-size: 18px;
+    font-weight: bold;
+
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
 }
 
 .footer-section h3::after {
@@ -1017,9 +906,9 @@ body {
     width: 40px;
     height: 3px;
 
-    background: #ff3d02;
-
     margin-top: 8px;
+
+    background: #ff3d02;
 }
 
 .footer-section > a {
@@ -1047,18 +936,16 @@ body {
 
 .contact-item {
     display: flex;
-
     align-items: flex-start;
 
     gap: 14px;
 
+    margin-bottom: 5px;
+
     color: #aaa;
 
     font-size: 15px;
-
     line-height: 1.6;
-
-    margin-bottom: 5px;
 
     text-decoration: none;
 }
@@ -1069,15 +956,14 @@ body {
     height: 22px;
 
     display: flex;
-
     align-items: center;
     justify-content: center;
+
+    margin-top: 2px;
 
     color: #ff3d02;
 
     font-size: 17px;
-
-    margin-top: 2px;
 }
 
 .contact-item span {
@@ -1110,16 +996,13 @@ body {
     height: 40px;
 
     display: flex;
-
     align-items: center;
     justify-content: center;
 
     color: #aaa;
-
     background: #080808;
 
     border: 1px solid #333;
-
     border-radius: 50%;
 
     text-decoration: none;
@@ -1131,7 +1014,6 @@ body {
 
 .social-links a:hover {
     color: white;
-
     background: #ff3d02;
 
     border-color: #ff3d02;
@@ -1153,7 +1035,6 @@ body {
     padding: 20px 5%;
 
     display: flex;
-
     align-items: center;
     justify-content: space-between;
 
@@ -1168,7 +1049,6 @@ body {
     color: #666;
 
     font-size: 13px;
-
     letter-spacing: 0.5px;
 }
 
@@ -1187,39 +1067,35 @@ body {
 
 .booking-overlay {
     position: fixed;
-
     inset: 0;
 
     width: 100%;
     height: 100%;
 
-    background: rgba(0, 0, 0, 0.90);
-
-    backdrop-filter: blur(8px);
+    z-index: 9999;
 
     display: flex;
-
     align-items: center;
     justify-content: center;
 
     padding: 20px;
 
-    z-index: 9999;
+    background: rgba(0, 0, 0, 0.90);
+
+    backdrop-filter: blur(8px);
 
     opacity: 0;
-
     visibility: hidden;
+
+    overflow-y: auto;
 
     transition:
         opacity 0.3s ease,
         visibility 0.3s ease;
-
-    overflow-y: auto;
 }
 
 .booking-overlay.active {
     opacity: 1;
-
     visibility: visible;
 }
 
@@ -1229,15 +1105,15 @@ body {
 ================================================== */
 
 .booking-modal {
-    width: 100%;
-
-    max-width: 850px;
+    width: min(850px, 100%);
 
     max-height: 92vh;
 
     overflow-y: auto;
 
     position: relative;
+
+    padding: 40px;
 
     background:
         linear-gradient(
@@ -1251,8 +1127,6 @@ body {
     border-top: 4px solid #ff3d02;
 
     border-radius: 8px;
-
-    padding: 40px;
 
     box-shadow:
         0 20px 80px rgba(0, 0, 0, 0.95),
@@ -1282,8 +1156,11 @@ body {
     width: 40px;
     height: 40px;
 
-    border: 1px solid #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
+    border: 1px solid #333;
     border-radius: 50%;
 
     background: #0b0b0b;
@@ -1293,11 +1170,6 @@ body {
     font-size: 18px;
 
     cursor: pointer;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
 
     transition: 0.3s;
 }
@@ -1318,48 +1190,43 @@ body {
 ================================================== */
 
 .booking-header {
-    padding-right: 50px;
-
     margin-bottom: 30px;
 
-    border-bottom: 1px solid #292929;
-
+    padding-right: 50px;
     padding-bottom: 25px;
+
+    border-bottom: 1px solid #292929;
 }
 
 .booking-label {
     display: inline-block;
 
+    margin-bottom: 10px;
+
     color: #ff3d02;
 
     font-size: 12px;
-
     font-weight: bold;
 
     letter-spacing: 3px;
-
-    margin-bottom: 10px;
 }
 
 .booking-header h2 {
+    margin-bottom: 10px;
+
     color: white;
 
-    font-size: 38px;
-
+    font-size: clamp(27px, 4vw, 38px);
     font-weight: 900;
 
     text-transform: uppercase;
-
     letter-spacing: 1px;
-
-    margin-bottom: 10px;
 }
 
 .booking-header p {
     color: #999;
 
     font-size: 15px;
-
     line-height: 1.6;
 }
 
@@ -1370,7 +1237,6 @@ body {
 
 .booking-form {
     display: flex;
-
     flex-direction: column;
 
     gap: 20px;
@@ -1380,14 +1246,13 @@ body {
     display: grid;
 
     grid-template-columns:
-        repeat(2, 1fr);
+        repeat(2, minmax(0, 1fr));
 
     gap: 18px;
 }
 
 .form-group {
     display: flex;
-
     flex-direction: column;
 
     gap: 8px;
@@ -1397,11 +1262,9 @@ body {
     color: #ddd;
 
     font-size: 13px;
-
     font-weight: bold;
 
     text-transform: uppercase;
-
     letter-spacing: 0.8px;
 }
 
@@ -1415,18 +1278,16 @@ body {
 .form-group textarea {
     width: 100%;
 
-    border: 1px solid #333;
+    padding: 13px 15px;
 
+    border: 1px solid #333;
     border-radius: 4px;
 
     background: #050505;
 
     color: white;
 
-    padding: 13px 15px;
-
     font-family: Arial, sans-serif;
-
     font-size: 14px;
 
     outline: none;
@@ -1473,7 +1334,6 @@ body {
 
 .form-group select option {
     background: #080808;
-
     color: white;
 }
 
@@ -1489,20 +1349,17 @@ body {
 
 .booking-submit {
     width: 100%;
-
     min-height: 52px;
 
     margin-top: 5px;
 
     display: flex;
-
     align-items: center;
     justify-content: center;
 
     gap: 12px;
 
     border: 2px solid #ff3d02;
-
     border-radius: 50px;
 
     background: #ff3d02;
@@ -1510,11 +1367,9 @@ body {
     color: white;
 
     font-size: 14px;
-
     font-weight: bold;
 
     text-transform: uppercase;
-
     letter-spacing: 1px;
 
     cursor: pointer;
@@ -1527,7 +1382,6 @@ body {
 
 .booking-submit:hover {
     background: transparent;
-
     color: #ff3d02;
 
     transform: translateY(-2px);
@@ -1550,70 +1404,78 @@ body {
 
 
 /* ==================================================
-   TABLET
+   LARGE TABLET
 ================================================== */
 
 @media (max-width: 1200px) {
 
     .boxes {
         grid-template-columns:
-            repeat(2, 360px);
+            repeat(2, minmax(280px, 360px));
     }
 
     .event-thumbnail {
         width: 140px;
     }
+
+    .footer-container {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
 }
 
 
-@media (max-width: 1000px) {
+/* ==================================================
+   TABLET
+================================================== */
+
+@media (max-width: 900px) {
+
+    body {
+        padding-top: 120px;
+    }
+
+    .header {
+        height: 120px;
+    }
+
+    .header nav {
+        gap: 18px;
+    }
 
     .about-us {
         flex-direction: column;
 
         align-items: stretch;
-
-        gap: 30px;
     }
 
     .about-video {
         width: 100%;
-
         height: 500px;
-    }
-
-    .big-box {
-        width: 90%;
-
-        height: auto;
-
-        aspect-ratio: 1 / 0.75;
     }
 
     .boxes {
         grid-template-columns:
-            repeat(2, 360px);
-
-        gap: 20px;
+            repeat(2, minmax(0, 1fr));
     }
 
-    .featured-event {
-        width: 90%;
-
-        height: 500px;
+    .image-button {
+        height: 450px;
     }
 
-    .event-thumbnails {
-        width: 95%;
+    .image-button img {
+        height: calc(100% - 60px);
+    }
 
-        margin: auto;
+    .image-title {
+        height: 60px;
     }
 
     .footer-container {
         grid-template-columns:
             repeat(2, 1fr);
 
-        gap: 40px;
+        gap: 35px;
     }
 }
 
@@ -1625,38 +1487,37 @@ body {
 @media (max-width: 600px) {
 
     body {
-        padding-top: 120px;
+        padding-top: 100px;
+
+        background-attachment: scroll;
     }
 
 
     /* HEADER */
 
     .header {
-        height: 120px;
+        height: 100px;
 
-        padding: 0 20px;
-
-        border-bottom-width: 2px;
+        padding: 0 15px;
     }
 
     .logo img {
-        width: 110px;
+        width: 90px;
     }
 
     .header nav {
-        gap: 10px;
+        gap: 7px;
     }
 
     .header nav a {
-        font-size: 9px;
-
+        font-size: 8px;
         letter-spacing: 0;
     }
 
     .header nav a.book-button {
-        padding: 7px 14px;
+        padding: 7px 11px;
 
-        font-size: 9px;
+        font-size: 8px;
 
         border-width: 1px;
     }
@@ -1667,27 +1528,30 @@ body {
     .about-us {
         width: 94%;
 
-        padding: 25px 20px;
+        margin: 20px auto;
+
+        padding: 25px 18px;
 
         gap: 25px;
+
+        border-left-width: 3px;
     }
 
     .about-content h1 {
         font-size: 30px;
-
         letter-spacing: 1px;
     }
 
     .about-content p {
-        font-size: 15px;
-
+        font-size: 14px;
         line-height: 1.7;
+
+        text-align: left;
     }
 
     .about-video {
         width: 100%;
-
-        height: 450px;
+        height: 400px;
     }
 
 
@@ -1703,43 +1567,34 @@ body {
 
     .big-box {
         width: 100%;
-
-        height: auto;
-
-        aspect-ratio: 1 / 0.8;
     }
 
 
     /* EVENTS */
 
     .events {
-        width: 100%;
-
         padding: 25px 5px;
     }
 
     .events h2 {
         font-size: 28px;
-
         letter-spacing: 2px;
     }
 
     .events-description {
         font-size: 14px;
-
         margin-bottom: 25px;
     }
 
     .featured-event {
         width: 100%;
-
-        height: 350px;
+        aspect-ratio: 1 / 0.8;
 
         margin-bottom: 20px;
     }
 
     .featured-title {
-        font-size: 16px;
+        font-size: 15px;
 
         padding: 25px 15px 15px;
     }
@@ -1751,54 +1606,47 @@ body {
         display: grid;
 
         grid-template-columns:
-            repeat(3, 1fr);
+            repeat(3, minmax(0, 1fr));
 
-        gap: 8px;
-
-        width: 100%;
+        gap: 7px;
     }
 
     .event-thumbnail {
         width: 100%;
-
-        height: 95px;
+        height: 90px;
     }
 
     .event-thumbnail > img {
-        height: 62px;
+        height: 60px;
     }
 
     .event-thumbnail span {
-        height: 31px;
+        height: 30px;
 
-        font-size: 8px;
-
+        font-size: 7px;
         letter-spacing: 0;
     }
 
     .video-thumbnail {
-        height: 62px;
+        height: 60px;
     }
 
     .video-thumbnail i {
-        width: 28px;
-        height: 28px;
+        width: 27px;
+        height: 27px;
 
-        font-size: 11px;
+        font-size: 10px;
     }
 
 
     /* SERVICES */
 
     .services {
-        width: 100%;
-
-        padding: 25px 15px;
+        padding: 25px 10px;
     }
 
     .services h2 {
         font-size: 28px;
-
         letter-spacing: 2px;
     }
 
@@ -1808,26 +1656,23 @@ body {
 
     .boxes {
         grid-template-columns:
-            repeat(2, 1fr);
+            repeat(2, minmax(0, 1fr));
 
-        gap: 12px;
+        gap: 10px;
     }
 
     .image-button {
-        width: 100%;
-
-        height: 300px;
+        height: 280px;
     }
 
     .image-button img {
-        height: 250px;
+        height: calc(100% - 48px);
     }
 
     .image-title {
-        height: 50px;
+        height: 48px;
 
-        font-size: 13px;
-
+        font-size: 11px;
         letter-spacing: 0;
     }
 
@@ -1845,11 +1690,11 @@ body {
 
         grid-template-columns: 1fr;
 
-        gap: 35px;
+        gap: 30px;
     }
 
     .footer-brand img {
-        width: 130px;
+        width: 120px;
     }
 
     .footer-brand p {
@@ -1877,7 +1722,7 @@ body {
 
         text-align: center;
 
-        padding: 20px;
+        padding: 20px 15px;
     }
 
     .footer-bottom p {
@@ -1889,9 +1734,13 @@ body {
 
     .booking-overlay {
         padding: 10px;
+
+        align-items: center;
     }
 
     .booking-modal {
+        width: 100%;
+
         max-height: 96vh;
 
         padding: 30px 20px;
@@ -1913,16 +1762,17 @@ body {
         padding-right: 40px;
 
         margin-bottom: 25px;
+
+        padding-bottom: 20px;
     }
 
     .booking-label {
         font-size: 10px;
-
         letter-spacing: 2px;
     }
 
     .booking-header h2 {
-        font-size: 27px;
+        font-size: 26px;
     }
 
     .booking-header p {
@@ -1942,7 +1792,58 @@ body {
 
     .booking-submit {
         font-size: 12px;
+    }
+}
 
-        padding: 12px;
+
+/* ==================================================
+   SMALL MOBILE
+================================================== */
+
+@media (max-width: 400px) {
+
+    .header {
+        padding: 0 10px;
+    }
+
+    .logo img {
+        width: 78px;
+    }
+
+    .header nav {
+        gap: 5px;
+    }
+
+    .header nav a {
+        font-size: 7px;
+    }
+
+    .header nav a.book-button {
+        padding: 6px 9px;
+        font-size: 7px;
+    }
+
+    .about-content h1 {
+        font-size: 26px;
+    }
+
+    .about-video {
+        height: 350px;
+    }
+
+    .event-thumbnail span {
+        font-size: 6px;
+    }
+
+    .image-button {
+        height: 250px;
+    }
+
+    .image-title {
+        font-size: 9px;
+    }
+
+    .booking-modal {
+        padding: 25px 15px;
     }
 }
