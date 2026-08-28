@@ -586,7 +586,7 @@ else {
     */
 
     $maxFileSize =
-        4 * 1024 * 1024;
+        500 * 1024 * 1024;
 
     if ($fileSize > $maxFileSize) {
 
