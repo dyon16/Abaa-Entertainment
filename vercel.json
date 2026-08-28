@@ -40,7 +40,11 @@
 {
   "source": "/admin/services",
   "destination": "/api/admin-services.php"
+},{
+  "source": "/booking-status",
+  "destination": "/api/booking-status.php"
 }
+
 
 
 ]
