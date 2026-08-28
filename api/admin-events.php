@@ -2779,9 +2779,8 @@ foreach (
                                     <input
                                         type="hidden"
                                         name="event_id"
-                                        value="<?= (
-                                            int)$event['id']
-                                        ?>"
+                                        value="<?= (int)$event['id'] ?>"
+
                                     >
 
 
