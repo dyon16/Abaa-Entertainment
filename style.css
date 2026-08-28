@@ -405,8 +405,6 @@ body {
 
     border-radius: 5px;
 
-    border: 1px solid #292929;
-
     background: #080808;
 
     box-shadow:
@@ -436,9 +434,7 @@ body {
     transition: 0.5s;
 }
 
-.big-box:hover img {
-    transform: scale(1.05);
-}
+
 
 /* ==================================================
    EVENTS
