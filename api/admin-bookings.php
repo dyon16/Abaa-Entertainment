@@ -97,7 +97,7 @@ if (!$authSecret)
         </a>
 
 
-        <a href="/admin-events">
+        <a href="/admin/events">
 
             <i class="fa-solid fa-photo-film"></i>
 
@@ -108,7 +108,7 @@ if (!$authSecret)
         </a>
 
 
-        <a href="/admin-services">
+        <a href="/admin/services">
 
             <i class="fa-solid fa-screwdriver-wrench"></i>
 
