@@ -715,13 +715,24 @@ if ($admin) {
 
     <a href="/admin/events">
 
-        <i class="fa-solid fa-photo-film"></i>
+            <i class="fa-solid fa-photo-film"></i>
 
-        <span>
-            Events
-        </span>
+            <span>
+                Events
+            </span>
 
-    </a>
+        </a>
+
+
+        <a href="/admin/services">
+
+            <i class="fa-solid fa-screwdriver-wrench"></i>
+
+            <span>
+                Services
+            </span>
+
+        </a>
 
 
            
