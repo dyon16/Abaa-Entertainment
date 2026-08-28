@@ -9,7 +9,6 @@
 include(__DIR__ . '/conn.php');
 
 
-
 /*
 |--------------------------------------------------------------------------
 | ADMIN AUTHENTICATION
@@ -20,8 +19,8 @@ $authSecret = getenv('ADMIN_AUTH_SECRET');
 
 if (!$authSecret) {
 
-    // Change this if you have not created
-    // ADMIN_AUTH_SECRET in Vercel yet.
+    // IMPORTANT:
+    // Set ADMIN_AUTH_SECRET in your Vercel environment variables.
     $authSecret = 'ABAA_CHANGE_THIS_SECRET_2026';
 
 }
@@ -69,7 +68,8 @@ function base64UrlDecode($data)
             ),
             '-_',
             '+/'
-        )
+        ),
+        true
     );
 }
 
@@ -92,18 +92,15 @@ function createAdminCookie(
         'exp' => time() + (60 * 60 * 8)
     ];
 
-
     $payloadEncoded = base64UrlEncode(
         json_encode($payload)
     );
-
 
     $signature = hash_hmac(
         'sha256',
         $payloadEncoded,
         $secret
     );
-
 
     return $payloadEncoded . '.' . $signature;
 }
@@ -121,39 +118,23 @@ function verifyAdminCookie(
 ) {
 
     if (!$cookie) {
-
         return false;
-
     }
 
-
-    $parts = explode(
-        '.',
-        $cookie
-    );
-
+    $parts = explode('.', $cookie);
 
     if (count($parts) !== 2) {
-
         return false;
-
     }
 
+    $payloadEncoded = $parts[0];
+    $providedSignature = $parts[1];
 
-    $payloadEncoded =
-        $parts[0];
-
-    $providedSignature =
-        $parts[1];
-
-
-    $expectedSignature =
-        hash_hmac(
-            'sha256',
-            $payloadEncoded,
-            $secret
-        );
-
+    $expectedSignature = hash_hmac(
+        'sha256',
+        $payloadEncoded,
+        $secret
+    );
 
     if (
         !hash_equals(
@@ -161,58 +142,39 @@ function verifyAdminCookie(
             $providedSignature
         )
     ) {
-
         return false;
-
     }
 
-
-    $payloadJson =
-        base64UrlDecode(
-            $payloadEncoded
-        );
-
+    $payloadJson = base64UrlDecode(
+        $payloadEncoded
+    );
 
     if (!$payloadJson) {
-
         return false;
-
     }
 
-
-    $payload =
-        json_decode(
-            $payloadJson,
-            true
-        );
-
+    $payload = json_decode(
+        $payloadJson,
+        true
+    );
 
     if (!is_array($payload)) {
-
         return false;
-
     }
-
 
     if (
         !isset($payload['id']) ||
         !isset($payload['username']) ||
         !isset($payload['exp'])
     ) {
-
         return false;
-
     }
-
 
     if (
         (int) $payload['exp'] < time()
     ) {
-
         return false;
-
     }
-
 
     return $payload;
 }
@@ -241,13 +203,9 @@ if (
         ]
     );
 
-
-    header(
-        'Location: /admin'
-    );
+    header('Location: /admin');
 
     exit;
-
 }
 
 
@@ -259,18 +217,14 @@ if (
 
 $admin = false;
 
-
 if (
-    isset(
-        $_COOKIE[$cookieName]
-    )
+    isset($_COOKIE[$cookieName])
 ) {
 
-    $admin =
-        verifyAdminCookie(
-            $_COOKIE[$cookieName],
-            $authSecret
-        );
+    $admin = verifyAdminCookie(
+        $_COOKIE[$cookieName],
+        $authSecret
+    );
 
 }
 
@@ -283,21 +237,16 @@ if (
 
 $loginError = '';
 
-
 if (
     $_SERVER['REQUEST_METHOD'] === 'POST' &&
     isset($_POST['login'])
 ) {
 
-    $username =
-        trim(
-            $_POST['username'] ?? ''
-        );
+    $username = trim(
+        $_POST['username'] ?? ''
+    );
 
-
-    $password =
-        $_POST['password'] ?? '';
-
+    $password = $_POST['password'] ?? '';
 
     if (
         $username === '' ||
@@ -324,14 +273,11 @@ if (
                  LIMIT 1"
             );
 
-
             $stmt->execute([
                 ':username' => $username
             ]);
 
-
-            $adminUser =
-                $stmt->fetch();
+            $adminUser = $stmt->fetch();
 
 
             /*
@@ -339,12 +285,11 @@ if (
             | CHECK PASSWORD
             |--------------------------------------------------------------------------
             |
-            | Plain-text password comparison.
+            | Current database setup uses plain-text passwords.
             |
-            | Database:
-            |
-            | username = admin
-            | password = admin123
+            | Recommended later:
+            | password_hash()
+            | password_verify()
             |
             |--------------------------------------------------------------------------
             */
@@ -354,19 +299,11 @@ if (
                 $password === $adminUser['password']
             ) {
 
-                /*
-                |--------------------------------------------------------------------------
-                | CREATE LOGIN COOKIE
-                |--------------------------------------------------------------------------
-                */
-
-                $authCookie =
-                    createAdminCookie(
-                        $adminUser['id'],
-                        $adminUser['username'],
-                        $authSecret
-                    );
-
+                $authCookie = createAdminCookie(
+                    $adminUser['id'],
+                    $adminUser['username'],
+                    $authSecret
+                );
 
                 setcookie(
                     $cookieName,
@@ -388,16 +325,7 @@ if (
                     ]
                 );
 
-
-                /*
-                |--------------------------------------------------------------------------
-                | REDIRECT TO ADMIN
-                |--------------------------------------------------------------------------
-                */
-
-                header(
-                    'Location: /admin'
-                );
+                header('Location: /admin');
 
                 exit;
 
@@ -414,7 +342,6 @@ if (
                 'Admin login error: ' .
                 $e->getMessage()
             );
-
 
             $loginError =
                 'Unable to connect to the database.';
@@ -441,24 +368,19 @@ if ($admin) {
 
     try {
 
-        $stmt =
-            $pdo->query(
-                "SELECT *
-                 FROM bookings
-                 ORDER BY id DESC"
-            );
+        $stmt = $pdo->query(
+            "SELECT *
+             FROM bookings
+             ORDER BY id DESC"
+        );
 
-
-        $bookings =
-            $stmt->fetchAll();
-
+        $bookings = $stmt->fetchAll();
 
         if (!empty($bookings)) {
 
-            $bookingColumns =
-                array_keys(
-                    $bookings[0]
-                );
+            $bookingColumns = array_keys(
+                $bookings[0]
+            );
 
         }
 
@@ -475,6 +397,7 @@ if ($admin) {
 
 ?>
 
+
 <!DOCTYPE html>
 
 <html lang="en">
@@ -488,16 +411,23 @@ if ($admin) {
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>
-        ABAA Admin
-    </title>
+    <meta
+        name="theme-color"
+        content="#ff5a1f"
+    >
 
+    <title>ABAA Admin</title>
+
+
+    <!-- ADMIN CSS -->
 
     <link
         rel="stylesheet"
         href="/admin.css"
     >
 
+
+    <!-- FONT AWESOME -->
 
     <link
         rel="stylesheet"
@@ -512,37 +442,52 @@ if ($admin) {
 
 <?php if (!$admin): ?>
 
+
 <!-- ==================================================
      LOGIN PAGE
 ================================================== -->
 
 <div class="login-page">
 
+
     <div class="login-card">
 
 
+        <!-- TOP BRAND -->
+
         <div class="login-logo">
 
-            <img
-                src="/logo.png"
-                alt="ABAA Entertainment"
-            >
+            <div class="login-logo-ring">
+
+                <img
+                    src="/logo.png"
+                    alt="ABAA Entertainment"
+                >
+
+            </div>
 
         </div>
 
 
         <span class="login-label">
+
             ABAA ENTERTAINMENT
+
         </span>
 
 
         <h1>
+
             Admin Login
+
         </h1>
 
 
         <p class="login-description">
-            Sign in to manage booking requests.
+
+            Sign in to manage your booking requests,
+            events and inquiries.
+
         </p>
 
 
@@ -552,12 +497,18 @@ if ($admin) {
 
                 <i class="fa-solid fa-circle-exclamation"></i>
 
-                <?= htmlspecialchars($loginError) ?>
+                <span>
+
+                    <?= htmlspecialchars($loginError) ?>
+
+                </span>
 
             </div>
 
         <?php endif; ?>
 
+
+        <!-- LOGIN FORM -->
 
         <form
             method="POST"
@@ -568,50 +519,64 @@ if ($admin) {
 
             <div class="form-group">
 
+
                 <label for="username">
+
                     Username
+
                 </label>
 
 
                 <div class="input-wrapper">
 
+
                     <i class="fa-solid fa-user"></i>
+
 
                     <input
                         type="text"
                         id="username"
                         name="username"
-                        placeholder="Enter username"
+                        placeholder="Enter your username"
                         autocomplete="username"
                         required
                     >
 
+
                 </div>
+
 
             </div>
 
 
             <div class="form-group">
 
+
                 <label for="password">
+
                     Password
+
                 </label>
 
 
                 <div class="input-wrapper">
 
+
                     <i class="fa-solid fa-lock"></i>
+
 
                     <input
                         type="password"
                         id="password"
                         name="password"
-                        placeholder="Enter password"
+                        placeholder="Enter your password"
                         autocomplete="current-password"
                         required
                     >
 
+
                 </div>
+
 
             </div>
 
@@ -623,12 +588,16 @@ if ($admin) {
             >
 
                 <span>
-                    Login
+
+                    Sign In
+
                 </span>
+
 
                 <i class="fa-solid fa-arrow-right"></i>
 
             </button>
+
 
         </form>
 
@@ -645,12 +614,23 @@ if ($admin) {
         </a>
 
 
+        <div class="login-footer">
+
+            <i class="fa-solid fa-shield-halved"></i>
+
+            Secure administrator access
+
+        </div>
+
+
     </div>
+
 
 </div>
 
 
 <?php else: ?>
+
 
 <!-- ==================================================
      ADMIN DASHBOARD
@@ -659,33 +639,50 @@ if ($admin) {
 <div class="admin-layout">
 
 
-    <!-- SIDEBAR -->
+    <!-- ==================================================
+         SIDEBAR
+    ================================================== -->
 
     <aside class="sidebar">
 
 
+        <!-- BRAND -->
+
         <div class="sidebar-brand">
 
-            <img
-                src="/logo.png"
-                alt="ABAA Entertainment"
-            >
+
+            <div class="sidebar-logo">
+
+                <img
+                    src="/logo.png"
+                    alt="ABAA Entertainment"
+                >
+
+            </div>
 
 
             <div>
 
                 <strong>
+
                     ABAA
+
                 </strong>
 
+
                 <span>
+
                     ADMIN PANEL
+
                 </span>
 
             </div>
 
+
         </div>
 
+
+        <!-- NAVIGATION -->
 
         <nav class="sidebar-nav">
 
@@ -695,9 +692,13 @@ if ($admin) {
                 class="active"
             >
 
-                <i class="fa-solid fa-chart-line"></i>
+                <i class="fa-solid fa-chart-pie"></i>
 
-                Dashboard
+                <span>
+
+                    Dashboard
+
+                </span>
 
             </a>
 
@@ -706,12 +707,52 @@ if ($admin) {
 
                 <i class="fa-solid fa-globe"></i>
 
-                View Website
+                <span>
+
+                    View Website
+
+                </span>
 
             </a>
 
+
         </nav>
 
+
+        <!-- SIDEBAR INFO -->
+
+        <div class="sidebar-info">
+
+
+            <div class="sidebar-info-icon">
+
+                <i class="fa-solid fa-bolt"></i>
+
+            </div>
+
+
+            <div>
+
+                <strong>
+
+                    ABAA Entertainment
+
+                </strong>
+
+
+                <span>
+
+                    Booking management system
+
+                </span>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- SIDEBAR BOTTOM -->
 
         <div class="sidebar-bottom">
 
@@ -738,10 +779,13 @@ if ($admin) {
 
 
                     <span>
+
                         Administrator
+
                     </span>
 
                 </div>
+
 
             </div>
 
@@ -759,7 +803,11 @@ if ($admin) {
 
                     <i class="fa-solid fa-right-from-bracket"></i>
 
-                    Logout
+                    <span>
+
+                        Logout
+
+                    </span>
 
                 </button>
 
@@ -768,134 +816,257 @@ if ($admin) {
 
         </div>
 
+
     </aside>
 
 
-    <!-- MAIN -->
+    <!-- ==================================================
+         MAIN
+    ================================================== -->
 
     <main class="admin-main">
 
+
+        <!-- ==================================================
+             TOP PANEL
+        ================================================== -->
+
+        <div class="top-panel">
+
+
+            <div class="top-panel-left">
+
+
+                <div class="top-panel-icon">
+
+                    <i class="fa-solid fa-layer-group"></i>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+
+                        ABAA ENTERTAINMENT
+
+                    </span>
+
+
+                    <strong>
+
+                        Booking Management
+
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+
+            <div class="top-panel-right">
+
+
+                <div class="online-status">
+
+                    <span></span>
+
+                    System Online
+
+                </div>
+
+
+                <div class="top-admin">
+
+                    <i class="fa-solid fa-circle-user"></i>
+
+                    <?= htmlspecialchars(
+                        $admin['username']
+                    ) ?>
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+        <!-- ==================================================
+             HEADER
+        ================================================== -->
 
         <header class="admin-header">
 
 
             <div>
 
+
                 <span class="dashboard-label">
-                    ADMINISTRATION
+
+                    DASHBOARD
+
                 </span>
 
 
                 <h1>
-                    Booking Dashboard
+
+                    Booking Overview
+
                 </h1>
 
 
                 <p>
-                    Manage and review your event booking requests.
+
+                    Review and manage your latest event
+                    booking requests.
+
                 </p>
 
-            </div>
-
-
-            <div class="header-user">
-
-                <i class="fa-solid fa-circle-user"></i>
-
-
-                <span>
-
-                    <?= htmlspecialchars(
-                        $admin['username']
-                    ) ?>
-
-                </span>
 
             </div>
+
+
+            <a
+                href="/"
+                class="view-site-button"
+            >
+
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+
+                View Website
+
+            </a>
 
 
         </header>
 
 
-        <!-- STATISTICS -->
+        <!-- ==================================================
+             STATISTICS
+        ================================================== -->
 
         <section class="stats-grid">
 
 
-            <div class="stat-card">
-
-
-                <div class="stat-icon blue">
-
-                    <i class="fa-solid fa-calendar-check"></i>
-
-                </div>
-
-
-                <div>
-
-                    <span>
-                        Total Bookings
-                    </span>
-
-
-                    <strong>
-                        <?= count($bookings) ?>
-                    </strong>
-
-                </div>
-
-            </div>
-
+            <!-- TOTAL BOOKINGS -->
 
             <div class="stat-card">
 
 
                 <div class="stat-icon orange">
 
+                    <i class="fa-solid fa-calendar-check"></i>
+
+                </div>
+
+
+                <div class="stat-content">
+
+                    <span>
+
+                        Total Bookings
+
+                    </span>
+
+
+                    <strong>
+
+                        <?= count($bookings) ?>
+
+                    </strong>
+
+
+                    <small>
+
+                        All booking requests
+
+                    </small>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- REQUESTS -->
+
+            <div class="stat-card">
+
+
+                <div class="stat-icon dark-orange">
+
                     <i class="fa-solid fa-clock"></i>
 
                 </div>
 
 
-                <div>
+                <div class="stat-content">
 
                     <span>
+
                         Requests
+
                     </span>
 
 
                     <strong>
+
                         <?= count($bookings) ?>
+
                     </strong>
 
+
+                    <small>
+
+                        Awaiting review
+
+                    </small>
+
                 </div>
+
 
             </div>
 
 
+            <!-- ADMIN -->
+
             <div class="stat-card">
 
 
-                <div class="stat-icon green">
+                <div class="stat-icon dark">
 
-                    <i class="fa-solid fa-users"></i>
+                    <i class="fa-solid fa-user-shield"></i>
 
                 </div>
 
 
-                <div>
+                <div class="stat-content">
 
                     <span>
-                        Admin
+
+                        Administrators
+
                     </span>
 
 
                     <strong>
+
                         1
+
                     </strong>
 
+
+                    <small>
+
+                        Active administrator
+
+                    </small>
+
                 </div>
+
 
             </div>
 
@@ -903,29 +1074,58 @@ if ($admin) {
         </section>
 
 
-        <!-- BOOKINGS -->
+        <!-- ==================================================
+             BOOKINGS SECTION
+        ================================================== -->
 
         <section class="bookings-section">
 
+
+            <!-- SECTION HEADER -->
 
             <div class="section-header">
 
 
                 <div>
 
-                    <span>
-                        BOOKINGS
-                    </span>
+
+                    <div class="section-title-row">
 
 
-                    <h2>
-                        Recent Booking Requests
-                    </h2>
+                        <span class="section-icon">
+
+                            <i class="fa-solid fa-calendar-days"></i>
+
+                        </span>
+
+
+                        <div>
+
+                            <span class="section-label">
+
+                                BOOKINGS
+
+                            </span>
+
+
+                            <h2>
+
+                                Recent Booking Requests
+
+                            </h2>
+
+                        </div>
+
+
+                    </div>
+
 
                 </div>
 
 
                 <div class="booking-count">
+
+                    <i class="fa-solid fa-inbox"></i>
 
                     <?= count($bookings) ?>
 
@@ -940,24 +1140,45 @@ if ($admin) {
             <?php if (empty($bookings)): ?>
 
 
+                <!-- ==================================================
+                     EMPTY STATE
+                ================================================== -->
+
                 <div class="empty-state">
 
 
                     <div class="empty-icon">
 
-                        <i class="fa-solid fa-calendar-xmark"></i>
+                        <i class="fa-regular fa-calendar-xmark"></i>
 
                     </div>
 
 
                     <h3>
+
                         No bookings yet
+
                     </h3>
 
 
                     <p>
-                        New booking requests will appear here.
+
+                        New booking requests from your website
+                        will appear here.
+
                     </p>
+
+
+                    <a
+                        href="/"
+                        class="empty-button"
+                    >
+
+                        <i class="fa-solid fa-globe"></i>
+
+                        Visit Website
+
+                    </a>
 
 
                 </div>
@@ -965,6 +1186,10 @@ if ($admin) {
 
             <?php else: ?>
 
+
+                <!-- ==================================================
+                     BOOKING TABLE
+                ================================================== -->
 
                 <div class="table-wrapper">
 
@@ -976,20 +1201,39 @@ if ($admin) {
 
                             <tr>
 
+
                                 <?php foreach (
                                     $bookingColumns
                                     as $column
                                 ): ?>
 
+
                                     <th>
 
-                                        <?= htmlspecialchars(
-                                            $column
-                                        ) ?>
+
+                                        <?php
+
+                                        $columnLabel =
+                                            str_replace(
+                                                '_',
+                                                ' ',
+                                                $column
+                                            );
+
+                                        echo htmlspecialchars(
+                                            ucwords(
+                                                $columnLabel
+                                            )
+                                        );
+
+                                        ?>
+
 
                                     </th>
 
+
                                 <?php endforeach; ?>
+
 
                             </tr>
 
@@ -1024,13 +1268,33 @@ if ($admin) {
 
                                                 <div class="message-cell">
 
+
                                                     <?= nl2br(
                                                         htmlspecialchars(
                                                             $booking[$column] ?? ''
                                                         )
                                                     ) ?>
 
+
                                                 </div>
+
+
+                                            <?php elseif (
+                                                $column === 'status'
+                                            ): ?>
+
+
+                                                <span class="status-badge">
+
+                                                    <span></span>
+
+                                                    <?= htmlspecialchars(
+                                                        (string) (
+                                                            $booking[$column] ?? ''
+                                                        )
+                                                    ) ?>
+
+                                                </span>
 
 
                                             <?php else: ?>
@@ -1071,6 +1335,30 @@ if ($admin) {
 
 
         </section>
+
+
+        <!-- ==================================================
+             FOOTER
+        ================================================== -->
+
+        <footer class="admin-footer">
+
+
+            <span>
+
+                © <?= date('Y') ?> ABAA Entertainment
+
+            </span>
+
+
+            <span>
+
+                Admin Dashboard
+
+            </span>
+
+
+        </footer>
 
 
     </main>
