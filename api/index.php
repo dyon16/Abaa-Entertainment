@@ -53,6 +53,34 @@ function e($value)
     );
 }
 
+
+/*
+|--------------------------------------------------------------------------
+| GET VIDEO MIME TYPE
+|--------------------------------------------------------------------------
+*/
+
+function getVideoMimeType($url)
+{
+    $path = parse_url($url, PHP_URL_PATH);
+
+    $extension = strtolower(
+        pathinfo($path, PATHINFO_EXTENSION)
+    );
+
+    switch ($extension) {
+
+        case 'webm':
+            return 'video/webm';
+
+        case 'mp4':
+            return 'video/mp4';
+
+        default:
+            return 'video/mp4';
+    }
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -87,6 +115,10 @@ function e($value)
 
 <body>
 
+
+<!-- ==================================================
+     HEADER
+================================================== -->
 
 <header class="header">
 
@@ -148,14 +180,25 @@ function e($value)
         </p>
 
         <h1>
-            <span>Powered by Passion.</span><br>
-            <span>Driven by Excellence.</span>
+
+            <span>
+                Powered by Passion.
+            </span>
+
+            <br>
+
+            <span>
+                Driven by Excellence.
+            </span>
+
         </h1>
 
         <p class="hero-description">
+
             We create unforgettable experiences through
             creativity, technology, passion, and professional
             event production.
+
         </p>
 
     </div>
@@ -355,6 +398,7 @@ function e($value)
                     muted
                     loop
                     playsinline
+                    preload="metadata"
                     style="display:none;"
                 >
 
@@ -364,6 +408,9 @@ function e($value)
                         type="video/mp4"
                     >
 
+                    Your browser does not support
+                    the video tag.
+
                 </video>
 
 
@@ -371,7 +418,9 @@ function e($value)
                     class="featured-title"
                     id="featuredTitle"
                 >
+
                     No events available
+
                 </div>
 
             </div>
@@ -381,12 +430,13 @@ function e($value)
 
 
             <!-- ==================================================
-                 FEATURED EVENT
+                 FIRST EVENT
             ================================================== -->
 
             <?php
 
-            $firstEvent = $events[0];
+            $firstEvent =
+                $events[0];
 
             $firstFile =
                 $firstEvent['file_url'];
@@ -400,8 +450,17 @@ function e($value)
             $firstThumbnail =
                 $firstEvent['thumbnail_url'];
 
+            $firstMimeType =
+                $firstType === 'video'
+                    ? getVideoMimeType($firstFile)
+                    : 'video/mp4';
+
             ?>
 
+
+            <!-- ==================================================
+                 FEATURED EVENT
+            ================================================== -->
 
             <div class="featured-event">
 
@@ -409,18 +468,26 @@ function e($value)
                 <?php if ($firstType === 'video'): ?>
 
 
+                    <!-- ==========================================
+                         VIDEO THUMBNAIL
+                    =========================================== -->
+
                     <img
                         id="featuredImage"
                         src="<?= e(
                             $firstThumbnail ?: '/logo.png'
                         ) ?>"
                         alt="<?= e($firstTitle) ?>"
-                        style="<?= $firstThumbnail
+                        <?= $firstThumbnail
                             ? ''
-                            : 'display:none;'
-                        ?>"
+                            : 'style="display:none;"'
+                        ?>
                     >
 
+
+                    <!-- ==========================================
+                         VIDEO PLAYER
+                    =========================================== -->
 
                     <video
                         id="featuredVideo"
@@ -428,6 +495,7 @@ function e($value)
                         muted
                         loop
                         playsinline
+                        preload="metadata"
                         <?= $firstThumbnail
                             ? 'style="display:none;"'
                             : ''
@@ -437,7 +505,7 @@ function e($value)
                         <source
                             id="featuredVideoSource"
                             src="<?= e($firstFile) ?>"
-                            type="video/mp4"
+                            type="<?= e($firstMimeType) ?>"
                         >
 
                         Your browser does not support
@@ -446,8 +514,33 @@ function e($value)
                     </video>
 
 
+                    <!-- ==========================================
+                         VIDEO PLAY OVERLAY
+                    =========================================== -->
+
+                    <?php if ($firstThumbnail): ?>
+
+                        <button
+                            type="button"
+                            id="featuredPlayButton"
+                            class="featured-play-button"
+                            onclick="playFeaturedVideo()"
+                            aria-label="Play video"
+                        >
+
+                            <i class="fa-solid fa-play"></i>
+
+                        </button>
+
+                    <?php endif; ?>
+
+
                 <?php else: ?>
 
+
+                    <!-- ==========================================
+                         IMAGE
+                    =========================================== -->
 
                     <img
                         id="featuredImage"
@@ -456,12 +549,17 @@ function e($value)
                     >
 
 
+                    <!-- ==========================================
+                         HIDDEN VIDEO
+                    =========================================== -->
+
                     <video
                         id="featuredVideo"
                         controls
                         muted
                         loop
                         playsinline
+                        preload="metadata"
                         style="display:none;"
                     >
 
@@ -471,11 +569,18 @@ function e($value)
                             type="video/mp4"
                         >
 
+                        Your browser does not support
+                        the video tag.
+
                     </video>
 
 
                 <?php endif; ?>
 
+
+                <!-- ==========================================
+                     TITLE
+                =========================================== -->
 
                 <div
                     class="featured-title"
@@ -502,6 +607,28 @@ function e($value)
                 ): ?>
 
 
+                    <?php
+
+                    $eventType =
+                        $event['type'];
+
+                    $eventFile =
+                        $event['file_url'];
+
+                    $eventTitle =
+                        $event['title'];
+
+                    $eventThumbnail =
+                        $event['thumbnail_url'];
+
+                    $eventMimeType =
+                        $eventType === 'video'
+                            ? getVideoMimeType($eventFile)
+                            : '';
+
+                    ?>
+
+
                     <button
                         type="button"
                         class="event-thumbnail <?= $index === 0
@@ -509,47 +636,45 @@ function e($value)
                             : ''
                         ?>"
                         onclick="showEvent(
-                            <?= e($event['type']) === 'video'
-                                ? "'video'"
-                                : "'image'"
-                            ?>,
-                            <?= json_encode(
-                                $event['file_url']
-                            ) ?>,
-                            <?= json_encode(
-                                $event['title']
-                            ) ?>,
+                            <?= json_encode($eventType) ?>,
+                            <?= json_encode($eventFile) ?>,
+                            <?= json_encode($eventTitle) ?>,
                             this,
-                            <?= json_encode(
-                                $event['thumbnail_url']
-                            ) ?>
+                            <?= json_encode($eventThumbnail) ?>,
+                            <?= json_encode($eventMimeType) ?>
                         )"
                     >
 
 
                         <?php if (
-                            $event['type'] === 'video'
+                            $eventType === 'video'
                         ): ?>
 
 
-                            <div class="video-thumbnail">
-
+                            <div
+                                class="video-thumbnail"
+                            >
 
                                 <img
                                     src="<?= e(
-                                        $event['thumbnail_url']
+                                        $eventThumbnail
                                         ?: '/logo.png'
                                     ) ?>"
                                     alt="<?= e(
-                                        $event['title']
+                                        $eventTitle
                                     ) ?>"
                                 >
 
 
-                                <i
-                                    class="fa-solid fa-play"
-                                ></i>
+                                <span
+                                    class="video-thumbnail-play"
+                                >
 
+                                    <i
+                                        class="fa-solid fa-play"
+                                    ></i>
+
+                                </span>
 
                             </div>
 
@@ -559,10 +684,10 @@ function e($value)
 
                             <img
                                 src="<?= e(
-                                    $event['file_url']
+                                    $eventFile
                                 ) ?>"
                                 alt="<?= e(
-                                    $event['title']
+                                    $eventTitle
                                 ) ?>"
                             >
 
@@ -573,7 +698,7 @@ function e($value)
                         <span>
 
                             <?= e(
-                                $event['title']
+                                $eventTitle
                             ) ?>
 
                         </span>
@@ -615,10 +740,12 @@ function e($value)
             >
 
             <p>
+
                 Creating unforgettable events,
                 entertainment, and experiences
                 through creativity, technology,
                 and professional event services.
+
             </p>
 
         </div>
@@ -706,8 +833,10 @@ function e($value)
                 <i class="fa-solid fa-location-dot"></i>
 
                 <span>
+
                     2F, Casa Ynares, P. Gomez,
                     Libis, Binangonan, Rizal
+
                 </span>
 
             </a>
@@ -790,12 +919,17 @@ function e($value)
     <div class="footer-bottom">
 
         <p>
-            © <?= date('Y') ?> ABAA Entertainment.
+
+            © <?= date('Y') ?>
+            ABAA Entertainment.
             All Rights Reserved.
+
         </p>
 
         <p>
+
             Entertainment • Events • Experiences
+
         </p>
 
     </div>
@@ -840,8 +974,10 @@ function e($value)
             </h2>
 
             <p>
+
                 Tell us about your event and our team
                 will get back to you.
+
             </p>
 
         </div>
@@ -1030,7 +1166,7 @@ function e($value)
 
 
             <!-- ==================================================
-                 MULTIPLE SERVICES
+                 SERVICES
             ================================================== -->
 
             <div class="form-group">
@@ -1192,6 +1328,10 @@ function e($value)
 
 
 
+<!-- ==================================================
+     JAVASCRIPT
+================================================== -->
+
 <script>
 
 
@@ -1206,8 +1346,15 @@ function showEvent(
     source,
     title,
     button,
-    thumbnail
+    thumbnail,
+    mimeType
 ) {
+
+    /*
+    |--------------------------------------------------------------------------
+    | ELEMENTS
+    |--------------------------------------------------------------------------
+    */
 
     const image =
         document.getElementById(
@@ -1227,6 +1374,11 @@ function showEvent(
     const featuredTitle =
         document.getElementById(
             "featuredTitle"
+        );
+
+    const playButton =
+        document.getElementById(
+            "featuredPlayButton"
         );
 
 
@@ -1249,9 +1401,19 @@ function showEvent(
         });
 
 
-    button.classList.add(
-        "active"
-    );
+    /*
+    |--------------------------------------------------------------------------
+    | ADD ACTIVE STATE
+    |--------------------------------------------------------------------------
+    */
+
+    if (button) {
+
+        button.classList.add(
+            "active"
+        );
+
+    }
 
 
     /*
@@ -1266,16 +1428,59 @@ function showEvent(
 
     /*
     |--------------------------------------------------------------------------
-    | IMAGE
+    | STOP CURRENT VIDEO
+    |--------------------------------------------------------------------------
+    */
+
+    video.pause();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | IMAGE EVENT
     |--------------------------------------------------------------------------
     */
 
     if (type === "image") {
 
-        video.pause();
+        /*
+        | Clear video
+        */
+
+        videoSource.removeAttribute(
+            "src"
+        );
+
+        video.removeAttribute(
+            "src"
+        );
+
+        video.load();
+
+
+        /*
+        | Hide video
+        */
 
         video.style.display =
             "none";
+
+
+        /*
+        | Hide play button
+        */
+
+        if (playButton) {
+
+            playButton.style.display =
+                "none";
+
+        }
+
+
+        /*
+        | Show image
+        */
 
         image.src =
             source;
@@ -1283,30 +1488,101 @@ function showEvent(
         image.style.display =
             "block";
 
+
+        return;
     }
 
 
     /*
     |--------------------------------------------------------------------------
-    | VIDEO
+    | VIDEO EVENT
     |--------------------------------------------------------------------------
     */
 
     if (type === "video") {
 
+        /*
+        | Hide image
+        */
+
         image.style.display =
             "none";
+
+
+        /*
+        | Set video URL
+        */
 
         videoSource.src =
             source;
 
+
+        /*
+        | Set MIME type
+        */
+
+        if (mimeType) {
+
+            videoSource.type =
+                mimeType;
+
+        } else {
+
+            videoSource.type =
+                "video/mp4";
+
+        }
+
+
+        /*
+        | Reload video
+        */
+
         video.load();
+
+
+        /*
+        | Show video
+        */
 
         video.style.display =
             "block";
 
+
+        /*
+        | Show play button only when
+        | thumbnail exists
+        */
+
+        if (
+            playButton &&
+            thumbnail
+        ) {
+
+            playButton.style.display =
+                "flex";
+
+        } else if (playButton) {
+
+            playButton.style.display =
+                "none";
+
+        }
+
+
+        /*
+        | Try autoplay
+        */
+
         video.play().catch(
-            function() {}
+            function(error) {
+
+                console.log(
+                    "Autoplay prevented:",
+                    error
+                );
+
+            }
         );
 
     }
@@ -1317,11 +1593,139 @@ function showEvent(
 
 /*
 |--------------------------------------------------------------------------
+| PLAY FEATURED VIDEO
+|--------------------------------------------------------------------------
+*/
+
+function playFeaturedVideo()
+{
+
+    const image =
+        document.getElementById(
+            "featuredImage"
+        );
+
+    const video =
+        document.getElementById(
+            "featuredVideo"
+        );
+
+    const playButton =
+        document.getElementById(
+            "featuredPlayButton"
+        );
+
+
+    if (!video) {
+
+        return;
+
+    }
+
+
+    /*
+    | Hide thumbnail
+    */
+
+    if (image) {
+
+        image.style.display =
+            "none";
+
+    }
+
+
+    /*
+    | Show video
+    */
+
+    video.style.display =
+        "block";
+
+
+    /*
+    | Hide play button
+    */
+
+    if (playButton) {
+
+        playButton.style.display =
+            "none";
+
+    }
+
+
+    /*
+    | Play
+    */
+
+    video.play().catch(
+        function(error) {
+
+            console.log(
+                "Unable to play video:",
+                error
+            );
+
+        }
+    );
+
+}
+
+
+
+/*
+|--------------------------------------------------------------------------
+| VIDEO ERROR
+|--------------------------------------------------------------------------
+*/
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+        const video =
+            document.getElementById(
+                "featuredVideo"
+            );
+
+
+        if (!video) {
+
+            return;
+
+        }
+
+
+        video.addEventListener(
+            "error",
+            function() {
+
+                console.error(
+                    "Unable to load event video."
+                );
+
+                console.error(
+                    "Video source:",
+                    video.currentSrc
+                );
+
+            }
+        );
+
+    }
+);
+
+
+
+/*
+|--------------------------------------------------------------------------
 | OPEN BOOKING MODAL
 |--------------------------------------------------------------------------
 */
 
-function openBookingModal(event) {
+function openBookingModal(event)
+{
 
     if (event) {
 
@@ -1367,7 +1771,8 @@ function openBookingModal(event) {
 |--------------------------------------------------------------------------
 */
 
-function closeBookingModal() {
+function closeBookingModal()
+{
 
     const modal =
         document.getElementById(
@@ -1402,7 +1807,7 @@ function closeBookingModal() {
 
 /*
 |--------------------------------------------------------------------------
-| CLICK OUTSIDE
+| CLICK OUTSIDE MODAL
 |--------------------------------------------------------------------------
 */
 
@@ -1452,6 +1857,109 @@ document.addEventListener(
 );
 
 </script>
+
+
+
+<!-- ==================================================
+     ADDITIONAL VIDEO BUTTON CSS
+================================================== -->
+
+<style>
+
+.featured-event {
+    position: relative;
+}
+
+.featured-play-button {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+    width: 70px;
+    height: 70px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: rgba(255, 90, 31, 0.95);
+
+    color: white;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    font-size: 24px;
+
+    box-shadow:
+        0 8px 30px rgba(0, 0, 0, 0.30);
+
+    z-index: 5;
+
+    transition:
+        transform .2s ease,
+        background .2s ease;
+}
+
+.featured-play-button:hover {
+
+    transform:
+        translate(-50%, -50%)
+        scale(1.08);
+
+    background:
+        rgba(255, 90, 31, 1);
+
+}
+
+.video-thumbnail {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.video-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.video-thumbnail-play {
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    transform:
+        translate(-50%, -50%);
+
+    width: 38px;
+    height: 38px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(255, 90, 31, .95);
+
+    color: white;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    pointer-events: none;
+
+}
+
+.video-thumbnail-play i {
+    font-size: 13px;
+}
+
+</style>
 
 
 </body>
