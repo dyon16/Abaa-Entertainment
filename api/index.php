@@ -612,6 +612,13 @@ include(__DIR__ . '/conn.php');
             <a href="/about">
                 About Us
             </a>
+            <a
+    href="/booking-status"
+    class="booking-status-link"
+>
+    <i class="fa-solid fa-magnifying-glass"></i>
+    Check Booking Status
+</a>
 
         </div>
 
