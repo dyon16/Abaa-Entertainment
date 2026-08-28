@@ -62,10 +62,16 @@ function e($value)
 
 function getVideoMimeType($url)
 {
-    $path = parse_url($url, PHP_URL_PATH);
+    $path = parse_url(
+        $url,
+        PHP_URL_PATH
+    );
 
     $extension = strtolower(
-        pathinfo($path, PATHINFO_EXTENSION)
+        pathinfo(
+            $path,
+            PATHINFO_EXTENSION
+        )
     );
 
     switch ($extension) {
@@ -73,9 +79,17 @@ function getVideoMimeType($url)
         case 'webm':
             return 'video/webm';
 
-        case 'mp4':
+        case 'ogg':
+        case 'ogv':
+            return 'video/ogg';
+
+        case 'mov':
+            return 'video/quicktime';
+
+        case 'm4v':
             return 'video/mp4';
 
+        case 'mp4':
         default:
             return 'video/mp4';
     }
@@ -395,7 +409,6 @@ function getVideoMimeType($url)
                 <video
                     id="featuredVideo"
                     controls
-                    muted
                     loop
                     playsinline
                     preload="metadata"
@@ -453,7 +466,7 @@ function getVideoMimeType($url)
             $firstMimeType =
                 $firstType === 'video'
                     ? getVideoMimeType($firstFile)
-                    : 'video/mp4';
+                    : '';
 
             ?>
 
@@ -492,7 +505,6 @@ function getVideoMimeType($url)
                     <video
                         id="featuredVideo"
                         controls
-                        muted
                         loop
                         playsinline
                         preload="metadata"
@@ -515,7 +527,7 @@ function getVideoMimeType($url)
 
 
                     <!-- ==========================================
-                         VIDEO PLAY OVERLAY
+                         BIG VIDEO PLAY BUTTON
                     =========================================== -->
 
                     <?php if ($firstThumbnail): ?>
@@ -556,7 +568,6 @@ function getVideoMimeType($url)
                     <video
                         id="featuredVideo"
                         controls
-                        muted
                         loop
                         playsinline
                         preload="metadata"
@@ -651,9 +662,11 @@ function getVideoMimeType($url)
                         ): ?>
 
 
-                            <div
-                                class="video-thumbnail"
-                            >
+                            <!-- ==================================
+                                 VIDEO SMALL THUMBNAIL
+                            =================================== -->
+
+                            <div class="video-thumbnail">
 
                                 <img
                                     src="<?= e(
@@ -665,6 +678,8 @@ function getVideoMimeType($url)
                                     ) ?>"
                                 >
 
+
+                                <!-- ORANGE PLAY ICON ONLY -->
 
                                 <span
                                     class="video-thumbnail-play"
@@ -681,6 +696,10 @@ function getVideoMimeType($url)
 
                         <?php else: ?>
 
+
+                            <!-- ==================================
+                                 IMAGE SMALL THUMBNAIL
+                            =================================== -->
 
                             <img
                                 src="<?= e(
@@ -1352,7 +1371,7 @@ function showEvent(
 
     /*
     |--------------------------------------------------------------------------
-    | ELEMENTS
+    | GET ELEMENTS
     |--------------------------------------------------------------------------
     */
 
@@ -1422,8 +1441,12 @@ function showEvent(
     |--------------------------------------------------------------------------
     */
 
-    featuredTitle.textContent =
-        title;
+    if (featuredTitle) {
+
+        featuredTitle.textContent =
+            title;
+
+    }
 
 
     /*
@@ -1432,7 +1455,11 @@ function showEvent(
     |--------------------------------------------------------------------------
     */
 
-    video.pause();
+    if (video) {
+
+        video.pause();
+
+    }
 
 
     /*
@@ -1443,27 +1470,31 @@ function showEvent(
 
     if (type === "image") {
 
-        /*
-        | Clear video
-        */
-
-        videoSource.removeAttribute(
-            "src"
-        );
-
-        video.removeAttribute(
-            "src"
-        );
-
-        video.load();
-
 
         /*
-        | Hide video
+        | Clear video source
         */
 
-        video.style.display =
-            "none";
+        if (videoSource) {
+
+            videoSource.removeAttribute(
+                "src"
+            );
+
+        }
+
+        if (video) {
+
+            video.removeAttribute(
+                "src"
+            );
+
+            video.load();
+
+            video.style.display =
+                "none";
+
+        }
 
 
         /*
@@ -1482,14 +1513,19 @@ function showEvent(
         | Show image
         */
 
-        image.src =
-            source;
+        if (image) {
 
-        image.style.display =
-            "block";
+            image.src =
+                source;
+
+            image.style.display =
+                "block";
+
+        }
 
 
         return;
+
     }
 
 
@@ -1501,35 +1537,40 @@ function showEvent(
 
     if (type === "video") {
 
+
         /*
         | Hide image
         */
 
-        image.style.display =
-            "none";
+        if (image) {
+
+            image.style.display =
+                "none";
+
+        }
 
 
         /*
-        | Set video URL
+        | Set video source
         */
 
-        videoSource.src =
-            source;
+        if (videoSource) {
+
+            videoSource.src =
+                source;
 
 
-        /*
-        | Set MIME type
-        */
+            if (mimeType) {
 
-        if (mimeType) {
+                videoSource.type =
+                    mimeType;
 
-            videoSource.type =
-                mimeType;
+            } else {
 
-        } else {
+                videoSource.type =
+                    "video/mp4";
 
-            videoSource.type =
-                "video/mp4";
+            }
 
         }
 
@@ -1538,31 +1579,24 @@ function showEvent(
         | Reload video
         */
 
-        video.load();
+        if (video) {
+
+            video.load();
+
+            video.style.display =
+                "block";
+
+        }
 
 
         /*
-        | Show video
+        | Hide old play overlay
+        |
+        | The browser's own controls
+        | will handle play/pause.
         */
 
-        video.style.display =
-            "block";
-
-
-        /*
-        | Show play button only when
-        | thumbnail exists
-        */
-
-        if (
-            playButton &&
-            thumbnail
-        ) {
-
-            playButton.style.display =
-                "flex";
-
-        } else if (playButton) {
+        if (playButton) {
 
             playButton.style.display =
                 "none";
@@ -1571,19 +1605,15 @@ function showEvent(
 
 
         /*
-        | Try autoplay
+        | IMPORTANT:
+        |
+        | Do NOT call video.play() here.
+        |
+        | This allows the user to decide
+        | when to play and control volume.
         */
 
-        video.play().catch(
-            function(error) {
-
-                console.log(
-                    "Autoplay prevented:",
-                    error
-                );
-
-            }
-        );
+        return;
 
     }
 
@@ -1595,6 +1625,11 @@ function showEvent(
 |--------------------------------------------------------------------------
 | PLAY FEATURED VIDEO
 |--------------------------------------------------------------------------
+|
+| This is only used for the orange
+| play button displayed over the
+| first video's thumbnail.
+|
 */
 
 function playFeaturedVideo()
@@ -1644,7 +1679,7 @@ function playFeaturedVideo()
 
 
     /*
-    | Hide play button
+    | Hide orange button
     */
 
     if (playButton) {
@@ -1656,7 +1691,12 @@ function playFeaturedVideo()
 
 
     /*
-    | Play
+    | Start video.
+    |
+    | IMPORTANT:
+    | There is NO muted attribute,
+    | so the browser's normal volume
+    | controls remain available.
     */
 
     video.play().catch(
@@ -1676,7 +1716,7 @@ function playFeaturedVideo()
 
 /*
 |--------------------------------------------------------------------------
-| VIDEO ERROR
+| VIDEO ERROR HANDLER
 |--------------------------------------------------------------------------
 */
 
@@ -1708,6 +1748,34 @@ document.addEventListener(
                 console.error(
                     "Video source:",
                     video.currentSrc
+                );
+
+            }
+        );
+
+
+        /*
+        | Debug information
+        */
+
+        video.addEventListener(
+            "loadedmetadata",
+            function() {
+
+                console.log(
+                    "Video loaded successfully."
+                );
+
+                console.log(
+                    "Video URL:",
+                    video.currentSrc
+                );
+
+                console.log(
+                    "Has audio:",
+                    video.mozHasAudio ||
+                    video.webkitAudioDecodedByteCount > 0 ||
+                    video.audioTracks?.length > 0
                 );
 
             }
@@ -1861,32 +1929,89 @@ document.addEventListener(
 
 
 <!-- ==================================================
-     ADDITIONAL VIDEO BUTTON CSS
+     EVENT VIDEO CSS
 ================================================== -->
 
 <style>
 
+/*
+|--------------------------------------------------------------------------
+| FEATURED EVENT
+|--------------------------------------------------------------------------
+*/
+
 .featured-event {
+
     position: relative;
+
 }
 
+
+/*
+|--------------------------------------------------------------------------
+| FEATURED IMAGE
+|--------------------------------------------------------------------------
+*/
+
+.featured-event > img {
+
+    display: block;
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| FEATURED VIDEO
+|--------------------------------------------------------------------------
+*/
+
+.featured-event > video {
+
+    display: block;
+
+    width: 100%;
+
+    max-width: 100%;
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| BIG ORANGE PLAY BUTTON
+|--------------------------------------------------------------------------
+*/
+
 .featured-play-button {
+
     position: absolute;
+
     left: 50%;
     top: 50%;
-    transform: translate(-50%, -50%);
+
+    transform:
+        translate(-50%, -50%);
 
     width: 70px;
     height: 70px;
 
     border: none;
+
     border-radius: 50%;
 
-    background: rgba(255, 90, 31, 0.95);
+    background:
+        rgba(
+            255,
+            90,
+            31,
+            0.95
+        );
 
     color: white;
 
     display: flex;
+
     align-items: center;
     justify-content: center;
 
@@ -1895,14 +2020,28 @@ document.addEventListener(
     font-size: 24px;
 
     box-shadow:
-        0 8px 30px rgba(0, 0, 0, 0.30);
+        0 8px 30px
+        rgba(
+            0,
+            0,
+            0,
+            0.30
+        );
 
     z-index: 5;
 
     transition:
         transform .2s ease,
         background .2s ease;
+
 }
+
+
+/*
+|--------------------------------------------------------------------------
+| BIG PLAY HOVER
+|--------------------------------------------------------------------------
+*/
 
 .featured-play-button:hover {
 
@@ -1911,23 +2050,68 @@ document.addEventListener(
         scale(1.08);
 
     background:
-        rgba(255, 90, 31, 1);
+        rgba(
+            255,
+            90,
+            31,
+            1
+        );
 
 }
+
+
+/*
+|--------------------------------------------------------------------------
+| VIDEO THUMBNAIL
+|--------------------------------------------------------------------------
+|
+| IMPORTANT:
+| No black background here.
+|
+*/
 
 .video-thumbnail {
+
     position: relative;
+
     width: 100%;
     height: 100%;
+
+    overflow: hidden;
+
 }
+
+
+/*
+|--------------------------------------------------------------------------
+| VIDEO THUMBNAIL IMAGE
+|--------------------------------------------------------------------------
+*/
 
 .video-thumbnail img {
+
     width: 100%;
     height: 100%;
+
     object-fit: cover;
+
+    display: block;
+
 }
 
+
+/*
+|--------------------------------------------------------------------------
+| SMALL ORANGE PLAY ICON
+|--------------------------------------------------------------------------
+|
+| No black circle.
+| No black background.
+|
+*/
+
 .video-thumbnail-play {
+
     position: absolute;
 
     left: 50%;
@@ -1942,7 +2126,12 @@ document.addEventListener(
     border-radius: 50%;
 
     background:
-        rgba(255, 90, 31, .95);
+        rgba(
+            255,
+            90,
+            31,
+            0.95
+        );
 
     color: white;
 
@@ -1955,8 +2144,47 @@ document.addEventListener(
 
 }
 
+
+/*
+|--------------------------------------------------------------------------
+| SMALL PLAY ICON
+|--------------------------------------------------------------------------
+*/
+
 .video-thumbnail-play i {
+
     font-size: 13px;
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| EVENT THUMBNAIL BUTTON
+|--------------------------------------------------------------------------
+|
+| Make sure the button itself does
+| not create an unwanted black area.
+|
+*/
+
+.event-thumbnail {
+
+    background: transparent;
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| VIDEO THUMBNAIL BUTTON IMAGE
+|--------------------------------------------------------------------------
+*/
+
+.event-thumbnail .video-thumbnail {
+
+    background: transparent;
+
 }
 
 </style>
