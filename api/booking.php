@@ -254,9 +254,10 @@ $sql = "
         cname,
         contact_person,
         service,
-        message
+        message,
+        status
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ";
 
 
@@ -266,27 +267,29 @@ try {
         $pdo->prepare($sql);
 
 
-    $stmt->execute([
+   $stmt->execute([
 
-        $name,
+    $name,
 
-        $phone,
+    $phone,
 
-        $email,
+    $email,
 
-        $event_type,
+    $event_type,
 
-        $event_date,
+    $event_date,
 
-        $cname,
+    $cname,
 
-        $contact_person,
+    $contact_person,
 
-        $service,
+    $service,
 
-        $message
+    $message,
 
-    ]);
+    "Pending"
+
+]);
 
 } catch (PDOException $e) {
 
