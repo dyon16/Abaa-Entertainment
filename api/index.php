@@ -2,6 +2,57 @@
 
 include(__DIR__ . '/conn.php');
 
+/*
+|--------------------------------------------------------------------------
+| LOAD VISIBLE EVENTS
+|--------------------------------------------------------------------------
+*/
+
+$events = [];
+
+try {
+
+    $stmt = $pdo->query(
+        "SELECT
+            id,
+            title,
+            type,
+            file_url,
+            thumbnail_url,
+            is_visible,
+            created_at
+         FROM events
+         WHERE is_visible = 1
+         ORDER BY id DESC"
+    );
+
+    $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+} catch (PDOException $e) {
+
+    error_log(
+        'Event query error: ' .
+        $e->getMessage()
+    );
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| HELPER
+|--------------------------------------------------------------------------
+*/
+
+function e($value)
+{
+    return htmlspecialchars(
+        (string)($value ?? ''),
+        ENT_QUOTES,
+        'UTF-8'
+    );
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -115,6 +166,10 @@ include(__DIR__ . '/conn.php');
 
 <main class="main-container">
 
+
+    <!-- ==================================================
+         ABOUT / LOGO
+    ================================================== -->
 
     <section class="big-box">
 
@@ -279,287 +334,265 @@ include(__DIR__ . '/conn.php');
         </p>
 
 
-        <div class="featured-event">
-
-            <img
-                id="featuredImage"
-                src="/event1.jpg"
-                alt="Android18 x UYRE"
-            >
+        <?php if (empty($events)): ?>
 
 
-            <video
-                id="featuredVideo"
-                controls
-                muted
-                loop
-                playsinline
-                style="display:none;"
-            >
+            <!-- ==================================================
+                 NO EVENTS
+            ================================================== -->
 
-                <source
-                    id="featuredVideoSource"
-                    src=""
-                    type="video/mp4"
-                >
-
-                Your browser does not support
-                the video tag.
-
-            </video>
-
-
-            <div
-                class="featured-title"
-                id="featuredTitle"
-            >
-                Android18 x UYRE
-            </div>
-
-        </div>
-
-
-        <div class="event-thumbnails">
-
-
-            <button
-                type="button"
-                class="event-thumbnail active"
-                onclick="showEvent(
-                    'image',
-                    '/event1.jpg',
-                    'Android18 x UYRE',
-                    this
-                )"
-            >
+            <div class="featured-event">
 
                 <img
-                    src="/event1.jpg"
-                    alt="Android18 x UYRE"
+                    id="featuredImage"
+                    src="/logo.png"
+                    alt="ABAA Entertainment"
                 >
 
-                <span>
-                    Android18 x UYRE
-                </span>
-
-            </button>
-
-
-            <button
-                type="button"
-                class="event-thumbnail"
-                onclick="showEvent(
-                    'image',
-                    '/event2.jpg',
-                    'Android18 x UYRE',
-                    this
-                )"
-            >
-
-                <img
-                    src="/event2.jpg"
-                    alt="Android18 x UYRE"
+                <video
+                    id="featuredVideo"
+                    controls
+                    muted
+                    loop
+                    playsinline
+                    style="display:none;"
                 >
 
-                <span>
-                    Android18 x UYRE
-                </span>
-
-            </button>
-
-
-            <button
-                type="button"
-                class="event-thumbnail"
-                onclick="showEvent(
-                    'image',
-                    '/event3.jpg',
-                    'Music Festival - Cavite',
-                    this
-                )"
-            >
-
-                <img
-                    src="/event3.jpg"
-                    alt="Music Festival - Cavite"
-                >
-
-                <span>
-                    Music Festival
-                </span>
-
-            </button>
-
-
-            <button
-                type="button"
-                class="event-thumbnail"
-                onclick="showEvent(
-                    'image',
-                    '/event4.jpg',
-                    'Wofex',
-                    this
-                )"
-            >
-
-                <img
-                    src="/event4.jpg"
-                    alt="Wofex"
-                >
-
-                <span>
-                    Wofex
-                </span>
-
-            </button>
-
-
-            <button
-                type="button"
-                class="event-thumbnail"
-                onclick="showEvent(
-                    'image',
-                    '/event5.jpg',
-                    'Grand Youth Day',
-                    this
-                )"
-            >
-
-                <img
-                    src="/event5.jpg"
-                    alt="Grand Youth Day"
-                >
-
-                <span>
-                    Grand Youth Day
-                </span>
-
-            </button>
-
-
-            <button
-                type="button"
-                class="event-thumbnail"
-                onclick="showEvent(
-                    'image',
-                    '/event6.jpg',
-                    'FirstFilm Project',
-                    this
-                )"
-            >
-
-                <img
-                    src="/event6.jpg"
-                    alt="FirstFilm Project"
-                >
-
-                <span>
-                    FirstFilm Project
-                </span>
-
-            </button>
-
-
-            <button
-                type="button"
-                class="event-thumbnail"
-                onclick="showEvent(
-                    'image',
-                    '/event7.jpg',
-                    'Concert Event',
-                    this
-                )"
-            >
-
-                <img
-                    src="/event7.jpg"
-                    alt="Concert Event"
-                >
-
-                <span>
-                    Concert
-                </span>
-
-            </button>
-
-
-            <button
-                type="button"
-                class="event-thumbnail"
-                onclick="showEvent(
-                    'image',
-                    '/event8.jpg',
-                    'Product Launch',
-                    this
-                )"
-            >
-
-                <img
-                    src="/event8.jpg"
-                    alt="Product Launch"
-                >
-
-                <span>
-                    Product Launch
-                </span>
-
-            </button>
-
-
-            <button
-                type="button"
-                class="event-thumbnail"
-                onclick="showEvent(
-                    'image',
-                    '/event9.jpg',
-                    'Festival Celebration',
-                    this
-                )"
-            >
-
-                <img
-                    src="/event9.jpg"
-                    alt="Festival Celebration"
-                >
-
-                <span>
-                    Festival
-                </span>
-
-            </button>
-
-
-            <button
-                type="button"
-                class="event-thumbnail"
-                onclick="showEvent(
-                    'video',
-                    '/event10.mp4',
-                    'Live Event Highlights',
-                    this
-                )"
-            >
-
-                <div class="video-thumbnail">
-
-                    <img
-                        src="/event10-img.jpg"
-                        alt="Live Event Highlights"
+                    <source
+                        id="featuredVideoSource"
+                        src=""
+                        type="video/mp4"
                     >
 
-                    <i class="fa-solid fa-play"></i>
+                </video>
+
+
+                <div
+                    class="featured-title"
+                    id="featuredTitle"
+                >
+                    No events available
+                </div>
+
+            </div>
+
+
+        <?php else: ?>
+
+
+            <!-- ==================================================
+                 FEATURED EVENT
+            ================================================== -->
+
+            <?php
+
+            $firstEvent = $events[0];
+
+            $firstFile =
+                $firstEvent['file_url'];
+
+            $firstTitle =
+                $firstEvent['title'];
+
+            $firstType =
+                $firstEvent['type'];
+
+            $firstThumbnail =
+                $firstEvent['thumbnail_url'];
+
+            ?>
+
+
+            <div class="featured-event">
+
+
+                <?php if ($firstType === 'video'): ?>
+
+
+                    <img
+                        id="featuredImage"
+                        src="<?= e(
+                            $firstThumbnail ?: '/logo.png'
+                        ) ?>"
+                        alt="<?= e($firstTitle) ?>"
+                        style="<?= $firstThumbnail
+                            ? ''
+                            : 'display:none;'
+                        ?>"
+                    >
+
+
+                    <video
+                        id="featuredVideo"
+                        controls
+                        muted
+                        loop
+                        playsinline
+                        <?= $firstThumbnail
+                            ? 'style="display:none;"'
+                            : ''
+                        ?>
+                    >
+
+                        <source
+                            id="featuredVideoSource"
+                            src="<?= e($firstFile) ?>"
+                            type="video/mp4"
+                        >
+
+                        Your browser does not support
+                        the video tag.
+
+                    </video>
+
+
+                <?php else: ?>
+
+
+                    <img
+                        id="featuredImage"
+                        src="<?= e($firstFile) ?>"
+                        alt="<?= e($firstTitle) ?>"
+                    >
+
+
+                    <video
+                        id="featuredVideo"
+                        controls
+                        muted
+                        loop
+                        playsinline
+                        style="display:none;"
+                    >
+
+                        <source
+                            id="featuredVideoSource"
+                            src=""
+                            type="video/mp4"
+                        >
+
+                    </video>
+
+
+                <?php endif; ?>
+
+
+                <div
+                    class="featured-title"
+                    id="featuredTitle"
+                >
+
+                    <?= e($firstTitle) ?>
 
                 </div>
 
-                <span>
-                    Highlights
-                </span>
+            </div>
 
-            </button>
 
-        </div>
+
+            <!-- ==================================================
+                 EVENT THUMBNAILS
+            ================================================== -->
+
+            <div class="event-thumbnails">
+
+
+                <?php foreach (
+                    $events as $index => $event
+                ): ?>
+
+
+                    <button
+                        type="button"
+                        class="event-thumbnail <?= $index === 0
+                            ? 'active'
+                            : ''
+                        ?>"
+                        onclick="showEvent(
+                            <?= e($event['type']) === 'video'
+                                ? "'video'"
+                                : "'image'"
+                            ?>,
+                            <?= json_encode(
+                                $event['file_url']
+                            ) ?>,
+                            <?= json_encode(
+                                $event['title']
+                            ) ?>,
+                            this,
+                            <?= json_encode(
+                                $event['thumbnail_url']
+                            ) ?>
+                        )"
+                    >
+
+
+                        <?php if (
+                            $event['type'] === 'video'
+                        ): ?>
+
+
+                            <div class="video-thumbnail">
+
+
+                                <img
+                                    src="<?= e(
+                                        $event['thumbnail_url']
+                                        ?: '/logo.png'
+                                    ) ?>"
+                                    alt="<?= e(
+                                        $event['title']
+                                    ) ?>"
+                                >
+
+
+                                <i
+                                    class="fa-solid fa-play"
+                                ></i>
+
+
+                            </div>
+
+
+                        <?php else: ?>
+
+
+                            <img
+                                src="<?= e(
+                                    $event['file_url']
+                                ) ?>"
+                                alt="<?= e(
+                                    $event['title']
+                                ) ?>"
+                            >
+
+
+                        <?php endif; ?>
+
+
+                        <span>
+
+                            <?= e(
+                                $event['title']
+                            ) ?>
+
+                        </span>
+
+
+                    </button>
+
+
+                <?php endforeach; ?>
+
+
+            </div>
+
+
+        <?php endif; ?>
+
 
     </section>
+
 
 </main>
 
@@ -612,12 +645,13 @@ include(__DIR__ . '/conn.php');
             <a href="/about">
                 About Us
             </a>
+
             <a
-    href="/booking-status"
-    class="booking-status-link"
->
-    Check Booking Status
-</a>
+                href="/booking-status"
+                class="booking-status-link"
+            >
+                Check Booking Status
+            </a>
 
         </div>
 
@@ -709,6 +743,7 @@ include(__DIR__ . '/conn.php');
 
             <div class="social-links">
 
+
                 <a
                     href="https://www.facebook.com/ABAAEntertainment"
                     target="_blank"
@@ -742,9 +777,12 @@ include(__DIR__ . '/conn.php');
 
                 </a>
 
+
             </div>
 
+
         </div>
+
 
     </div>
 
@@ -752,7 +790,7 @@ include(__DIR__ . '/conn.php');
     <div class="footer-bottom">
 
         <p>
-            © 2026 ABAA Entertainment.
+            © <?= date('Y') ?> ABAA Entertainment.
             All Rights Reserved.
         </p>
 
@@ -953,24 +991,20 @@ include(__DIR__ . '/conn.php');
                 </div>
 
 
-                <!-- ==================================================
-                     MM/DD/YYYY DATE
-                ================================================== -->
-
                 <div class="form-group">
 
-    <label for="booking_date">
-        Event Date
-    </label>
+                    <label for="booking_date">
+                        Event Date
+                    </label>
 
-    <input
-        type="date"
-        id="booking_date"
-        name="event_date"
-        required
-    >
+                    <input
+                        type="date"
+                        id="booking_date"
+                        name="event_date"
+                        required
+                    >
 
-</div>
+                </div>
 
 
             </div>
@@ -1171,7 +1205,8 @@ function showEvent(
     type,
     source,
     title,
-    button
+    button,
+    thumbnail
 ) {
 
     const image =
@@ -1195,43 +1230,80 @@ function showEvent(
         );
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | REMOVE ACTIVE STATE
+    |--------------------------------------------------------------------------
+    */
+
     document
-        .querySelectorAll(".event-thumbnail")
+        .querySelectorAll(
+            ".event-thumbnail"
+        )
         .forEach(function(item) {
 
-            item.classList.remove("active");
+            item.classList.remove(
+                "active"
+            );
 
         });
 
 
-    button.classList.add("active");
+    button.classList.add(
+        "active"
+    );
 
 
-    featuredTitle.textContent = title;
+    /*
+    |--------------------------------------------------------------------------
+    | UPDATE TITLE
+    |--------------------------------------------------------------------------
+    */
 
+    featuredTitle.textContent =
+        title;
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | IMAGE
+    |--------------------------------------------------------------------------
+    */
 
     if (type === "image") {
 
         video.pause();
 
-        video.style.display = "none";
+        video.style.display =
+            "none";
 
-        image.src = source;
+        image.src =
+            source;
 
-        image.style.display = "block";
+        image.style.display =
+            "block";
 
     }
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | VIDEO
+    |--------------------------------------------------------------------------
+    */
+
     if (type === "video") {
 
-        image.style.display = "none";
+        image.style.display =
+            "none";
 
-        videoSource.src = source;
+        videoSource.src =
+            source;
 
         video.load();
 
-        video.style.display = "block";
+        video.style.display =
+            "block";
 
         video.play().catch(
             function() {}
@@ -1240,9 +1312,6 @@ function showEvent(
     }
 
 }
-
-
-
 
 
 
@@ -1274,7 +1343,9 @@ function openBookingModal(event) {
     }
 
 
-    modal.classList.add("active");
+    modal.classList.add(
+        "active"
+    );
 
 
     modal.setAttribute(
@@ -1311,7 +1382,9 @@ function closeBookingModal() {
     }
 
 
-    modal.classList.remove("active");
+    modal.classList.remove(
+        "active"
+    );
 
 
     modal.setAttribute(
@@ -1367,7 +1440,9 @@ document.addEventListener(
     "keydown",
     function(event) {
 
-        if (event.key === "Escape") {
+        if (
+            event.key === "Escape"
+        ) {
 
             closeBookingModal();
 
