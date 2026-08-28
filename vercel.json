@@ -24,5 +24,9 @@
       "source": "/booking",
       "destination": "/api/booking.php"
     }
+    {
+      "source": "/admin",
+      "destination": "/api/admin.php"
+    }
   ]
 }
