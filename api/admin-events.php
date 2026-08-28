@@ -217,7 +217,7 @@ $httpCode = curl_getinfo(
     CURLINFO_HTTP_CODE
 );
 
-curl_close($ch);
+
 
 if ($response === false) {
     return [
@@ -315,7 +315,7 @@ $httpCode = curl_getinfo(
     CURLINFO_HTTP_CODE
 );
 
-curl_close($ch);
+
 
 return (
     $response !== false &&
