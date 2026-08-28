@@ -1868,89 +1868,111 @@ input {
    BOOKING STATUS BADGES
 ========================================= */
 
+/* =========================================
+   VIBRANT BOOKING STATUS BADGES
+========================================= */
+
 .status-badge {
     display: inline-flex;
     align-items: center;
-    gap: 7px;
-    padding: 6px 11px;
+    gap: 8px;
+    padding: 8px 13px;
     border-radius: 999px;
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 800;
     line-height: 1;
     white-space: nowrap;
+    border: 2px solid;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
 .status-badge > span {
-    width: 7px;
-    height: 7px;
+    width: 9px;
+    height: 9px;
     border-radius: 50%;
     display: inline-block;
+    box-shadow: 0 0 6px currentColor;
 }
 
 
-/* PENDING */
+/* 🟠 PENDING */
 
 .status-pending {
-    color: #b45309;
-    background: #fff7ed;
-    border: 1px solid #fed7aa;
+    color: #ffffff;
+    background: #ff8a00;
+    border-color: #ff8a00;
 }
 
 .status-pending > span {
-    background: #f59e0b;
+    background: #ffffff;
+    color: #ffffff;
 }
 
 
-/* CONFIRMED */
+/* 🔵 CONFIRMED */
 
 .status-confirmed {
-    color: #1d4ed8;
-    background: #eff6ff;
-    border: 1px solid #bfdbfe;
+    color: #ffffff;
+    background: #087cf5;
+    border-color: #087cf5;
 }
 
 .status-confirmed > span {
-    background: #3b82f6;
+    background: #ffffff;
+    color: #ffffff;
 }
 
 
-/* IN PROGRESS */
+/* 🟣 IN PROGRESS */
 
 .status-in-progress {
-    color: #7e22ce;
-    background: #faf5ff;
-    border: 1px solid #e9d5ff;
+    color: #ffffff;
+    background: #8b35d6;
+    border-color: #8b35d6;
 }
 
 .status-in-progress > span {
-    background: #a855f7;
+    background: #ffffff;
+    color: #ffffff;
 }
 
 
-/* COMPLETED */
+/* 🟢 COMPLETED */
 
 .status-completed {
-    color: #15803d;
-    background: #f0fdf4;
-    border: 1px solid #bbf7d0;
+    color: #ffffff;
+    background: #16a34a;
+    border-color: #16a34a;
 }
 
 .status-completed > span {
-    background: #22c55e;
+    background: #ffffff;
+    color: #ffffff;
 }
 
 
-/* CANCELLED */
+/* 🔴 CANCELLED */
 
 .status-cancelled {
-    color: #dc2626;
-    background: #fef2f2;
-    border: 1px solid #fecaca;
+    color: #ffffff;
+    background: #ef3030;
+    border-color: #ef3030;
 }
 
 .status-cancelled > span {
-    background: #ef4444;
+    background: #ffffff;
+    color: #ffffff;
 }
+
+
+/* HOVER */
+
+.status-badge:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.08);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.14);
+}
+
 
 /* =========================================================
    TABLE SCROLLBAR
