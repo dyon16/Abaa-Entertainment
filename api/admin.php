@@ -1,50 +1,29 @@
 <?php
 
-include(__DIR__ . '/conn.php');
+/*
+|--------------------------------------------------------------------------
+| DATABASE
+|--------------------------------------------------------------------------
+*/
+
+include(__DIR__ . '/../conn.php');
 
 
 /*
 |--------------------------------------------------------------------------
 | ADMIN AUTHENTICATION
 |--------------------------------------------------------------------------
-|
-| Vercel-friendly authentication.
-|
-| We use a signed cookie instead of relying on PHP sessions because
-| Vercel functions are serverless.
-|
-|--------------------------------------------------------------------------
 */
 
-
-/*
-|--------------------------------------------------------------------------
-| CONFIGURATION
-|--------------------------------------------------------------------------
-*/
-
-// IMPORTANT:
-// Add ADMIN_AUTH_SECRET to your Vercel Environment Variables.
-//
-// Example:
-// ADMIN_AUTH_SECRET = a-long-random-secret-string
-//
 $authSecret = getenv('ADMIN_AUTH_SECRET');
 
 if (!$authSecret) {
 
-    // For local development only.
-    // On production, always set ADMIN_AUTH_SECRET in Vercel.
-    $authSecret = 'CHANGE_THIS_TO_A_LONG_RANDOM_SECRET';
+    // Change this if you have not created
+    // ADMIN_AUTH_SECRET in Vercel yet.
+    $authSecret = 'ABAA_CHANGE_THIS_SECRET_2026';
 
 }
-
-
-/*
-|--------------------------------------------------------------------------
-| COOKIE SETTINGS
-|--------------------------------------------------------------------------
-*/
 
 $cookieName = 'abaa_admin_auth';
 
@@ -56,7 +35,7 @@ $secureCookie = (
 
 /*
 |--------------------------------------------------------------------------
-| HELPER: BASE64 URL
+| BASE64 URL ENCODE
 |--------------------------------------------------------------------------
 */
 
@@ -72,6 +51,12 @@ function base64UrlEncode($data)
     );
 }
 
+
+/*
+|--------------------------------------------------------------------------
+| BASE64 URL DECODE
+|--------------------------------------------------------------------------
+*/
 
 function base64UrlDecode($data)
 {
@@ -90,17 +75,20 @@ function base64UrlDecode($data)
 
 /*
 |--------------------------------------------------------------------------
-| CREATE AUTH COOKIE
+| CREATE LOGIN COOKIE
 |--------------------------------------------------------------------------
 */
 
-function createAdminCookie($adminId, $username, $secret)
-{
+function createAdminCookie(
+    $adminId,
+    $username,
+    $secret
+) {
 
     $payload = [
-        'id'       => (int) $adminId,
+        'id' => (int) $adminId,
         'username' => $username,
-        'exp'      => time() + (60 * 60 * 8)
+        'exp' => time() + (60 * 60 * 8)
     ];
 
 
@@ -122,12 +110,14 @@ function createAdminCookie($adminId, $username, $secret)
 
 /*
 |--------------------------------------------------------------------------
-| VERIFY AUTH COOKIE
+| VERIFY LOGIN COOKIE
 |--------------------------------------------------------------------------
 */
 
-function verifyAdminCookie($cookie, $secret)
-{
+function verifyAdminCookie(
+    $cookie,
+    $secret
+) {
 
     if (!$cookie) {
 
@@ -136,7 +126,10 @@ function verifyAdminCookie($cookie, $secret)
     }
 
 
-    $parts = explode('.', $cookie);
+    $parts = explode(
+        '.',
+        $cookie
+    );
 
 
     if (count($parts) !== 2) {
@@ -146,16 +139,19 @@ function verifyAdminCookie($cookie, $secret)
     }
 
 
-    $payloadEncoded = $parts[0];
+    $payloadEncoded =
+        $parts[0];
 
-    $providedSignature = $parts[1];
+    $providedSignature =
+        $parts[1];
 
 
-    $expectedSignature = hash_hmac(
-        'sha256',
-        $payloadEncoded,
-        $secret
-    );
+    $expectedSignature =
+        hash_hmac(
+            'sha256',
+            $payloadEncoded,
+            $secret
+        );
 
 
     if (
@@ -170,9 +166,10 @@ function verifyAdminCookie($cookie, $secret)
     }
 
 
-    $payloadJson = base64UrlDecode(
-        $payloadEncoded
-    );
+    $payloadJson =
+        base64UrlDecode(
+            $payloadEncoded
+        );
 
 
     if (!$payloadJson) {
@@ -182,10 +179,11 @@ function verifyAdminCookie($cookie, $secret)
     }
 
 
-    $payload = json_decode(
-        $payloadJson,
-        true
-    );
+    $payload =
+        json_decode(
+            $payloadJson,
+            true
+        );
 
 
     if (!is_array($payload)) {
@@ -206,7 +204,9 @@ function verifyAdminCookie($cookie, $secret)
     }
 
 
-    if ((int) $payload['exp'] < time()) {
+    if (
+        (int) $payload['exp'] < time()
+    ) {
 
         return false;
 
@@ -232,16 +232,18 @@ if (
         $cookieName,
         '',
         [
-            'expires'  => time() - 3600,
-            'path'     => '/',
-            'secure'   => $secureCookie,
+            'expires' => time() - 3600,
+            'path' => '/',
+            'secure' => $secureCookie,
             'httponly' => true,
             'samesite' => 'Strict'
         ]
     );
 
 
-    header('Location: /admin.php');
+    header(
+        'Location: /admin'
+    );
 
     exit;
 
@@ -250,19 +252,24 @@ if (
 
 /*
 |--------------------------------------------------------------------------
-| CHECK CURRENT LOGIN
+| CHECK LOGIN
 |--------------------------------------------------------------------------
 */
 
 $admin = false;
 
 
-if (isset($_COOKIE[$cookieName])) {
+if (
+    isset(
+        $_COOKIE[$cookieName]
+    )
+) {
 
-    $admin = verifyAdminCookie(
-        $_COOKIE[$cookieName],
-        $authSecret
-    );
+    $admin =
+        verifyAdminCookie(
+            $_COOKIE[$cookieName],
+            $authSecret
+        );
 
 }
 
@@ -281,12 +288,14 @@ if (
     isset($_POST['login'])
 ) {
 
-    $username = trim(
-        $_POST['username'] ?? ''
-    );
+    $username =
+        trim(
+            $_POST['username'] ?? ''
+        );
 
 
-    $password = $_POST['password'] ?? '';
+    $password =
+        $_POST['password'] ?? '';
 
 
     if (
@@ -299,88 +308,97 @@ if (
 
     } else {
 
+        try {
 
-        /*
-        |--------------------------------------------------------------------------
-        | FIND ADMIN
-        |--------------------------------------------------------------------------
-        */
+            /*
+            |--------------------------------------------------------------------------
+            | FIND ADMIN
+            |--------------------------------------------------------------------------
+            */
 
-        $stmt = $conn->prepare(
-            "SELECT id, username, password
-             FROM admins
-             WHERE username = ?
-             LIMIT 1"
-        );
-
-
-        if ($stmt) {
-
-            $stmt->bind_param(
-                's',
-                $username
+            $stmt = $pdo->prepare(
+                "SELECT id, username, password
+                 FROM admins
+                 WHERE username = :username
+                 LIMIT 1"
             );
 
 
-            $stmt->execute();
+            $stmt->execute([
+                ':username' => $username
+            ]);
 
 
-            $result = $stmt->get_result();
-
-
-            $adminUser = $result->fetch_assoc();
-
-
-            $stmt->close();
+            $adminUser =
+                $stmt->fetch();
 
 
             /*
             |--------------------------------------------------------------------------
-            | VERIFY PASSWORD
+            | CHECK PASSWORD
+            |--------------------------------------------------------------------------
+            |
+            | Plain-text password comparison.
+            |
+            | Database:
+            |
+            | username = admin
+            | password = admin123
+            |
             |--------------------------------------------------------------------------
             */
 
             if (
                 $adminUser &&
-                password_verify(
-                    $password,
-                    $adminUser['password']
-                )
+                $password === $adminUser['password']
             ) {
-
 
                 /*
                 |--------------------------------------------------------------------------
-                | CREATE SIGNED COOKIE
+                | CREATE LOGIN COOKIE
                 |--------------------------------------------------------------------------
                 */
 
-                $authCookie = createAdminCookie(
-                    $adminUser['id'],
-                    $adminUser['username'],
-                    $authSecret
-                );
+                $authCookie =
+                    createAdminCookie(
+                        $adminUser['id'],
+                        $adminUser['username'],
+                        $authSecret
+                    );
 
 
                 setcookie(
                     $cookieName,
                     $authCookie,
                     [
-                        'expires'  => time() + (60 * 60 * 8),
-                        'path'     => '/',
-                        'secure'   => $secureCookie,
-                        'httponly' => true,
-                        'samesite' => 'Strict'
+                        'expires' =>
+                            time() + (60 * 60 * 8),
+
+                        'path' => '/',
+
+                        'secure' =>
+                            $secureCookie,
+
+                        'httponly' =>
+                            true,
+
+                        'samesite' =>
+                            'Strict'
                     ]
                 );
 
 
+                /*
+                |--------------------------------------------------------------------------
+                | REDIRECT TO ADMIN
+                |--------------------------------------------------------------------------
+                */
+
                 header(
-                    'Location: /admin.php'
+                    'Location: /admin'
                 );
 
                 exit;
-
 
             } else {
 
@@ -389,8 +407,13 @@ if (
 
             }
 
+        } catch (PDOException $e) {
 
-        } else {
+            error_log(
+                'Admin login error: ' .
+                $e->getMessage()
+            );
+
 
             $loginError =
                 'Unable to connect to the database.';
@@ -415,27 +438,35 @@ $bookingColumns = [];
 
 if ($admin) {
 
+    try {
 
-    $result = $conn->query(
-        "SELECT *
-         FROM bookings
-         ORDER BY id DESC"
-    );
-
-
-    if ($result) {
-
-        $bookingColumns =
-            $result->fetch_fields();
+        $stmt =
+            $pdo->query(
+                "SELECT *
+                 FROM bookings
+                 ORDER BY id DESC"
+            );
 
 
-        while (
-            $row = $result->fetch_assoc()
-        ) {
+        $bookings =
+            $stmt->fetchAll();
 
-            $bookings[] = $row;
+
+        if (!empty($bookings)) {
+
+            $bookingColumns =
+                array_keys(
+                    $bookings[0]
+                );
 
         }
+
+    } catch (PDOException $e) {
+
+        error_log(
+            'Booking query error: ' .
+            $e->getMessage()
+        );
 
     }
 
@@ -460,10 +491,12 @@ if ($admin) {
         ABAA Admin
     </title>
 
+
     <link
         rel="stylesheet"
         href="/admin.css"
     >
+
 
     <link
         rel="stylesheet"
@@ -478,9 +511,8 @@ if ($admin) {
 
 <?php if (!$admin): ?>
 
-
 <!-- ==================================================
-     LOGIN
+     LOGIN PAGE
 ================================================== -->
 
 <div class="login-page">
@@ -528,7 +560,7 @@ if ($admin) {
 
         <form
             method="POST"
-            action="/admin.php"
+            action="/admin"
             class="login-form"
         >
 
@@ -538,6 +570,7 @@ if ($admin) {
                 <label for="username">
                     Username
                 </label>
+
 
                 <div class="input-wrapper">
 
@@ -562,6 +595,7 @@ if ($admin) {
                 <label for="password">
                     Password
                 </label>
+
 
                 <div class="input-wrapper">
 
@@ -617,7 +651,6 @@ if ($admin) {
 
 <?php else: ?>
 
-
 <!-- ==================================================
      ADMIN DASHBOARD
 ================================================== -->
@@ -625,9 +658,7 @@ if ($admin) {
 <div class="admin-layout">
 
 
-    <!-- ==================================================
-         SIDEBAR
-    ================================================== -->
+    <!-- SIDEBAR -->
 
     <aside class="sidebar">
 
@@ -638,6 +669,7 @@ if ($admin) {
                 src="/logo.png"
                 alt="ABAA Entertainment"
             >
+
 
             <div>
 
@@ -656,8 +688,9 @@ if ($admin) {
 
         <nav class="sidebar-nav">
 
+
             <a
-                href="/admin.php"
+                href="/admin"
                 class="active"
             >
 
@@ -681,7 +714,9 @@ if ($admin) {
 
         <div class="sidebar-bottom">
 
+
             <div class="admin-user">
+
 
                 <div class="admin-avatar">
 
@@ -693,8 +728,13 @@ if ($admin) {
                 <div>
 
                     <strong>
-                        <?= htmlspecialchars($admin['username']) ?>
+
+                        <?= htmlspecialchars(
+                            $admin['username']
+                        ) ?>
+
                     </strong>
+
 
                     <span>
                         Administrator
@@ -707,7 +747,7 @@ if ($admin) {
 
             <form
                 method="POST"
-                action="/admin.php"
+                action="/admin"
             >
 
                 <button
@@ -724,19 +764,19 @@ if ($admin) {
 
             </form>
 
+
         </div>
 
     </aside>
 
 
-    <!-- ==================================================
-         MAIN
-    ================================================== -->
+    <!-- MAIN -->
 
     <main class="admin-main">
 
 
         <header class="admin-header">
+
 
             <div>
 
@@ -744,9 +784,11 @@ if ($admin) {
                     ADMINISTRATION
                 </span>
 
+
                 <h1>
                     Booking Dashboard
                 </h1>
+
 
                 <p>
                     Manage and review your event booking requests.
@@ -759,23 +801,28 @@ if ($admin) {
 
                 <i class="fa-solid fa-circle-user"></i>
 
+
                 <span>
-                    <?= htmlspecialchars($admin['username']) ?>
+
+                    <?= htmlspecialchars(
+                        $admin['username']
+                    ) ?>
+
                 </span>
 
             </div>
 
+
         </header>
 
 
-        <!-- ==================================================
-             STATISTICS
-        ================================================== -->
+        <!-- STATISTICS -->
 
         <section class="stats-grid">
 
 
             <div class="stat-card">
+
 
                 <div class="stat-icon blue">
 
@@ -783,11 +830,13 @@ if ($admin) {
 
                 </div>
 
+
                 <div>
 
                     <span>
                         Total Bookings
                     </span>
+
 
                     <strong>
                         <?= count($bookings) ?>
@@ -799,6 +848,7 @@ if ($admin) {
 
 
             <div class="stat-card">
+
 
                 <div class="stat-icon orange">
 
@@ -806,11 +856,13 @@ if ($admin) {
 
                 </div>
 
+
                 <div>
 
                     <span>
                         Requests
                     </span>
+
 
                     <strong>
                         <?= count($bookings) ?>
@@ -823,17 +875,20 @@ if ($admin) {
 
             <div class="stat-card">
 
+
                 <div class="stat-icon green">
 
                     <i class="fa-solid fa-users"></i>
 
                 </div>
 
+
                 <div>
 
                     <span>
                         Admin
                     </span>
+
 
                     <strong>
                         1
@@ -847,20 +902,20 @@ if ($admin) {
         </section>
 
 
-        <!-- ==================================================
-             BOOKINGS
-        ================================================== -->
+        <!-- BOOKINGS -->
 
         <section class="bookings-section">
 
 
             <div class="section-header">
 
+
                 <div>
 
                     <span>
                         BOOKINGS
                     </span>
+
 
                     <h2>
                         Recent Booking Requests
@@ -877,6 +932,7 @@ if ($admin) {
 
                 </div>
 
+
             </div>
 
 
@@ -885,19 +941,23 @@ if ($admin) {
 
                 <div class="empty-state">
 
+
                     <div class="empty-icon">
 
                         <i class="fa-solid fa-calendar-xmark"></i>
 
                     </div>
 
+
                     <h3>
                         No bookings yet
                     </h3>
 
+
                     <p>
                         New booking requests will appear here.
                     </p>
+
 
                 </div>
 
@@ -907,17 +967,24 @@ if ($admin) {
 
                 <div class="table-wrapper">
 
+
                     <table class="booking-table">
+
 
                         <thead>
 
                             <tr>
 
-                                <?php foreach ($bookingColumns as $column): ?>
+                                <?php foreach (
+                                    $bookingColumns
+                                    as $column
+                                ): ?>
 
                                     <th>
 
-                                        <?= htmlspecialchars($column->name) ?>
+                                        <?= htmlspecialchars(
+                                            $column
+                                        ) ?>
 
                                     </th>
 
@@ -930,69 +997,71 @@ if ($admin) {
 
                         <tbody>
 
-                            <?php foreach ($bookings as $booking): ?>
+
+                            <?php foreach (
+                                $bookings
+                                as $booking
+                            ): ?>
+
 
                                 <tr>
 
-                                    <?php foreach ($bookingColumns as $column): ?>
 
-                                        <?php
-
-                                        $columnName =
-                                            $column->name;
-
-                                        $value =
-                                            $booking[$columnName] ?? '';
-
-                                        ?>
+                                    <?php foreach (
+                                        $bookingColumns
+                                        as $column
+                                    ): ?>
 
 
                                         <td>
 
+
                                             <?php if (
-                                                $columnName === 'message'
+                                                $column === 'message'
                                             ): ?>
+
 
                                                 <div class="message-cell">
 
                                                     <?= nl2br(
                                                         htmlspecialchars(
-                                                            $value
+                                                            $booking[$column] ?? ''
                                                         )
                                                     ) ?>
 
                                                 </div>
 
-                                            <?php elseif (
-                                                is_array($value)
-                                            ): ?>
-
-                                                <?= htmlspecialchars(
-                                                    implode(
-                                                        ', ',
-                                                        $value
-                                                    )
-                                                ) ?>
 
                                             <?php else: ?>
 
+
                                                 <?= htmlspecialchars(
-                                                    (string) $value
+                                                    (string) (
+                                                        $booking[$column] ?? ''
+                                                    )
                                                 ) ?>
+
 
                                             <?php endif; ?>
 
+
                                         </td>
+
 
                                     <?php endforeach; ?>
 
+
                                 </tr>
+
 
                             <?php endforeach; ?>
 
+
                         </tbody>
 
+
                     </table>
+
 
                 </div>
 
@@ -1005,6 +1074,7 @@ if ($admin) {
 
     </main>
 
+
 </div>
 
 
@@ -1014,13 +1084,3 @@ if ($admin) {
 </body>
 
 </html>
-
-<?php
-
-if (isset($conn)) {
-
-    $conn->close();
-
-}
-
-?>
