@@ -46,6 +46,14 @@ body {
 /* ==================================================
    HEADER
 ================================================== */
+.booking-status-link {
+    color: #ff3d02 !important;
+    font-weight: 700;
+}
+
+.booking-status-link:hover {
+    color: #ff7043 !important;
+}
 
 .header {
     position: fixed;
