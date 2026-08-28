@@ -275,118 +275,109 @@ body::-webkit-scrollbar {
 
 
 /* ==================================================
-   ABOUT
+   ABOUT HERO
 ================================================== */
 
-.about-us {
-    width: min(95%, 1400px);
+.about-hero {
+    position: relative;
 
-    margin: 25px auto;
+    width: 100%;
 
-    padding: 35px 40px;
+    min-height: 500px;
 
     display: flex;
-
     align-items: center;
     justify-content: space-between;
 
-    gap: 50px;
+    gap: clamp(30px, 5vw, 60px);
 
-    color: white;
+    padding:
+        clamp(50px, 7vw, 70px)
+        clamp(5%, 7vw, 8%);
 
     background:
         linear-gradient(
-            135deg,
-            rgba(0, 0, 0, 0.96),
-            rgba(25, 10, 5, 0.92)
-        );
+            90deg,
+            rgba(0, 0, 0, 0.98),
+            rgba(0, 0, 0, 0.81),
+            rgba(0, 0, 0, 0.82)
+        ),
+        url("/event10-img.jpg");
 
-    border-left: 5px solid #ff3d02;
+    background-size: cover;
+    background-position: center;
 
-    border-radius: 5px;
+    border-bottom: 2px solid #222;
+}
 
-    box-shadow:
-        0 10px 40px rgba(0, 0, 0, 0.5);
+.about-hero::before {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    top: 0;
+
+    width: 6px;
+    height: 100%;
+
+    background: #ff3d02;
 }
 
 
 /* ==================================================
-   ABOUT CONTENT
+   HERO CONTENT
 ================================================== */
 
-.about-content {
+.about-hero-content {
+    position: relative;
+
+    z-index: 2;
+
     flex: 1;
 
-    min-width: 0;
+    width: 100%;
+    max-width: 1000px;
 }
 
-.about-content h1 {
-    margin-bottom: 15px;
+.small-title {
+    margin-bottom: 20px;
 
-    color: white;
+    color: #ff3d02;
 
-    font-size: clamp(32px, 4vw, 52px);
+    font-size: clamp(11px, 1.2vw, 15px);
+
+    font-weight: bold;
+
+    letter-spacing: 4px;
+}
+
+.about-hero h1 {
+    margin-bottom: 25px;
+
+    font-size: clamp(38px, 5vw, 65px);
+
+    line-height: 1.05;
 
     font-weight: 900;
 
     text-transform: uppercase;
 
     letter-spacing: 2px;
-
-    text-align: left;
 }
 
-.about-content p {
-    color: #cfcfcf;
+.about-hero h1 span {
+    white-space: nowrap;
+}
+
+.hero-description {
+    max-width: 650px;
+
+    color: #ccc;
 
     font-size: clamp(15px, 1.5vw, 19px);
 
-    line-height: 1.8;
-
-    letter-spacing: 0.3px;
-
-    text-align: justify;
-}
-
-
-/* ==================================================
-   ABOUT VIDEO
-================================================== */
-
-.about-video {
-    width: 400px;
-    height: 550px;
-
-    flex-shrink: 0;
-
-    overflow: hidden;
-
-    border-radius: 8px;
-
-    border: 2px solid #ff3d02;
-
-    background: #000;
-
-    box-shadow:
-        0 0 25px rgba(255, 61, 2, 0.25);
-
-    transition: 0.3s;
-}
-
-.about-video:hover {
-    border-color: #ff5722;
-
-    box-shadow:
-        0 0 35px rgba(255, 61, 2, 0.5);
-}
-
-.about-video video {
-    width: 100%;
-    height: 100%;
-
-    display: block;
-
-    object-fit: cover;
+    line-height: 1.7;
 }
 
 
@@ -1746,29 +1737,26 @@ body::-webkit-scrollbar {
     }
 
 
-    /* ABOUT */
+    .about-hero {
+        min-height: auto;
 
-    .about-us {
         flex-direction: column;
 
-        align-items: stretch;
+        align-items: center;
 
-        gap: 30px;
-    }
-
-    .about-content h1 {
         text-align: center;
+
+        padding: 60px 6%;
     }
 
-    .about-content p {
-        text-align: center;
-    }
-
-    .about-video {
+    .about-hero-content {
         width: 100%;
-
-        height: 500px;
     }
+
+    .hero-description {
+        margin: auto;
+    }
+
 
 
     /* MAIN */
@@ -1878,36 +1866,43 @@ body::-webkit-scrollbar {
     }
 
 
-    /* ==================================================
-       ABOUT
-    ================================================== */
+    /* HERO */
 
-    .about-us {
-        width: 94%;
+    .about-hero {
+        padding: 45px 20px 50px;
 
-        padding: 25px 20px;
-
-        gap: 25px;
+        gap: 30px;
     }
 
-    .about-content h1 {
+    .about-hero::before {
+        width: 4px;
+    }
+
+    .small-title {
+        margin-bottom: 15px;
+
+        font-size: 10px;
+
+        letter-spacing: 2px;
+    }
+
+    .about-hero h1 {
         font-size: 30px;
+
+        line-height: 1.15;
 
         letter-spacing: 1px;
     }
 
-    .about-content p {
-        font-size: 15px;
+    .about-hero h1 span {
+        white-space: normal;
+    }
+
+    .hero-description {
+        font-size: 14px;
 
         line-height: 1.7;
     }
-
-    .about-video {
-        width: 100%;
-
-        height: 450px;
-    }
-
 
     /* ==================================================
        MAIN
@@ -2292,9 +2287,10 @@ body::-webkit-scrollbar {
 
     /* ABOUT */
 
-    .about-content h1 {
+      .about-hero h1 {
         font-size: 27px;
     }
+
 
 
     /* EVENTS */
