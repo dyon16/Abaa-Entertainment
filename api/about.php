@@ -101,34 +101,17 @@ include(__DIR__ . '/conn.php');
 
         <p>
 
-            ABAA Entertainment is a forward-thinking
-            entertainment company committed to developing
-            talent, producing high-quality entertainment,
-            and creating meaningful opportunities within
-            the industry.
+           Founded in 2022 by Mr. Russel Ynares and Mr. Koy Quevedo, ABAA Entertainment Inc. 
+            began with a simple passion for music, live performances, and creating memorable experiences.
 
             <br><br>
 
-            Built on creativity, professionalism, and
-            innovation, ABAA Entertainment provides a
-            platform where artists, performers, and creative
-            professionals can showcase their talents and
-            reach wider audiences.
+            What started as a shared passion for music gradually evolved into a professional entertainment company dedicated to bringing
+            ideas, artists, and events to life. Through hard work, creativity, and a commitment to quality, 
+            Abaa Entertainment grew from its musical roots into a company capable of handling a wide range of 
+            entertainment and production requirements.
 
             <br><br>
-
-            The company focuses on nurturing emerging talent,
-            developing engaging entertainment projects, and
-            building strong partnerships that contribute to
-            the growth of the entertainment community.
-
-            <br><br>
-
-            With a vision of becoming a trusted and
-            influential name in the industry, ABAA
-            Entertainment continues to pursue excellence
-            while delivering fresh, inspiring, and memorable
-            entertainment experiences.
 
         </p>
 
