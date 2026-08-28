@@ -1864,49 +1864,93 @@ input {
 }
 
 
-/* =========================================================
-   STATUS BADGE
-========================================================= */
+/* =========================================
+   BOOKING STATUS BADGES
+========================================= */
 
 .status-badge {
-
     display: inline-flex;
-
     align-items: center;
-
-    gap: 6px;
-
-    padding: 5px 9px;
-
-    border-radius: 20px;
-
-    background: #fff7ed;
-
-    color: #c2410c;
-
-    border: 1px solid #fed7aa;
-
-    font-size: 11px;
-
+    gap: 7px;
+    padding: 6px 11px;
+    border-radius: 999px;
+    font-size: 12px;
     font-weight: 700;
-
+    line-height: 1;
     white-space: nowrap;
-
 }
-
 
 .status-badge > span {
-
-    width: 6px;
-
-    height: 6px;
-
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
-
-    background: var(--orange);
-
+    display: inline-block;
 }
 
+
+/* PENDING */
+
+.status-pending {
+    color: #b45309;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+}
+
+.status-pending > span {
+    background: #f59e0b;
+}
+
+
+/* CONFIRMED */
+
+.status-confirmed {
+    color: #1d4ed8;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+}
+
+.status-confirmed > span {
+    background: #3b82f6;
+}
+
+
+/* IN PROGRESS */
+
+.status-in-progress {
+    color: #7e22ce;
+    background: #faf5ff;
+    border: 1px solid #e9d5ff;
+}
+
+.status-in-progress > span {
+    background: #a855f7;
+}
+
+
+/* COMPLETED */
+
+.status-completed {
+    color: #15803d;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+}
+
+.status-completed > span {
+    background: #22c55e;
+}
+
+
+/* CANCELLED */
+
+.status-cancelled {
+    color: #dc2626;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+}
+
+.status-cancelled > span {
+    background: #ef4444;
+}
 
 /* =========================================================
    TABLE SCROLLBAR
