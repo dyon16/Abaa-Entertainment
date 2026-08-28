@@ -86,7 +86,7 @@ if (!$authSecret)
     class="active"
 >
 
-        >
+        
 
             <i class="fa-solid fa-calendar-check"></i>
 
