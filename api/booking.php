@@ -613,42 +613,7 @@ $bookingId = (int) $pdo->lastInsertId();
     line-height: 1.5;
 
 }
-.status-button {
 
-    display: inline-block;
-
-    margin-right: 10px;
-
-    padding: 14px 28px;
-
-    background: transparent;
-
-    color: #ff3d02;
-
-    text-decoration: none;
-
-    font-weight: bold;
-
-    text-transform: uppercase;
-
-    letter-spacing: 1px;
-
-    border-radius: 50px;
-
-    border: 2px solid #ff3d02;
-
-    transition: 0.3s;
-
-}
-
-
-.status-button:hover {
-
-    background: #ff3d02;
-
-    color: white;
-
-}
 
 
     </style>
@@ -715,12 +680,7 @@ $bookingId = (int) $pdo->lastInsertId();
         >
             Back To Home
         </a>
-<a
-    href="/booking-status?id=<?= $bookingId ?>&email=<?= urlencode($email) ?>"
-    class="status-button"
->
-    Check Booking Status
-</a>
+
 
 
     </div>
