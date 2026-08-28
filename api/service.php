@@ -1164,6 +1164,12 @@ $service = $services[$serviceKey];
             <a href="/about">
                 About Us
             </a>
+                      <a
+    href="/booking-status"
+    class="booking-status-link"
+>
+    Check Booking Status
+</a>
 
         </div>
 
