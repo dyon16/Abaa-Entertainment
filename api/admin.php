@@ -724,17 +724,7 @@ if ($admin) {
     </a>
 
 
-            <a href="/">
-
-                <i class="fa-solid fa-globe"></i>
-
-                <span>
-
-                    View Website
-
-                </span>
-
-            </a>
+           
 
 
         </nav>
