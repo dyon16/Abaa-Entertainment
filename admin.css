@@ -1,4 +1,10 @@
 /* =========================================================
+   ABAA ENTERTAINMENT
+   ADMIN DASHBOARD CSS
+========================================================= */
+
+
+/* =========================================================
    RESET
 ========================================================= */
 
@@ -11,7 +17,7 @@
 
 :root {
 
-    /* ABAA BRAND */
+    /* BRAND */
 
     --orange: #ff5a1f;
     --orange-dark: #e84b12;
@@ -44,6 +50,11 @@
    BODY
 ========================================================= */
 
+html {
+    min-height: 100%;
+}
+
+
 body {
 
     font-family:
@@ -59,6 +70,17 @@ body {
 
     min-height: 100vh;
 
+}
+
+
+a {
+    -webkit-tap-highlight-color: transparent;
+}
+
+
+button,
+input {
+    font-family: inherit;
 }
 
 
@@ -214,7 +236,7 @@ body {
 
 
 /* =========================================================
-   ERROR
+   LOGIN ERROR
 ========================================================= */
 
 .login-error {
@@ -242,8 +264,13 @@ body {
 }
 
 
+.login-error i {
+    flex-shrink: 0;
+}
+
+
 /* =========================================================
-   FORMS
+   FORM
 ========================================================= */
 
 .form-group {
@@ -293,6 +320,8 @@ body {
 
     transition: .2s;
 
+    pointer-events: none;
+
 }
 
 
@@ -341,7 +370,7 @@ body {
 }
 
 
-.input-wrapper input:focus ~ i {
+.input-wrapper:focus-within i {
 
     color: var(--orange);
 
@@ -451,6 +480,40 @@ body {
 
 
 /* =========================================================
+   LOGIN FOOTER
+========================================================= */
+
+.login-footer {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 7px;
+
+    margin-top: 22px;
+
+    padding-top: 18px;
+
+    border-top: 1px solid #f0f0f0;
+
+    color: #9ca3af;
+
+    font-size: 11px;
+
+}
+
+
+.login-footer i {
+
+    color: #22c55e;
+
+}
+
+
+/* =========================================================
    ADMIN LAYOUT
 ========================================================= */
 
@@ -496,6 +559,8 @@ body {
 
     border-right: 1px solid #292929;
 
+    z-index: 100;
+
 }
 
 
@@ -512,6 +577,23 @@ body {
     gap: 12px;
 
     padding: 5px 10px 30px;
+
+}
+
+
+.sidebar-logo {
+
+    width: 45px;
+
+    height: 45px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
 
 }
 
@@ -535,6 +617,8 @@ body {
 
     color: white;
 
+    line-height: 1.2;
+
 }
 
 
@@ -548,7 +632,7 @@ body {
 
     letter-spacing: 1.5px;
 
-    margin-top: 3px;
+    margin-top: 4px;
 
 }
 
@@ -588,7 +672,10 @@ body {
 
     font-size: 14px;
 
-    transition: .2s;
+    transition:
+        background .2s,
+        color .2s,
+        transform .2s;
 
 }
 
@@ -640,6 +727,86 @@ body {
 
     text-align: center;
 
+    flex-shrink: 0;
+
+}
+
+
+/* =========================================================
+   SIDEBAR INFO
+========================================================= */
+
+.sidebar-info {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-top: auto;
+
+    margin-bottom: 18px;
+
+    padding: 13px;
+
+    border-radius: 10px;
+
+    background: rgba(255, 90, 31, .06);
+
+    border: 1px solid rgba(255, 90, 31, .12);
+
+}
+
+
+.sidebar-info-icon {
+
+    width: 32px;
+
+    height: 32px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 8px;
+
+    color: var(--orange);
+
+    background: rgba(255, 90, 31, .10);
+
+}
+
+
+.sidebar-info strong {
+
+    display: block;
+
+    color: #e5e7eb;
+
+    font-size: 11px;
+
+    line-height: 1.3;
+
+}
+
+
+.sidebar-info span {
+
+    display: block;
+
+    color: #777;
+
+    font-size: 9px;
+
+    line-height: 1.4;
+
+    margin-top: 3px;
+
 }
 
 
@@ -649,7 +816,7 @@ body {
 
 .sidebar-bottom {
 
-    margin-top: auto;
+    width: 100%;
 
 }
 
@@ -675,6 +842,8 @@ body {
 
     height: 38px;
 
+    flex-shrink: 0;
+
     border-radius: 50%;
 
     background: #2a1a14;
@@ -694,6 +863,8 @@ body {
 
     display: block;
 
+    color: white;
+
     font-size: 13px;
 
 }
@@ -711,6 +882,10 @@ body {
 
 }
 
+
+/* =========================================================
+   LOGOUT BUTTON
+========================================================= */
 
 .logout-button {
 
@@ -764,13 +939,281 @@ body {
 
     width: calc(100% - 260px);
 
+    min-height: 100vh;
+
     padding: 0 40px 40px;
 
 }
 
 
 /* =========================================================
-   TOP HEADER / PANEL
+   TOP PANEL
+========================================================= */
+
+.top-panel {
+
+    min-height: 78px;
+
+    margin: 0 -40px;
+
+    padding: 0 40px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #111111,
+            #151515
+        );
+
+    color: white;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    border-bottom: 1px solid #292929;
+
+    position: relative;
+
+    overflow: hidden;
+
+}
+
+
+/* orange line */
+
+.top-panel::before {
+
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+
+    top: 0;
+
+    width: 100%;
+
+    height: 2px;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--orange),
+            #ff8a5c,
+            var(--orange)
+        );
+
+}
+
+
+/* subtle glow */
+
+.top-panel::after {
+
+    content: "";
+
+    position: absolute;
+
+    right: -100px;
+
+    top: -150px;
+
+    width: 350px;
+
+    height: 350px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255, 90, 31, .12),
+            transparent 65%
+        );
+
+    pointer-events: none;
+
+}
+
+
+/* =========================================================
+   TOP PANEL LEFT
+========================================================= */
+
+.top-panel-left {
+
+    position: relative;
+
+    z-index: 2;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+}
+
+
+.top-panel-icon {
+
+    width: 42px;
+
+    height: 42px;
+
+    flex-shrink: 0;
+
+    border-radius: 10px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: rgba(255, 90, 31, .12);
+
+    color: var(--orange);
+
+    border: 1px solid rgba(255, 90, 31, .20);
+
+    font-size: 17px;
+
+}
+
+
+.top-panel-left span {
+
+    display: block;
+
+    color: #999;
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+    letter-spacing: 2px;
+
+    margin-bottom: 3px;
+
+}
+
+
+.top-panel-left strong {
+
+    display: block;
+
+    color: white;
+
+    font-size: 16px;
+
+    font-weight: 700;
+
+}
+
+
+/* =========================================================
+   TOP PANEL RIGHT
+========================================================= */
+
+.top-panel-right {
+
+    position: relative;
+
+    z-index: 2;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 20px;
+
+}
+
+
+/* =========================================================
+   ONLINE STATUS
+========================================================= */
+
+.online-status {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    color: #a7f3d0;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+}
+
+
+.online-status span {
+
+    width: 8px;
+
+    height: 8px;
+
+    display: block;
+
+    border-radius: 50%;
+
+    background: #22c55e;
+
+    box-shadow:
+        0 0 0 4px
+        rgba(34, 197, 94, .10);
+
+}
+
+
+/* =========================================================
+   TOP ADMIN
+========================================================= */
+
+.top-admin {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 8px 12px;
+
+    border-radius: 8px;
+
+    background: #1d1d1d;
+
+    border: 1px solid #303030;
+
+    color: #d1d5db;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+}
+
+
+.top-admin i {
+
+    color: var(--orange);
+
+    font-size: 17px;
+
+}
+
+
+/* =========================================================
+   DASHBOARD HEADER
 ========================================================= */
 
 .admin-header {
@@ -804,7 +1247,7 @@ body {
 }
 
 
-/* Orange top accent */
+/* orange top accent */
 
 .admin-header::before {
 
@@ -831,7 +1274,7 @@ body {
 }
 
 
-/* Decorative orange glow */
+/* decorative glow */
 
 .admin-header::after {
 
@@ -859,7 +1302,15 @@ body {
 }
 
 
+/* =========================================================
+   DASHBOARD HEADER CONTENT
+========================================================= */
+
 .dashboard-label {
+
+    position: relative;
+
+    z-index: 2;
 
     color: var(--orange);
 
@@ -874,6 +1325,10 @@ body {
 
 .admin-header h1 {
 
+    position: relative;
+
+    z-index: 2;
+
     font-size: 32px;
 
     font-weight: 800;
@@ -887,6 +1342,10 @@ body {
 
 .admin-header p {
 
+    position: relative;
+
+    z-index: 2;
+
     color: var(--muted);
 
     margin-top: 7px;
@@ -896,40 +1355,63 @@ body {
 }
 
 
-.header-user {
+/* =========================================================
+   VIEW WEBSITE BUTTON
+========================================================= */
+
+.view-site-button {
 
     position: relative;
 
-    z-index: 2;
+    z-index: 3;
 
-    display: flex;
+    display: inline-flex;
 
     align-items: center;
 
+    justify-content: center;
+
     gap: 9px;
 
-    color: #4b5563;
+    padding: 11px 17px;
 
-    background: #fafafa;
+    border-radius: 9px;
 
-    border: 1px solid var(--border);
+    background: var(--orange);
 
-    border-radius: 50px;
+    color: white;
 
-    padding: 9px 14px;
+    text-decoration: none;
 
     font-size: 12px;
 
-    font-weight: 600;
+    font-weight: 700;
+
+    box-shadow:
+        0 5px 15px
+        rgba(255, 90, 31, .20);
+
+    transition: .2s;
 
 }
 
 
-.header-user i {
+.view-site-button:hover {
 
-    font-size: 22px;
+    background: var(--orange-dark);
 
-    color: var(--orange);
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 8px 20px
+        rgba(255, 90, 31, .28);
+
+}
+
+
+.view-site-button i {
+
+    font-size: 11px;
 
 }
 
@@ -951,6 +1433,10 @@ body {
 
 }
 
+
+/* =========================================================
+   STAT CARD
+========================================================= */
 
 .stat-card {
 
@@ -992,7 +1478,7 @@ body {
 }
 
 
-/* Orange bottom accent */
+/* orange bottom accent */
 
 .stat-card::after {
 
@@ -1015,11 +1501,17 @@ body {
 }
 
 
+/* =========================================================
+   STAT ICON
+========================================================= */
+
 .stat-icon {
 
     width: 48px;
 
     height: 48px;
+
+    flex-shrink: 0;
 
     border-radius: 12px;
 
@@ -1061,6 +1553,39 @@ body {
 }
 
 
+/* PHP uses dark-orange */
+
+.stat-icon.dark-orange {
+
+    color: #ea580c;
+
+    background: #fff7ed;
+
+}
+
+
+/* PHP uses dark */
+
+.stat-icon.dark {
+
+    color: #374151;
+
+    background: #f3f4f6;
+
+}
+
+
+/* =========================================================
+   STAT CONTENT
+========================================================= */
+
+.stat-content {
+
+    min-width: 0;
+
+}
+
+
 .stat-card span {
 
     display: block;
@@ -1082,11 +1607,26 @@ body {
 
     font-size: 25px;
 
+    line-height: 1.1;
+
+}
+
+
+.stat-card small {
+
+    display: block;
+
+    color: #9ca3af;
+
+    font-size: 10px;
+
+    margin-top: 5px;
+
 }
 
 
 /* =========================================================
-   BOOKINGS
+   BOOKINGS SECTION
 ========================================================= */
 
 .bookings-section {
@@ -1125,7 +1665,43 @@ body {
 }
 
 
-.section-header > div:first-child > span {
+.section-title-row {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+}
+
+
+.section-icon {
+
+    width: 42px;
+
+    height: 42px;
+
+    flex-shrink: 0;
+
+    border-radius: 10px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    color: var(--orange);
+
+    background: var(--orange-light);
+
+    border: 1px solid #ffd9ca;
+
+}
+
+
+.section-label {
 
     color: var(--orange);
 
@@ -1149,7 +1725,17 @@ body {
 }
 
 
+/* =========================================================
+   BOOKING COUNT
+========================================================= */
+
 .booking-count {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
 
     background: var(--orange-light);
 
@@ -1165,11 +1751,13 @@ body {
 
     font-weight: 700;
 
+    white-space: nowrap;
+
 }
 
 
 /* =========================================================
-   TABLE
+   TABLE WRAPPER
 ========================================================= */
 
 .table-wrapper {
@@ -1180,6 +1768,10 @@ body {
 
 }
 
+
+/* =========================================================
+   TABLE
+========================================================= */
 
 .booking-table {
 
@@ -1251,6 +1843,10 @@ body {
 }
 
 
+/* =========================================================
+   MESSAGE CELL
+========================================================= */
+
 .message-cell {
 
     min-width: 200px;
@@ -1260,6 +1856,54 @@ body {
     line-height: 1.5;
 
     color: #6b7280;
+
+    white-space: normal;
+
+    overflow-wrap: anywhere;
+
+}
+
+
+/* =========================================================
+   STATUS BADGE
+========================================================= */
+
+.status-badge {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    padding: 5px 9px;
+
+    border-radius: 20px;
+
+    background: #fff7ed;
+
+    color: #c2410c;
+
+    border: 1px solid #fed7aa;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+
+}
+
+
+.status-badge > span {
+
+    width: 6px;
+
+    height: 6px;
+
+    border-radius: 50%;
+
+    background: var(--orange);
 
 }
 
@@ -1342,6 +1986,8 @@ body {
 
     margin-bottom: 7px;
 
+    font-size: 18px;
+
 }
 
 
@@ -1350,6 +1996,73 @@ body {
     color: var(--muted);
 
     font-size: 13px;
+
+    line-height: 1.5;
+
+}
+
+
+/* =========================================================
+   EMPTY BUTTON
+========================================================= */
+
+.empty-button {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    margin-top: 20px;
+
+    padding: 10px 15px;
+
+    border-radius: 8px;
+
+    background: var(--orange);
+
+    color: white;
+
+    text-decoration: none;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    transition: .2s;
+
+}
+
+
+.empty-button:hover {
+
+    background: var(--orange-dark);
+
+    transform: translateY(-1px);
+
+}
+
+
+/* =========================================================
+   ADMIN FOOTER
+========================================================= */
+
+.admin-footer {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 22px 5px 5px;
+
+    color: #9ca3af;
+
+    font-size: 11px;
 
 }
 
@@ -1371,7 +2084,32 @@ body {
    TABLET
 ========================================================= */
 
+@media (max-width: 1100px) {
+
+    .stats-grid {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+
+    }
+
+
+    .sidebar-info {
+
+        display: none;
+
+    }
+
+}
+
+
+/* =========================================================
+   SMALL TABLET
+========================================================= */
+
 @media (max-width: 900px) {
+
+    /* SIDEBAR */
 
     .sidebar {
 
@@ -1389,6 +2127,15 @@ body {
         padding-left: 0;
 
         padding-right: 0;
+
+    }
+
+
+    .sidebar-logo {
+
+        width: 40px;
+
+        height: 40px;
 
     }
 
@@ -1414,6 +2161,13 @@ body {
         justify-content: center;
 
         padding: 13px 8px;
+
+    }
+
+
+    .sidebar-nav a span {
+
+        display: none;
 
     }
 
@@ -1471,6 +2225,8 @@ body {
     }
 
 
+    /* MAIN */
+
     .admin-main {
 
         margin-left: 70px;
@@ -1481,6 +2237,58 @@ body {
 
     }
 
+
+    /* TOP PANEL */
+
+    .top-panel {
+
+        margin: 0 -25px;
+
+        padding: 0 25px;
+
+    }
+
+
+    .top-panel-right {
+
+        gap: 10px;
+
+    }
+
+
+    .online-status {
+
+        font-size: 0;
+
+    }
+
+
+    .online-status span {
+
+        width: 9px;
+
+        height: 9px;
+
+    }
+
+
+    .top-admin {
+
+        padding: 7px 9px;
+
+        font-size: 0;
+
+    }
+
+
+    .top-admin i {
+
+        font-size: 17px;
+
+    }
+
+
+    /* HEADER */
 
     .admin-header {
 
@@ -1508,6 +2316,8 @@ body {
 
 @media (max-width: 600px) {
 
+    /* LOGIN */
+
     .login-page {
 
         padding: 15px;
@@ -1531,12 +2341,70 @@ body {
     }
 
 
+    /* MAIN */
+
     .admin-main {
 
         padding: 0 18px 25px;
 
     }
 
+
+    /* TOP PANEL */
+
+    .top-panel {
+
+        min-height: 70px;
+
+        margin: 0 -18px;
+
+        padding: 0 18px;
+
+    }
+
+
+    .top-panel-icon {
+
+        width: 38px;
+
+        height: 38px;
+
+        border-radius: 9px;
+
+    }
+
+
+    .top-panel-left {
+
+        gap: 10px;
+
+    }
+
+
+    .top-panel-left span {
+
+        font-size: 8px;
+
+        letter-spacing: 1.5px;
+
+    }
+
+
+    .top-panel-left strong {
+
+        font-size: 14px;
+
+    }
+
+
+    .top-panel-right {
+
+        gap: 8px;
+
+    }
+
+
+    /* DASHBOARD HEADER */
 
     .admin-header {
 
@@ -1578,14 +2446,14 @@ body {
     }
 
 
-    .header-user {
+    .view-site-button {
 
-        display: inline-flex;
-
-        margin-top: 18px;
+        margin-top: 20px;
 
     }
 
+
+    /* STATS */
 
     .stat-card {
 
@@ -1593,6 +2461,8 @@ body {
 
     }
 
+
+    /* SECTION */
 
     .section-header {
 
@@ -1617,6 +2487,21 @@ body {
     .booking-count {
 
         font-size: 11px;
+
+    }
+
+
+    /* FOOTER */
+
+    .admin-footer {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 6px;
+
+        padding-left: 2px;
 
     }
 
@@ -1648,6 +2533,22 @@ body {
         margin-left: 60px;
 
         width: calc(100% - 60px);
+
+    }
+
+
+    .top-panel {
+
+        margin-left: -18px;
+
+        margin-right: -18px;
+
+    }
+
+
+    .top-panel-left strong {
+
+        font-size: 13px;
 
     }
 
