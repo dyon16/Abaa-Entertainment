@@ -15,6 +15,7 @@
 
 html {
     scroll-behavior: smooth;
+
     scrollbar-width: none;
 }
 
@@ -26,17 +27,10 @@ html::-webkit-scrollbar {
 /* ==================================================
    BODY
 ================================================== */
-.booking-status-link {
-    color: #ff3d02 !important;
-    font-weight: 700;
-}
-
-.booking-status-link:hover {
-    color: #ff7043 !important;
-}
 
 body {
     margin: 0;
+
     min-height: 100vh;
 
     font-family: Arial, sans-serif;
@@ -51,8 +45,11 @@ body {
         url("background.jpg");
 
     background-size: cover;
+
     background-position: center;
+
     background-repeat: no-repeat;
+
     background-attachment: fixed;
 
     padding-top: 150px;
@@ -64,6 +61,21 @@ body {
 
 body::-webkit-scrollbar {
     display: none;
+}
+
+
+/* ==================================================
+   BOOKING STATUS
+================================================== */
+
+.booking-status-link {
+    color: #ff3d02 !important;
+
+    font-weight: 700;
+}
+
+.booking-status-link:hover {
+    color: #ff7043 !important;
 }
 
 
@@ -94,17 +106,24 @@ body::-webkit-scrollbar {
     z-index: 1000;
 
     display: flex;
+
     align-items: center;
+
     justify-content: space-between;
 
-    padding: 0 clamp(20px, 5vw, 50px);
+    padding:
+        0
+        clamp(20px, 5vw, 50px);
 
-    background: rgba(0, 0, 0, 0.97);
+    background:
+        rgba(0, 0, 0, 0.97);
 
-    border-bottom: 3px solid #ff3d02;
+    border-bottom:
+        3px solid #ff3d02;
 
     box-shadow:
-        0 5px 20px rgba(0, 0, 0, 0.6);
+        0 5px 20px
+        rgba(0, 0, 0, 0.6);
 }
 
 
@@ -114,6 +133,7 @@ body::-webkit-scrollbar {
 
 .logo {
     display: flex;
+
     align-items: center;
 
     text-decoration: none;
@@ -124,7 +144,8 @@ body::-webkit-scrollbar {
 }
 
 .logo img {
-    width: clamp(90px, 10vw, 150px);
+    width:
+        clamp(90px, 10vw, 150px);
 
     height: auto;
 
@@ -142,9 +163,11 @@ body::-webkit-scrollbar {
 
 .header nav {
     display: flex;
+
     align-items: center;
 
-    gap: clamp(10px, 3vw, 40px);
+    gap:
+        clamp(10px, 3vw, 40px);
 
     min-width: 0;
 }
@@ -156,7 +179,8 @@ body::-webkit-scrollbar {
 
     text-decoration: none;
 
-    font-size: clamp(10px, 1.2vw, 16px);
+    font-size:
+        clamp(10px, 1.2vw, 16px);
 
     font-weight: bold;
 
@@ -171,7 +195,7 @@ body::-webkit-scrollbar {
 
 
 /* ==================================================
-   NAVIGATION UNDERLINE
+   NAV UNDERLINE
 ================================================== */
 
 .header nav a:not(.book-button)::after {
@@ -187,7 +211,8 @@ body::-webkit-scrollbar {
 
     background: #ff3d02;
 
-    transform: translateX(-50%);
+    transform:
+        translateX(-50%);
 
     transition: 0.3s;
 }
@@ -222,7 +247,8 @@ body::-webkit-scrollbar {
 
     background: #ff3d02;
 
-    transform: translateX(-50%);
+    transform:
+        translateX(-50%);
 }
 
 
@@ -234,19 +260,23 @@ body::-webkit-scrollbar {
     display: inline-flex;
 
     align-items: center;
+
     justify-content: center;
 
-    padding: 12px 30px;
+    padding:
+        12px 30px;
 
     color: white;
 
     background: #ff3d02;
 
-    border: 2px solid #ff3d02;
+    border:
+        2px solid #ff3d02;
 
     border-radius: 50px;
 
-    font-size: clamp(10px, 1.2vw, 16px);
+    font-size:
+        clamp(10px, 1.2vw, 16px);
 
     font-weight: bold;
 
@@ -257,7 +287,8 @@ body::-webkit-scrollbar {
     text-decoration: none;
 
     box-shadow:
-        0 0 15px rgba(255, 61, 2, 0.35);
+        0 0 15px
+        rgba(255, 61, 2, 0.35);
 
     transition: 0.3s;
 }
@@ -271,10 +302,12 @@ body::-webkit-scrollbar {
 
     background: transparent;
 
-    transform: translateY(-2px);
+    transform:
+        translateY(-2px);
 
     box-shadow:
-        0 0 25px rgba(255, 61, 2, 0.65);
+        0 0 25px
+        rgba(255, 61, 2, 0.65);
 }
 
 .header nav a.book-button:active {
@@ -294,10 +327,13 @@ body::-webkit-scrollbar {
     min-height: 500px;
 
     display: flex;
+
     align-items: center;
+
     justify-content: space-between;
 
-    gap: clamp(30px, 5vw, 60px);
+    gap:
+        clamp(30px, 5vw, 60px);
 
     padding:
         clamp(50px, 7vw, 70px)
@@ -313,9 +349,11 @@ body::-webkit-scrollbar {
         url("/event10-img.jpg");
 
     background-size: cover;
+
     background-position: center;
 
-    border-bottom: 2px solid #222;
+    border-bottom:
+        2px solid #222;
 }
 
 
@@ -331,6 +369,7 @@ body::-webkit-scrollbar {
     flex: 1;
 
     width: 100%;
+
     max-width: 1000px;
 }
 
@@ -339,7 +378,8 @@ body::-webkit-scrollbar {
 
     color: #ff3d02;
 
-    font-size: clamp(11px, 1.2vw, 15px);
+    font-size:
+        clamp(11px, 1.2vw, 15px);
 
     font-weight: bold;
 
@@ -349,7 +389,8 @@ body::-webkit-scrollbar {
 .about-hero h1 {
     margin-bottom: 25px;
 
-    font-size: clamp(38px, 5vw, 65px);
+    font-size:
+        clamp(38px, 5vw, 65px);
 
     line-height: 1.05;
 
@@ -369,7 +410,8 @@ body::-webkit-scrollbar {
 
     color: #ccc;
 
-    font-size: clamp(15px, 1.5vw, 19px);
+    font-size:
+        clamp(15px, 1.5vw, 19px);
 
     line-height: 1.7;
 }
@@ -380,9 +422,11 @@ body::-webkit-scrollbar {
 ================================================== */
 
 .main-container {
-    width: min(95%, 1400px);
+    width:
+        min(95%, 1400px);
 
-    margin: 40px auto;
+    margin:
+        40px auto;
 
     display: flex;
 
@@ -399,7 +443,8 @@ body::-webkit-scrollbar {
 ================================================== */
 
 .big-box {
-    width: min(750px, 100%);
+    width:
+        min(750px, 100%);
 
     height: 600px;
 
@@ -409,12 +454,8 @@ body::-webkit-scrollbar {
 
     border-radius: 5px;
 
-  
-
     transition: 0.3s;
 }
-
-
 
 .big-box img {
     width: 100%;
@@ -425,335 +466,6 @@ body::-webkit-scrollbar {
     object-fit: cover;
 
     transition: 0.6s;
-}
-
-
-
-/* ==================================================
-   EVENTS
-================================================== */
-
-.events {
-    width: 100%;
-
-    padding:
-        clamp(40px, 6vw, 70px)
-        5%;
-
-    text-align: center;
-
-    color: white;
-
-    background: rgba(0, 0, 0, 0.20);
-
-    border-top: 1px solid #222;
-    border-bottom: 1px solid #222;
-}
-
-.events h2 {
-    margin-bottom: 10px;
-
-    color: white;
-
-    font-size: clamp(30px, 4vw, 42px);
-
-    font-weight: 900;
-
-    text-transform: uppercase;
-
-    letter-spacing: 3px;
-}
-
-.events h2::after {
-    content: "";
-
-    display: block;
-
-    width: 80px;
-    height: 4px;
-
-    margin: 12px auto;
-
-    background: #ff3d02;
-}
-
-.events-description {
-    max-width: 750px;
-
-    margin: 0 auto 35px;
-
-    color: #aaa;
-
-    font-size: 17px;
-
-    line-height: 1.6;
-}
-
-
-/* ==================================================
-   FEATURED EVENT
-================================================== */
-
-.featured-event {
-    position: relative;
-
-    width: min(850px, 100%);
-
-    height: 560px;
-
-    margin: 0 auto 30px;
-
-    overflow: hidden;
-
-    background: #080808;
-
-    border: 2px solid #333;
-
-    border-radius: 5px;
-
-    box-shadow:
-        0 0 25px rgba(255, 61, 2, 0.25);
-
-    transition: 0.3s;
-}
-
-.featured-event:hover {
-    border-color: #ff3d02;
-
-    box-shadow:
-        0 15px 40px rgba(255, 61, 2, 0.35);
-}
-
-.featured-event > img,
-.featured-event > video {
-    width: 100%;
-    height: 100%;
-
-    display: block;
-
-    object-fit: cover;
-}
-
-.featured-event > img {
-    transition: 0.5s;
-}
-
-.featured-event:hover > img {
-    transform: scale(1.04);
-}
-
-.featured-event > video {
-    background: #000;
-}
-
-
-/* ==================================================
-   FEATURED EVENT TITLE
-================================================== */
-
-.featured-title {
-    position: absolute;
-
-    left: 0;
-    right: 0;
-    bottom: 0;
-
-    padding: 35px 25px 25px;
-
-    background:
-        linear-gradient(
-            transparent,
-            rgba(0, 0, 0, 0.95)
-        );
-
-    color: white;
-
-    font-size: clamp(18px, 2vw, 24px);
-
-    font-weight: bold;
-
-    text-transform: uppercase;
-
-    letter-spacing: 1px;
-
-    text-align: left;
-}
-
-
-/* ==================================================
-   EVENT THUMBNAILS
-================================================== */
-
-.event-thumbnails {
-    width: 100%;
-
-    display: flex;
-
-    justify-content: center;
-
-    align-items: stretch;
-
-    gap: 15px;
-
-    flex-wrap: wrap;
-}
-
-.event-thumbnail {
-    width: 150px;
-    height: 120px;
-
-    padding: 0;
-
-    position: relative;
-
-    overflow: hidden;
-
-    cursor: pointer;
-
-    background: #080808;
-
-    border: 2px solid #333;
-
-    border-radius: 5px;
-
-    font-family: Arial, sans-serif;
-
-    transition:
-        transform 0.3s,
-        border-color 0.3s,
-        box-shadow 0.3s;
-}
-
-.event-thumbnail > img {
-    width: 100%;
-    height: 82px;
-
-    display: block;
-
-    object-fit: cover;
-
-    filter: brightness(0.65);
-
-    transition: 0.3s;
-}
-
-.event-thumbnail span {
-    width: 100%;
-    height: 36px;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    padding: 5px;
-
-    background: #080808;
-
-    color: #aaa;
-
-    font-size: 11px;
-
-    font-weight: bold;
-
-    text-transform: uppercase;
-
-    letter-spacing: 0.5px;
-}
-
-.event-thumbnail:hover {
-    transform: translateY(-6px);
-
-    border-color: #ff3d02;
-
-    box-shadow:
-        0 10px 25px rgba(255, 61, 2, 0.3);
-}
-
-.event-thumbnail:hover > img {
-    filter: brightness(1);
-
-    transform: scale(1.05);
-}
-
-.event-thumbnail:hover span {
-    color: #ff3d02;
-}
-
-.event-thumbnail.active {
-    border-color: #ff3d02;
-
-    box-shadow:
-        0 0 20px rgba(255, 61, 2, 0.4);
-}
-
-.event-thumbnail.active > img {
-    filter: brightness(1);
-}
-
-.event-thumbnail.active span {
-    color: #ff3d02;
-}
-
-
-/* ==================================================
-   VIDEO THUMBNAIL
-================================================== */
-
-.video-thumbnail {
-    width: 100%;
-    height: 82px;
-
-    position: relative;
-
-    overflow: hidden;
-}
-
-.video-thumbnail img {
-    width: 100%;
-    height: 100%;
-
-    display: block;
-
-    object-fit: cover;
-
-    filter: brightness(0.65);
-
-    transition: 0.3s;
-}
-
-.video-thumbnail i {
-    position: absolute;
-
-    top: 50%;
-    left: 50%;
-
-    width: 40px;
-    height: 40px;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    transform: translate(-50%, -50%);
-
-    border-radius: 50%;
-
-    background: #ff3d02;
-
-    color: white;
-
-    font-size: 15px;
-
-    box-shadow:
-        0 5px 15px rgba(0, 0, 0, 0.5);
-}
-
-.event-thumbnail:hover .video-thumbnail img {
-    filter: brightness(1);
-
-    transform: scale(1.05);
 }
 
 
@@ -772,10 +484,14 @@ body::-webkit-scrollbar {
 
     color: white;
 
-    background: rgba(0, 0, 0, 0.30);
+    background:
+        rgba(0, 0, 0, 0.30);
 
-    border-top: 1px solid #222;
-    border-bottom: 1px solid #222;
+    border-top:
+        1px solid #222;
+
+    border-bottom:
+        1px solid #222;
 }
 
 .services h2 {
@@ -783,7 +499,8 @@ body::-webkit-scrollbar {
 
     color: white;
 
-    font-size: clamp(30px, 4vw, 42px);
+    font-size:
+        clamp(30px, 4vw, 42px);
 
     font-weight: 900;
 
@@ -800,7 +517,8 @@ body::-webkit-scrollbar {
     width: 80px;
     height: 4px;
 
-    margin: 12px auto;
+    margin:
+        12px auto;
 
     background: #ff3d02;
 }
@@ -808,7 +526,8 @@ body::-webkit-scrollbar {
 .services-description {
     max-width: 750px;
 
-    margin: 0 auto 35px;
+    margin:
+        0 auto 35px;
 
     color: #aaa;
 
@@ -824,6 +543,7 @@ body::-webkit-scrollbar {
 
 .boxes {
     width: 100%;
+
     max-width: 1150px;
 
     margin: auto;
@@ -854,7 +574,8 @@ body::-webkit-scrollbar {
 
     background: #080808;
 
-    border: 2px solid #333;
+    border:
+        2px solid #333;
 
     border-radius: 5px;
 
@@ -884,7 +605,9 @@ body::-webkit-scrollbar {
 
 .image-button img {
     width: 100%;
-    height: calc(100% - 70px);
+
+    height:
+        calc(100% - 70px);
 
     display: block;
 
@@ -901,17 +624,20 @@ body::-webkit-scrollbar {
     display: flex;
 
     align-items: center;
+
     justify-content: center;
 
     padding: 10px;
 
     background: #080808;
 
-    border-top: 1px solid #222;
+    border-top:
+        1px solid #222;
 
     color: white;
 
-    font-size: clamp(16px, 1.8vw, 20px);
+    font-size:
+        clamp(16px, 1.8vw, 20px);
 
     font-weight: bold;
 
@@ -921,12 +647,14 @@ body::-webkit-scrollbar {
 }
 
 .image-button:hover {
-    transform: translateY(-8px);
+    transform:
+        translateY(-8px);
 
     border-color: #ff3d02;
 
     box-shadow:
-        0 15px 35px rgba(255, 61, 2, 0.35);
+        0 15px 35px
+        rgba(255, 61, 2, 0.35);
 }
 
 .image-button:hover::before {
@@ -949,6 +677,531 @@ body::-webkit-scrollbar {
 
 
 /* ==================================================
+   EVENTS
+================================================== */
+
+.events {
+    width: 100%;
+
+    padding:
+        clamp(40px, 6vw, 70px)
+        5%;
+
+    text-align: center;
+
+    color: white;
+
+    background:
+        rgba(0, 0, 0, 0.20);
+
+    border-top:
+        1px solid #222;
+
+    border-bottom:
+        1px solid #222;
+}
+
+.events h2 {
+    margin-bottom: 10px;
+
+    color: white;
+
+    font-size:
+        clamp(30px, 4vw, 42px);
+
+    font-weight: 900;
+
+    text-transform: uppercase;
+
+    letter-spacing: 3px;
+}
+
+.events h2::after {
+    content: "";
+
+    display: block;
+
+    width: 80px;
+    height: 4px;
+
+    margin:
+        12px auto;
+
+    background: #ff3d02;
+}
+
+.events-description {
+    max-width: 750px;
+
+    margin:
+        0 auto 35px;
+
+    color: #aaa;
+
+    font-size: 17px;
+
+    line-height: 1.6;
+}
+
+
+/* ==================================================
+   FEATURED EVENT
+================================================== */
+
+.featured-event {
+    position: relative;
+
+    width:
+        min(850px, 100%);
+
+    height: 560px;
+
+    margin:
+        0 auto 30px;
+
+    overflow: hidden;
+
+    background: #080808;
+
+    border:
+        2px solid #333;
+
+    border-radius: 5px;
+
+    box-shadow:
+        0 0 25px
+        rgba(255, 61, 2, 0.25);
+
+    transition: 0.3s;
+}
+
+.featured-event:hover {
+    border-color: #ff3d02;
+
+    box-shadow:
+        0 15px 40px
+        rgba(255, 61, 2, 0.35);
+}
+
+
+/* ==================================================
+   FEATURED IMAGE / VIDEO
+================================================== */
+
+.featured-event > img,
+.featured-event > video {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+}
+
+.featured-event > img {
+    transition: 0.5s;
+}
+
+.featured-event:hover > img {
+    transform: scale(1.04);
+}
+
+.featured-event > video {
+    background: #000;
+}
+
+
+/* ==================================================
+   FEATURED TITLE
+================================================== */
+
+.featured-title {
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    z-index: 4;
+
+    padding:
+        35px 25px 25px;
+
+    background:
+        linear-gradient(
+            transparent,
+            rgba(0, 0, 0, 0.95)
+        );
+
+    color: white;
+
+    font-size:
+        clamp(18px, 2vw, 24px);
+
+    font-weight: bold;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1px;
+
+    text-align: left;
+
+    pointer-events: none;
+}
+
+
+/* ==================================================
+   FEATURED PLAY BUTTON
+================================================== */
+
+.featured-play-button {
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    z-index: 6;
+
+    transform:
+        translate(-50%, -50%);
+
+    width: 70px;
+    height: 70px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background:
+        #ff3d02;
+
+    color: white;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    cursor: pointer;
+
+    font-size: 24px;
+
+    box-shadow:
+        0 8px 30px
+        rgba(0, 0, 0, 0.30);
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease;
+}
+
+.featured-play-button:hover {
+    transform:
+        translate(-50%, -50%)
+        scale(1.08);
+
+    background:
+        #ff5722;
+}
+
+.featured-play-button i {
+    color: white;
+
+    background: transparent;
+
+    border: none;
+
+    box-shadow: none;
+}
+
+
+/* ==================================================
+   EVENT THUMBNAILS
+================================================== */
+
+.event-thumbnails {
+    width: 100%;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: stretch;
+
+    gap: 15px;
+
+    flex-wrap: wrap;
+}
+
+
+/* ==================================================
+   EVENT THUMBNAIL BUTTON
+================================================== */
+
+.event-thumbnail {
+    width: 150px;
+    height: 120px;
+
+    padding: 0;
+    margin: 0;
+
+    position: relative;
+
+    overflow: hidden;
+
+    display: flex;
+
+    flex-direction: column;
+
+    flex-shrink: 0;
+
+    cursor: pointer;
+
+    background: #080808;
+
+    border:
+        2px solid #333;
+
+    border-radius: 5px;
+
+    font-family: Arial, sans-serif;
+
+    transition:
+        transform 0.3s ease,
+        border-color 0.3s ease,
+        box-shadow 0.3s ease;
+}
+
+
+/* ==================================================
+   NORMAL IMAGE THUMBNAIL
+================================================== */
+
+.event-thumbnail > img {
+    width: 100%;
+    height: 82px;
+
+    flex-shrink: 0;
+
+    display: block;
+
+    object-fit: cover;
+
+    filter: brightness(0.65);
+
+    transition:
+        transform 0.3s ease,
+        filter 0.3s ease;
+}
+
+
+/* ==================================================
+   VIDEO THUMBNAIL
+================================================== */
+
+.video-thumbnail {
+    position: relative;
+
+    width: 100%;
+    height: 82px;
+
+    flex-shrink: 0;
+
+    overflow: hidden;
+
+    display: block;
+
+    background: #080808;
+}
+
+.video-thumbnail img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+
+    filter: brightness(0.65);
+
+    transition:
+        transform 0.3s ease,
+        filter 0.3s ease;
+}
+
+
+/* ==================================================
+   VIDEO PLAY ICON
+================================================== */
+
+.video-thumbnail-play {
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    z-index: 3;
+
+    width: 40px;
+    height: 40px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    transform:
+        translate(-50%, -50%);
+
+    border: none;
+
+    border-radius: 50%;
+
+    background:
+        #ff3d02;
+
+    color: white;
+
+    pointer-events: none;
+
+    box-shadow:
+        0 5px 15px
+        rgba(0, 0, 0, 0.5);
+}
+
+.video-thumbnail-play i {
+    position: static;
+
+    width: auto;
+    height: auto;
+
+    display: block;
+
+    margin: 0;
+    padding: 0;
+
+    transform: none;
+
+    background: transparent;
+
+    border: none;
+
+    color: white;
+
+    font-size: 15px;
+
+    box-shadow: none;
+}
+
+
+/* ==================================================
+   THUMBNAIL TITLE
+================================================== */
+
+.event-thumbnail-title {
+    width: 100%;
+    height: 36px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding:
+        5px;
+
+    background:
+        #080808;
+
+    color: #aaa;
+
+    font-size: 11px;
+
+    font-weight: bold;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.5px;
+
+    line-height: 1.1;
+
+    text-align: center;
+
+    overflow: hidden;
+}
+
+
+/* ==================================================
+   THUMBNAIL HOVER
+================================================== */
+
+.event-thumbnail:hover {
+    transform:
+        translateY(-6px);
+
+    border-color:
+        #ff3d02;
+
+    box-shadow:
+        0 10px 25px
+        rgba(255, 61, 2, 0.3);
+}
+
+.event-thumbnail:hover > img {
+    filter: brightness(1);
+
+    transform: scale(1.05);
+}
+
+.event-thumbnail:hover .video-thumbnail img {
+    filter: brightness(1);
+
+    transform: scale(1.05);
+}
+
+.event-thumbnail:hover
+.event-thumbnail-title {
+    color:
+        #ff3d02;
+}
+
+
+/* ==================================================
+   ACTIVE THUMBNAIL
+================================================== */
+
+.event-thumbnail.active {
+    border-color:
+        #ff3d02;
+
+    box-shadow:
+        0 0 20px
+        rgba(255, 61, 2, 0.4);
+}
+
+.event-thumbnail.active > img {
+    filter:
+        brightness(1);
+}
+
+.event-thumbnail.active
+.video-thumbnail img {
+    filter:
+        brightness(1);
+}
+
+.event-thumbnail.active
+.event-thumbnail-title {
+    color:
+        #ff3d02;
+}
+
+
+/* ==================================================
    FOOTER
 ================================================== */
 
@@ -966,18 +1219,22 @@ body::-webkit-scrollbar {
 
     color: white;
 
-    border-top: 3px solid #ff3d02;
+    border-top:
+        3px solid #ff3d02;
 
     box-shadow:
-        0 -10px 40px rgba(0, 0, 0, 0.6);
+        0 -10px 40px
+        rgba(0, 0, 0, 0.6);
 }
 
 .footer-container {
-    width: min(95%, 1400px);
+    width:
+        min(95%, 1400px);
 
     margin: auto;
 
-    padding: 55px 20px 45px;
+    padding:
+        55px 20px 45px;
 
     display: grid;
 
@@ -1057,7 +1314,8 @@ body::-webkit-scrollbar {
 .footer-section > a:hover {
     color: #ff3d02;
 
-    transform: translateX(5px);
+    transform:
+        translateX(5px);
 }
 
 
@@ -1089,6 +1347,7 @@ body::-webkit-scrollbar {
     display: flex;
 
     align-items: center;
+
     justify-content: center;
 
     margin-top: 2px;
@@ -1132,13 +1391,15 @@ body::-webkit-scrollbar {
     display: flex;
 
     align-items: center;
+
     justify-content: center;
 
     color: #aaa;
 
     background: #080808;
 
-    border: 1px solid #333;
+    border:
+        1px solid #333;
 
     border-radius: 50%;
 
@@ -1156,10 +1417,12 @@ body::-webkit-scrollbar {
 
     border-color: #ff3d02;
 
-    transform: translateY(-4px);
+    transform:
+        translateY(-4px);
 
     box-shadow:
-        0 5px 15px rgba(255, 61, 2, 0.4);
+        0 5px 15px
+        rgba(255, 61, 2, 0.4);
 }
 
 
@@ -1170,18 +1433,22 @@ body::-webkit-scrollbar {
 .footer-bottom {
     width: 100%;
 
-    padding: 20px 5%;
+    padding:
+        20px 5%;
 
     display: flex;
 
     align-items: center;
+
     justify-content: space-between;
 
     gap: 20px;
 
-    border-top: 1px solid #222;
+    border-top:
+        1px solid #222;
 
-    background: #030303;
+    background:
+        #030303;
 }
 
 .footer-bottom p {
@@ -1203,9 +1470,6 @@ body::-webkit-scrollbar {
 
 /* ==================================================
    BOOKING OVERLAY
-   IMPORTANT:
-   This covers the SCREEN.
-   The modal itself does NOT.
 ================================================== */
 
 .booking-overlay {
@@ -1221,14 +1485,19 @@ body::-webkit-scrollbar {
     display: flex;
 
     align-items: center;
+
     justify-content: center;
 
     padding: 20px;
 
-    background: rgba(0, 0, 0, 0.90);
+    background:
+        rgba(0, 0, 0, 0.90);
 
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter:
+        blur(8px);
+
+    -webkit-backdrop-filter:
+        blur(8px);
 
     opacity: 0;
 
@@ -1255,15 +1524,18 @@ body::-webkit-scrollbar {
 .booking-modal {
     position: relative;
 
-    width: min(850px, calc(100vw - 40px));
+    width:
+        min(850px, calc(100vw - 40px));
 
     max-width: 850px;
 
-    max-height: calc(100vh - 40px);
+    max-height:
+        calc(100vh - 40px);
 
     margin: auto;
 
     overflow-x: hidden;
+
     overflow-y: auto;
 
     padding: 40px;
@@ -1275,24 +1547,34 @@ body::-webkit-scrollbar {
             #160704
         );
 
-    border: 1px solid #333;
+    border:
+        1px solid #333;
 
-    border-top: 4px solid #ff3d02;
+    border-top:
+        4px solid #ff3d02;
 
     border-radius: 8px;
 
     box-shadow:
-        0 20px 80px rgba(0, 0, 0, 0.95),
-        0 0 40px rgba(255, 61, 2, 0.18);
+        0 20px 80px
+        rgba(0, 0, 0, 0.95),
 
-    transform: translateY(30px) scale(0.96);
+        0 0 40px
+        rgba(255, 61, 2, 0.18);
+
+    transform:
+        translateY(30px)
+        scale(0.96);
 
     transition:
         transform 0.3s ease;
 }
 
-.booking-overlay.active .booking-modal {
-    transform: translateY(0) scale(1);
+.booking-overlay.active
+.booking-modal {
+    transform:
+        translateY(0)
+        scale(1);
 }
 
 
@@ -1312,13 +1594,15 @@ body::-webkit-scrollbar {
     display: flex;
 
     align-items: center;
+
     justify-content: center;
 
     color: #aaa;
 
     background: #0b0b0b;
 
-    border: 1px solid #333;
+    border:
+        1px solid #333;
 
     border-radius: 50%;
 
@@ -1336,7 +1620,8 @@ body::-webkit-scrollbar {
 
     border-color: #ff3d02;
 
-    transform: rotate(90deg);
+    transform:
+        rotate(90deg);
 }
 
 
@@ -1351,7 +1636,8 @@ body::-webkit-scrollbar {
 
     margin-bottom: 30px;
 
-    border-bottom: 1px solid #292929;
+    border-bottom:
+        1px solid #292929;
 }
 
 .booking-label {
@@ -1373,7 +1659,8 @@ body::-webkit-scrollbar {
 
     color: white;
 
-    font-size: clamp(27px, 4vw, 38px);
+    font-size:
+        clamp(27px, 4vw, 38px);
 
     font-weight: 900;
 
@@ -1443,15 +1730,19 @@ body::-webkit-scrollbar {
 .form-group select,
 .form-group textarea {
     width: 100%;
+
     max-width: 100%;
 
-    padding: 13px 15px;
+    padding:
+        13px 15px;
 
     color: white;
 
-    background: #050505;
+    background:
+        #050505;
 
-    border: 1px solid #333;
+    border:
+        1px solid #333;
 
     border-radius: 4px;
 
@@ -1490,11 +1781,15 @@ body::-webkit-scrollbar {
 .form-group textarea:focus {
     border-color: #ff3d02;
 
-    background: #090909;
+    background:
+        #090909;
 
     box-shadow:
-        0 0 0 2px rgba(255, 61, 2, 0.12),
-        0 0 15px rgba(255, 61, 2, 0.08);
+        0 0 0 2px
+        rgba(255, 61, 2, 0.12),
+
+        0 0 15px
+        rgba(255, 61, 2, 0.08);
 }
 
 .form-group select {
@@ -1504,7 +1799,8 @@ body::-webkit-scrollbar {
 .form-group select option {
     color: white;
 
-    background: #080808;
+    background:
+        #080808;
 }
 
 .form-group input[type="date"],
@@ -1537,13 +1833,16 @@ body::-webkit-scrollbar {
 
     min-width: 0;
 
-    padding: 13px 15px;
+    padding:
+        13px 15px;
 
     color: #ddd;
 
-    background: #080808;
+    background:
+        #080808;
 
-    border: 1px solid #333;
+    border:
+        1px solid #333;
 
     border-radius: 6px;
 
@@ -1559,9 +1858,11 @@ body::-webkit-scrollbar {
 .service-checkbox:hover {
     color: white;
 
-    border-color: #ff3d02;
+    border-color:
+        #ff3d02;
 
-    background: #120704;
+    background:
+        #120704;
 }
 
 .service-checkbox input {
@@ -1572,7 +1873,8 @@ body::-webkit-scrollbar {
 
     margin: 0;
 
-    accent-color: #ff3d02;
+    accent-color:
+        #ff3d02;
 
     cursor: pointer;
 }
@@ -1584,7 +1886,8 @@ body::-webkit-scrollbar {
 .service-checkbox:has(input:checked) {
     color: white;
 
-    border-color: #ff3d02;
+    border-color:
+        #ff3d02;
 
     background:
         rgba(255, 61, 2, 0.10);
@@ -1609,15 +1912,18 @@ body::-webkit-scrollbar {
     display: flex;
 
     align-items: center;
+
     justify-content: center;
 
     gap: 12px;
 
     color: white;
 
-    background: #ff3d02;
+    background:
+        #ff3d02;
 
-    border: 2px solid #ff3d02;
+    border:
+        2px solid #ff3d02;
 
     border-radius: 50px;
 
@@ -1634,22 +1940,28 @@ body::-webkit-scrollbar {
     transition: 0.3s;
 
     box-shadow:
-        0 0 20px rgba(255, 61, 2, 0.25);
+        0 0 20px
+        rgba(255, 61, 2, 0.25);
 }
 
 .booking-submit:hover {
-    color: #ff3d02;
+    color:
+        #ff3d02;
 
-    background: transparent;
+    background:
+        transparent;
 
-    transform: translateY(-2px);
+    transform:
+        translateY(-2px);
 
     box-shadow:
-        0 0 30px rgba(255, 61, 2, 0.4);
+        0 0 30px
+        rgba(255, 61, 2, 0.4);
 }
 
 .booking-submit:active {
-    transform: scale(0.98);
+    transform:
+        scale(0.98);
 }
 
 .booking-submit i {
@@ -1657,7 +1969,8 @@ body::-webkit-scrollbar {
 }
 
 .booking-submit:hover i {
-    transform: translateX(5px);
+    transform:
+        translateX(5px);
 }
 
 
@@ -1668,7 +1981,8 @@ body::-webkit-scrollbar {
 @media (max-width: 1200px) {
 
     .header {
-        padding: 0 30px;
+        padding:
+            0 30px;
     }
 
     .header nav {
@@ -1692,6 +2006,7 @@ body::-webkit-scrollbar {
 
         gap: 40px;
     }
+
 }
 
 
@@ -1708,7 +2023,8 @@ body::-webkit-scrollbar {
     .header {
         height: 120px;
 
-        padding: 0 25px;
+        padding:
+            0 25px;
     }
 
     .header nav {
@@ -1720,7 +2036,8 @@ body::-webkit-scrollbar {
     }
 
     .header nav a.book-button {
-        padding: 9px 18px;
+        padding:
+            9px 18px;
     }
 
 
@@ -1733,7 +2050,8 @@ body::-webkit-scrollbar {
 
         text-align: center;
 
-        padding: 60px 6%;
+        padding:
+            60px 6%;
     }
 
     .about-hero-content {
@@ -1745,9 +2063,6 @@ body::-webkit-scrollbar {
     }
 
 
-
-    /* MAIN */
-
     .main-container {
         width: 95%;
     }
@@ -1757,11 +2072,10 @@ body::-webkit-scrollbar {
 
         height: auto;
 
-        aspect-ratio: 1 / 0.8;
+        aspect-ratio:
+            1 / 0.8;
     }
 
-
-    /* EVENTS */
 
     .featured-event {
         width: 90%;
@@ -1776,14 +2090,13 @@ body::-webkit-scrollbar {
     }
 
 
-    /* SERVICES */
-
     .boxes {
         grid-template-columns:
             repeat(2, minmax(0, 360px));
 
         gap: 20px;
     }
+
 }
 
 
@@ -1796,20 +2109,21 @@ body::-webkit-scrollbar {
     body {
         padding-top: 105px;
 
-        background-attachment: scroll;
+        background-attachment:
+            scroll;
     }
 
 
-    /* ==================================================
-       HEADER
-    ================================================== */
+    /* HEADER */
 
     .header {
         height: 105px;
 
-        padding: 0 15px;
+        padding:
+            0 15px;
 
-        border-bottom-width: 2px;
+        border-bottom-width:
+            2px;
     }
 
     .logo img {
@@ -1834,7 +2148,8 @@ body::-webkit-scrollbar {
     }
 
     .header nav a.book-button {
-        padding: 7px 11px;
+        padding:
+            7px 11px;
 
         font-size: 8px;
 
@@ -1842,9 +2157,7 @@ body::-webkit-scrollbar {
     }
 
 
-    /* ==================================================
-       SCROLL
-    ================================================== */
+    /* SCROLL */
 
     #services,
     #events,
@@ -1856,13 +2169,10 @@ body::-webkit-scrollbar {
     /* HERO */
 
     .about-hero {
-        padding: 45px 20px 50px;
+        padding:
+            45px 20px 50px;
 
         gap: 30px;
-    }
-
-    .about-hero::before {
-        width: 4px;
     }
 
     .small-title {
@@ -1891,14 +2201,14 @@ body::-webkit-scrollbar {
         line-height: 1.7;
     }
 
-    /* ==================================================
-       MAIN
-    ================================================== */
+
+    /* MAIN */
 
     .main-container {
         width: 94%;
 
-        margin: 25px auto;
+        margin:
+            25px auto;
 
         gap: 25px;
     }
@@ -1908,16 +2218,16 @@ body::-webkit-scrollbar {
 
         height: auto;
 
-        aspect-ratio: 1 / 0.8;
+        aspect-ratio:
+            1 / 0.8;
     }
 
 
-    /* ==================================================
-       EVENTS
-    ================================================== */
+    /* EVENTS */
 
     .events {
-        padding: 50px 5%;
+        padding:
+            50px 5%;
     }
 
     .events h2 {
@@ -1941,14 +2251,15 @@ body::-webkit-scrollbar {
     }
 
     .featured-title {
-        padding: 25px 15px 15px;
+        padding:
+            25px 15px 15px;
 
         font-size: 16px;
     }
 
 
     /* ==================================================
-       EVENT THUMBNAILS
+       MOBILE EVENT THUMBNAILS
     ================================================== */
 
     .event-thumbnails {
@@ -1966,38 +2277,68 @@ body::-webkit-scrollbar {
         width: 100%;
 
         height: 95px;
+
+        display: flex;
+
+        flex-direction: column;
     }
 
-    .event-thumbnail > img {
+
+    .event-thumbnail > img,
+    .event-thumbnail .video-thumbnail {
+        width: 100%;
+
         height: 62px;
+
+        flex-shrink: 0;
     }
 
-    .event-thumbnail span {
-        height: 31px;
-
-        font-size: 8px;
-
-        letter-spacing: 0;
-    }
 
     .video-thumbnail {
-        height: 62px;
+        overflow: hidden;
     }
 
-    .video-thumbnail i {
+
+    .video-thumbnail img {
+        width: 100%;
+        height: 100%;
+
+        object-fit: cover;
+    }
+
+
+    .video-thumbnail-play {
         width: 28px;
         height: 28px;
+    }
 
+    .video-thumbnail-play i {
         font-size: 11px;
     }
 
 
-    /* ==================================================
-       SERVICES
-    ================================================== */
+    .event-thumbnail-title {
+        width: 100%;
+
+        height: 31px;
+
+        flex-shrink: 0;
+
+        padding: 4px;
+
+        font-size: 8px;
+
+        letter-spacing: 0;
+
+        line-height: 1.05;
+    }
+
+
+    /* SERVICES */
 
     .services {
-        padding: 50px 5%;
+        padding:
+            50px 5%;
     }
 
     .services h2 {
@@ -2026,7 +2367,8 @@ body::-webkit-scrollbar {
     }
 
     .image-button img {
-        height: calc(100% - 50px);
+        height:
+            calc(100% - 50px);
     }
 
     .image-title {
@@ -2040,9 +2382,7 @@ body::-webkit-scrollbar {
     }
 
 
-    /* ==================================================
-       FOOTER
-    ================================================== */
+    /* FOOTER */
 
     .footer {
         margin-top: 40px;
@@ -2051,7 +2391,8 @@ body::-webkit-scrollbar {
     .footer-container {
         width: 94%;
 
-        padding: 40px 10px;
+        padding:
+            40px 10px;
 
         grid-template-columns: 1fr;
 
@@ -2085,7 +2426,8 @@ body::-webkit-scrollbar {
     .footer-bottom {
         flex-direction: column;
 
-        padding: 18px 15px;
+        padding:
+            18px 15px;
 
         text-align: center;
     }
@@ -2095,9 +2437,7 @@ body::-webkit-scrollbar {
     }
 
 
-    /* ==================================================
-       BOOKING OVERLAY
-    ================================================== */
+    /* BOOKING OVERLAY */
 
     .booking-overlay {
         align-items: center;
@@ -2108,35 +2448,35 @@ body::-webkit-scrollbar {
     }
 
 
-    /* ==================================================
-       BOOKING MODAL
-    ================================================== */
+    /* BOOKING MODAL */
 
     .booking-modal {
-        width: calc(100vw - 20px);
+        width:
+            calc(100vw - 20px);
 
         max-width: none;
 
-        max-height: calc(100vh - 20px);
+        max-height:
+            calc(100vh - 20px);
 
         margin: auto;
 
-        padding: 30px 18px;
+        padding:
+            30px 18px;
 
         border-top-width: 3px;
 
         border-radius: 7px;
 
         overflow-x: hidden;
+
         overflow-y: auto;
 
         -webkit-overflow-scrolling: touch;
     }
 
 
-    /* ==================================================
-       CLOSE BUTTON
-    ================================================== */
+    /* CLOSE */
 
     .booking-close {
         top: 10px;
@@ -2149,9 +2489,7 @@ body::-webkit-scrollbar {
     }
 
 
-    /* ==================================================
-       BOOKING HEADER
-    ================================================== */
+    /* BOOKING HEADER */
 
     .booking-header {
         padding-right: 40px;
@@ -2176,9 +2514,7 @@ body::-webkit-scrollbar {
     }
 
 
-    /* ==================================================
-       BOOKING FORM
-    ================================================== */
+    /* BOOKING FORM */
 
     .booking-form {
         gap: 16px;
@@ -2214,9 +2550,7 @@ body::-webkit-scrollbar {
     }
 
 
-    /* ==================================================
-       SERVICE CHECKBOXES
-    ================================================== */
+    /* CHECKBOXES */
 
     .service-checkboxes {
         grid-template-columns: 1fr;
@@ -2229,9 +2563,7 @@ body::-webkit-scrollbar {
     }
 
 
-    /* ==================================================
-       SUBMIT
-    ================================================== */
+    /* SUBMIT */
 
     .booking-submit {
         min-height: 48px;
@@ -2240,6 +2572,7 @@ body::-webkit-scrollbar {
 
         font-size: 11px;
     }
+
 }
 
 
@@ -2250,7 +2583,8 @@ body::-webkit-scrollbar {
 @media (max-width: 380px) {
 
     .header {
-        padding: 0 10px;
+        padding:
+            0 10px;
     }
 
     .logo img {
@@ -2266,7 +2600,8 @@ body::-webkit-scrollbar {
     }
 
     .header nav a.book-button {
-        padding: 6px 9px;
+        padding:
+            6px 9px;
 
         font-size: 7px;
     }
@@ -2274,10 +2609,9 @@ body::-webkit-scrollbar {
 
     /* ABOUT */
 
-      .about-hero h1 {
+    .about-hero h1 {
         font-size: 27px;
     }
-
 
 
     /* EVENTS */
@@ -2298,7 +2632,8 @@ body::-webkit-scrollbar {
     }
 
     .image-button img {
-        height: calc(100% - 45px);
+        height:
+            calc(100% - 45px);
     }
 
     .image-title {
@@ -2311,14 +2646,18 @@ body::-webkit-scrollbar {
     /* BOOKING */
 
     .booking-modal {
-        width: calc(100vw - 16px);
+        width:
+            calc(100vw - 16px);
 
-        max-height: calc(100vh - 16px);
+        max-height:
+            calc(100vh - 16px);
 
-        padding: 28px 14px;
+        padding:
+            28px 14px;
     }
 
     .booking-header h2 {
         font-size: 22px;
     }
+
 }
