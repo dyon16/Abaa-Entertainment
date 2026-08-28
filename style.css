@@ -40,7 +40,7 @@ body {
             rgba(0, 0, 0, 0.90),
             rgba(0, 0, 0, 0.90)
         ),
-        url("/background.jpg");
+        url("background.jpg");
 
     background-size: cover;
     background-position: center;
@@ -50,6 +50,12 @@ body {
     padding-top: 150px;
 
     overflow-x: hidden;
+
+    scrollbar-width: none;
+}
+
+body::-webkit-scrollbar {
+    display: none;
 }
 
 
@@ -104,11 +110,13 @@ body {
 
     text-decoration: none;
 
+    flex-shrink: 0;
+
     transition: 0.3s;
 }
 
 .logo img {
-    width: clamp(100px, 10vw, 150px);
+    width: clamp(90px, 10vw, 150px);
 
     height: auto;
 
@@ -128,7 +136,9 @@ body {
     display: flex;
     align-items: center;
 
-    gap: clamp(12px, 3vw, 40px);
+    gap: clamp(10px, 3vw, 40px);
+
+    min-width: 0;
 }
 
 .header nav a {
@@ -138,7 +148,7 @@ body {
 
     text-decoration: none;
 
-    font-size: clamp(11px, 1.2vw, 16px);
+    font-size: clamp(10px, 1.2vw, 16px);
 
     font-weight: bold;
 
@@ -228,13 +238,15 @@ body {
 
     border-radius: 50px;
 
-    font-size: clamp(11px, 1.2vw, 16px);
+    font-size: clamp(10px, 1.2vw, 16px);
 
     font-weight: bold;
 
     text-transform: uppercase;
 
     letter-spacing: 1px;
+
+    text-decoration: none;
 
     box-shadow:
         0 0 15px rgba(255, 61, 2, 0.35);
@@ -263,97 +275,121 @@ body {
 
 
 /* ==================================================
-   ABOUT HERO
+   ABOUT
 ================================================== */
 
-.about-hero {
-    position: relative;
+.about-us {
+    width: min(95%, 1400px);
 
-    width: 100%;
+    margin: 25px auto;
 
-    min-height: 500px;
+    padding: 35px 40px;
 
     display: flex;
+
     align-items: center;
     justify-content: space-between;
 
-    gap: clamp(30px, 5vw, 60px);
+    gap: 50px;
 
-    padding:
-        clamp(50px, 7vw, 70px)
-        clamp(5%, 7vw, 8%);
+    color: white;
 
     background:
         linear-gradient(
-            90deg,
-            rgba(0, 0, 0, 0.98),
-            rgba(0, 0, 0, 0.81),
-            rgba(0, 0, 0, 0.82)
-        ),
-        url("/event10-img.jpg");
+            135deg,
+            rgba(0, 0, 0, 0.96),
+            rgba(25, 10, 5, 0.92)
+        );
 
-    background-size: cover;
-    background-position: center;
+    border-left: 5px solid #ff3d02;
 
-    border-bottom: 2px solid #222;
+    border-radius: 5px;
+
+    box-shadow:
+        0 10px 40px rgba(0, 0, 0, 0.5);
 }
-
 
 
 /* ==================================================
-   HERO CONTENT
+   ABOUT CONTENT
 ================================================== */
 
-.about-hero-content {
-    position: relative;
-
-    z-index: 2;
-
+.about-content {
     flex: 1;
 
-    width: 100%;
-    max-width: 1000px;
+    min-width: 0;
 }
 
-.small-title {
-    margin-bottom: 20px;
+.about-content h1 {
+    margin-bottom: 15px;
 
-    color: #ff3d02;
+    color: white;
 
-    font-size: clamp(11px, 1.2vw, 15px);
-
-    font-weight: bold;
-
-    letter-spacing: 4px;
-}
-
-.about-hero h1 {
-    margin-bottom: 25px;
-
-    font-size: clamp(38px, 5vw, 65px);
-
-    line-height: 1.05;
+    font-size: clamp(32px, 4vw, 52px);
 
     font-weight: 900;
 
     text-transform: uppercase;
 
     letter-spacing: 2px;
+
+    text-align: left;
 }
 
-.about-hero h1 span {
-    white-space: nowrap;
-}
-
-.hero-description {
-    max-width: 650px;
-
-    color: #ccc;
+.about-content p {
+    color: #cfcfcf;
 
     font-size: clamp(15px, 1.5vw, 19px);
 
-    line-height: 1.7;
+    line-height: 1.8;
+
+    letter-spacing: 0.3px;
+
+    text-align: justify;
 }
+
+
+/* ==================================================
+   ABOUT VIDEO
+================================================== */
+
+.about-video {
+    width: 400px;
+    height: 550px;
+
+    flex-shrink: 0;
+
+    overflow: hidden;
+
+    border-radius: 8px;
+
+    border: 2px solid #ff3d02;
+
+    background: #000;
+
+    box-shadow:
+        0 0 25px rgba(255, 61, 2, 0.25);
+
+    transition: 0.3s;
+}
+
+.about-video:hover {
+    border-color: #ff5722;
+
+    box-shadow:
+        0 0 35px rgba(255, 61, 2, 0.5);
+}
+
+.about-video video {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+}
+
+
 /* ==================================================
    MAIN CONTAINER
 ================================================== */
@@ -361,7 +397,7 @@ body {
 .main-container {
     width: min(95%, 1400px);
 
-    margin: auto;
+    margin: 40px auto;
 
     display: flex;
 
@@ -369,49 +405,50 @@ body {
 
     align-items: center;
 
-    gap: clamp(40px, 6vw, 70px);
+    gap: 40px;
 }
 
 
 /* ==================================================
-   BIG IMAGE BOX - CENTERED LOGO
+   BIG BOX
 ================================================== */
 
 .big-box {
     width: min(750px, 100%);
-    height: clamp(400px, 50vw, 600px);
+
+    height: 600px;
 
     position: relative;
+
     overflow: hidden;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    margin: 0 auto;
 
     border-radius: 5px;
 
-   
+    box-shadow:
+        0 0 25px rgba(255, 61, 2, 0.25);
 
     transition: 0.3s;
 }
 
+.big-box:hover {
+    box-shadow:
+        0 0 35px rgba(255, 61, 2, 0.45);
+}
 
 .big-box img {
-    width: auto;
-    height: auto;
-
-    max-width: 80%;
-    max-height: 80%;
+    width: 100%;
+    height: 100%;
 
     display: block;
 
-    object-fit: contain;
+    object-fit: cover;
 
-    transition: 0.5s;
+    transition: 0.6s;
 }
 
+.big-box:hover img {
+    transform: scale(1.04);
+}
 
 
 /* ==================================================
@@ -422,21 +459,23 @@ body {
     width: 100%;
 
     padding:
-        clamp(50px, 7vw, 80px)
+        clamp(40px, 6vw, 70px)
         5%;
 
     text-align: center;
 
     color: white;
 
-    background: rgba(0, 0, 0, 0.35);
+    background: rgba(0, 0, 0, 0.20);
 
     border-top: 1px solid #222;
     border-bottom: 1px solid #222;
 }
 
 .events h2 {
-    margin-bottom: 15px;
+    margin-bottom: 10px;
+
+    color: white;
 
     font-size: clamp(30px, 4vw, 42px);
 
@@ -455,7 +494,7 @@ body {
     width: 80px;
     height: 4px;
 
-    margin: 15px auto;
+    margin: 12px auto;
 
     background: #ff3d02;
 }
@@ -463,13 +502,13 @@ body {
 .events-description {
     max-width: 750px;
 
-    margin: 0 auto 40px;
+    margin: 0 auto 35px;
 
-    color: #999;
+    color: #aaa;
 
-    font-size: 16px;
+    font-size: 17px;
 
-    line-height: 1.7;
+    line-height: 1.6;
 }
 
 
@@ -478,13 +517,13 @@ body {
 ================================================== */
 
 .featured-event {
+    position: relative;
+
     width: min(850px, 100%);
 
-    height: clamp(400px, 55vw, 560px);
+    height: 560px;
 
     margin: 0 auto 30px;
-
-    position: relative;
 
     overflow: hidden;
 
@@ -495,7 +534,7 @@ body {
     border-radius: 5px;
 
     box-shadow:
-        0 0 30px rgba(255, 61, 2, 0.18);
+        0 0 25px rgba(255, 61, 2, 0.25);
 
     transition: 0.3s;
 }
@@ -504,7 +543,7 @@ body {
     border-color: #ff3d02;
 
     box-shadow:
-        0 15px 40px rgba(255, 61, 2, 0.30);
+        0 15px 40px rgba(255, 61, 2, 0.35);
 }
 
 .featured-event > img,
@@ -526,7 +565,7 @@ body {
 }
 
 .featured-event > video {
-    background: black;
+    background: #000;
 }
 
 
@@ -541,7 +580,7 @@ body {
     right: 0;
     bottom: 0;
 
-    padding: 40px 25px 25px;
+    padding: 35px 25px 25px;
 
     background:
         linear-gradient(
@@ -599,12 +638,12 @@ body {
 
     border-radius: 5px;
 
+    font-family: Arial, sans-serif;
+
     transition:
         transform 0.3s,
         border-color 0.3s,
         box-shadow 0.3s;
-
-    font-family: Arial, sans-serif;
 }
 
 .event-thumbnail > img {
@@ -650,7 +689,7 @@ body {
     border-color: #ff3d02;
 
     box-shadow:
-        0 10px 25px rgba(255, 61, 2, 0.30);
+        0 10px 25px rgba(255, 61, 2, 0.3);
 }
 
 .event-thumbnail:hover > img {
@@ -667,7 +706,7 @@ body {
     border-color: #ff3d02;
 
     box-shadow:
-        0 0 20px rgba(255, 61, 2, 0.40);
+        0 0 20px rgba(255, 61, 2, 0.4);
 }
 
 .event-thumbnail.active > img {
@@ -748,21 +787,23 @@ body {
     width: 100%;
 
     padding:
-        clamp(50px, 7vw, 80px)
+        clamp(40px, 6vw, 70px)
         5%;
 
     text-align: center;
 
     color: white;
 
-    background: rgba(0, 0, 0, 0.45);
+    background: rgba(0, 0, 0, 0.30);
 
     border-top: 1px solid #222;
     border-bottom: 1px solid #222;
 }
 
 .services h2 {
-    margin-bottom: 15px;
+    margin-bottom: 10px;
+
+    color: white;
 
     font-size: clamp(30px, 4vw, 42px);
 
@@ -781,7 +822,7 @@ body {
     width: 80px;
     height: 4px;
 
-    margin: 15px auto;
+    margin: 12px auto;
 
     background: #ff3d02;
 }
@@ -789,13 +830,13 @@ body {
 .services-description {
     max-width: 750px;
 
-    margin: 0 auto 40px;
+    margin: 0 auto 35px;
 
-    color: #999;
+    color: #aaa;
 
-    font-size: 16px;
+    font-size: 17px;
 
-    line-height: 1.7;
+    line-height: 1.6;
 }
 
 
@@ -805,22 +846,23 @@ body {
 
 .boxes {
     width: 100%;
+    max-width: 1150px;
+
+    margin: auto;
 
     display: grid;
 
     grid-template-columns:
         repeat(3, minmax(0, 1fr));
 
-    gap: 25px;
+    gap: 30px;
 
-    max-width: 1150px;
-
-    margin: auto;
+    justify-content: center;
 }
 
 .image-button {
     width: 100%;
-    height: clamp(400px, 40vw, 520px);
+    height: 520px;
 
     display: flex;
 
@@ -834,7 +876,7 @@ body {
 
     background: #080808;
 
-    border: 1px solid #292929;
+    border: 2px solid #333;
 
     border-radius: 5px;
 
@@ -906,7 +948,7 @@ body {
     border-color: #ff3d02;
 
     box-shadow:
-        0 15px 35px rgba(255, 61, 2, 0.30);
+        0 15px 35px rgba(255, 61, 2, 0.35);
 }
 
 .image-button:hover::before {
@@ -935,7 +977,7 @@ body {
 .footer {
     width: 100%;
 
-    margin-top: 0;
+    margin-top: 60px;
 
     background:
         linear-gradient(
@@ -1183,6 +1225,9 @@ body {
 
 /* ==================================================
    BOOKING OVERLAY
+   IMPORTANT:
+   This covers the SCREEN.
+   The modal itself does NOT.
 ================================================== */
 
 .booking-overlay {
@@ -1190,8 +1235,8 @@ body {
 
     inset: 0;
 
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
 
     z-index: 9999;
 
@@ -1205,6 +1250,7 @@ body {
     background: rgba(0, 0, 0, 0.90);
 
     backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 
     opacity: 0;
 
@@ -1231,10 +1277,15 @@ body {
 .booking-modal {
     position: relative;
 
-    width: min(100%, 850px);
+    width: min(850px, calc(100vw - 40px));
 
-    max-height: 92vh;
+    max-width: 850px;
 
+    max-height: calc(100vh - 40px);
+
+    margin: auto;
+
+    overflow-x: hidden;
     overflow-y: auto;
 
     padding: 40px;
@@ -1485,6 +1536,88 @@ body {
 
 
 /* ==================================================
+   SERVICE CHECKBOXES
+================================================== */
+
+.service-checkboxes {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 12px;
+
+    margin-top: 8px;
+}
+
+.service-checkbox {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    min-width: 0;
+
+    padding: 13px 15px;
+
+    color: #ddd;
+
+    background: #080808;
+
+    border: 1px solid #333;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+
+    transition:
+        color 0.3s,
+        border-color 0.3s,
+        background 0.3s,
+        box-shadow 0.3s;
+}
+
+.service-checkbox:hover {
+    color: white;
+
+    border-color: #ff3d02;
+
+    background: #120704;
+}
+
+.service-checkbox input {
+    width: 18px;
+    height: 18px;
+
+    flex-shrink: 0;
+
+    margin: 0;
+
+    accent-color: #ff3d02;
+
+    cursor: pointer;
+}
+
+.service-checkbox span {
+    cursor: pointer;
+}
+
+.service-checkbox:has(input:checked) {
+    color: white;
+
+    border-color: #ff3d02;
+
+    background:
+        rgba(255, 61, 2, 0.10);
+
+    box-shadow:
+        0 0 12px
+        rgba(255, 61, 2, 0.12);
+}
+
+
+/* ==================================================
    BOOKING SUBMIT
 ================================================== */
 
@@ -1554,7 +1687,7 @@ body {
    LARGE TABLET
 ================================================== */
 
-@media (max-width: 1100px) {
+@media (max-width: 1200px) {
 
     .header {
         padding: 0 30px;
@@ -1564,14 +1697,15 @@ body {
         gap: 20px;
     }
 
-       .about-company {
-        gap: 40px;
-    }
     .boxes {
         grid-template-columns:
-            repeat(2, minmax(0, 1fr));
+            repeat(2, minmax(0, 360px));
 
-        max-width: 760px;
+        justify-content: center;
+    }
+
+    .event-thumbnail {
+        width: 140px;
     }
 
     .footer-container {
@@ -1587,7 +1721,7 @@ body {
    TABLET
 ================================================== */
 
-@media (max-width: 900px) {
+@media (max-width: 1000px) {
 
     body {
         padding-top: 120px;
@@ -1612,26 +1746,28 @@ body {
     }
 
 
-
     /* ABOUT */
-.about-hero {
-        min-height: auto;
 
+    .about-us {
         flex-direction: column;
 
-        align-items: center;
+        align-items: stretch;
 
+        gap: 30px;
+    }
+
+    .about-content h1 {
         text-align: center;
-
-        padding: 60px 6%;
     }
 
-    .about-hero-content {
+    .about-content p {
+        text-align: center;
+    }
+
+    .about-video {
         width: 100%;
-    }
 
-    .hero-description {
-        margin: auto;
+        height: 500px;
     }
 
 
@@ -1644,15 +1780,13 @@ body {
     .big-box {
         width: 90%;
 
-        height: 450px;
+        height: auto;
+
+        aspect-ratio: 1 / 0.8;
     }
 
 
     /* EVENTS */
-
-    .events {
-        padding: 60px 5%;
-    }
 
     .featured-event {
         width: 90%;
@@ -1671,23 +1805,9 @@ body {
 
     .boxes {
         grid-template-columns:
-            repeat(2, minmax(0, 1fr));
+            repeat(2, minmax(0, 360px));
 
         gap: 20px;
-    }
-
-    .image-button {
-        height: 450px;
-    }
-
-    .image-button img {
-        height: calc(100% - 65px);
-    }
-
-    .image-title {
-        height: 65px;
-
-        font-size: 17px;
     }
 }
 
@@ -1713,6 +1833,8 @@ body {
         height: 105px;
 
         padding: 0 15px;
+
+        border-bottom-width: 2px;
     }
 
     .logo img {
@@ -1746,7 +1868,7 @@ body {
 
 
     /* ==================================================
-       SCROLL POSITION
+       SCROLL
     ================================================== */
 
     #services,
@@ -1760,43 +1882,32 @@ body {
        ABOUT
     ================================================== */
 
-  /* HERO */
+    .about-us {
+        width: 94%;
 
-    .about-hero {
-        padding: 45px 20px 50px;
+        padding: 25px 20px;
 
-        gap: 30px;
+        gap: 25px;
     }
 
-    .about-hero::before {
-        width: 4px;
-    }
-
-    .small-title {
-        margin-bottom: 15px;
-
-        font-size: 10px;
-
-        letter-spacing: 2px;
-    }
-
-    .about-hero h1 {
+    .about-content h1 {
         font-size: 30px;
-
-        line-height: 1.15;
 
         letter-spacing: 1px;
     }
 
-    .about-hero h1 span {
-        white-space: normal;
-    }
-
-    .hero-description {
-        font-size: 14px;
+    .about-content p {
+        font-size: 15px;
 
         line-height: 1.7;
     }
+
+    .about-video {
+        width: 100%;
+
+        height: 450px;
+    }
+
 
     /* ==================================================
        MAIN
@@ -1805,26 +1916,18 @@ body {
     .main-container {
         width: 94%;
 
-        gap: 35px;
-    }
+        margin: 25px auto;
 
+        gap: 25px;
+    }
 
     .big-box {
         width: 100%;
-        height: 300px;
 
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        height: auto;
+
+        aspect-ratio: 1 / 0.8;
     }
-
-    .big-box img {
-        max-width: 75%;
-        max-height: 75%;
-
-        object-fit: contain;
-    }
-}
 
 
     /* ==================================================
@@ -1844,7 +1947,7 @@ body {
     .events-description {
         font-size: 14px;
 
-        margin-bottom: 30px;
+        margin-bottom: 25px;
     }
 
     .featured-event {
@@ -1856,7 +1959,7 @@ body {
     }
 
     .featured-title {
-        padding: 30px 15px 15px;
+        padding: 25px 15px 15px;
 
         font-size: 16px;
     }
@@ -1941,7 +2044,7 @@ body {
     }
 
     .image-button img {
-        height: 250px;
+        height: calc(100% - 50px);
     }
 
     .image-title {
@@ -1959,14 +2062,18 @@ body {
        FOOTER
     ================================================== */
 
+    .footer {
+        margin-top: 40px;
+    }
+
     .footer-container {
         width: 94%;
+
+        padding: 40px 10px;
 
         grid-template-columns: 1fr;
 
         gap: 30px;
-
-        padding: 40px 10px;
     }
 
     .footer-brand img {
@@ -2007,25 +2114,30 @@ body {
 
 
     /* ==================================================
-       BOOKING POPUP
+       BOOKING OVERLAY
     ================================================== */
 
     .booking-overlay {
-        align-items: flex-start;
+        align-items: center;
 
         padding: 10px;
 
         overflow-y: auto;
     }
 
-    .booking-modal {
-        width: 100%;
 
-        max-width: 100%;
+    /* ==================================================
+       BOOKING MODAL
+    ================================================== */
+
+    .booking-modal {
+        width: calc(100vw - 20px);
+
+        max-width: none;
 
         max-height: calc(100vh - 20px);
 
-        margin: auto 0;
+        margin: auto;
 
         padding: 30px 18px;
 
@@ -2033,10 +2145,16 @@ body {
 
         border-radius: 7px;
 
+        overflow-x: hidden;
         overflow-y: auto;
 
         -webkit-overflow-scrolling: touch;
     }
+
+
+    /* ==================================================
+       CLOSE BUTTON
+    ================================================== */
 
     .booking-close {
         top: 10px;
@@ -2047,6 +2165,11 @@ body {
 
         font-size: 15px;
     }
+
+
+    /* ==================================================
+       BOOKING HEADER
+    ================================================== */
 
     .booking-header {
         padding-right: 40px;
@@ -2069,6 +2192,11 @@ body {
     .booking-header p {
         font-size: 12px;
     }
+
+
+    /* ==================================================
+       BOOKING FORM
+    ================================================== */
 
     .booking-form {
         gap: 16px;
@@ -2102,6 +2230,26 @@ body {
     .form-group textarea {
         min-height: 110px;
     }
+
+
+    /* ==================================================
+       SERVICE CHECKBOXES
+    ================================================== */
+
+    .service-checkboxes {
+        grid-template-columns: 1fr;
+
+        gap: 10px;
+    }
+
+    .service-checkbox {
+        padding: 12px;
+    }
+
+
+    /* ==================================================
+       SUBMIT
+    ================================================== */
 
     .booking-submit {
         min-height: 48px;
@@ -2144,7 +2292,7 @@ body {
 
     /* ABOUT */
 
-.about-hero h1 {
+    .about-content h1 {
         font-size: 27px;
     }
 
@@ -2167,7 +2315,7 @@ body {
     }
 
     .image-button img {
-        height: 225px;
+        height: calc(100% - 45px);
     }
 
     .image-title {
@@ -2180,128 +2328,14 @@ body {
     /* BOOKING */
 
     .booking-modal {
+        width: calc(100vw - 16px);
+
+        max-height: calc(100vh - 16px);
+
         padding: 28px 14px;
     }
 
     .booking-header h2 {
         font-size: 22px;
     }
-}/* ==================================================
-   BOOKING SERVICE CHECKBOXES
-================================================== */
-
-.service-checkboxes {
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(2, 1fr);
-
-    gap: 12px;
-
-    margin-top: 8px;
-
 }
-
-
-.service-checkbox {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 10px;
-
-    padding: 13px 15px;
-
-    color: #ddd;
-
-    background: #080808;
-
-    border: 1px solid #333;
-
-    border-radius: 6px;
-
-    cursor: pointer;
-
-    transition: 0.3s;
-
-}
-
-
-.service-checkbox:hover {
-
-    color: white;
-
-    border-color:
-        #ff3d02;
-
-    background:
-        #120704;
-
-}
-
-
-.service-checkbox input {
-
-    width: 18px;
-
-    height: 18px;
-
-    margin: 0;
-
-    accent-color:
-        #ff3d02;
-
-    cursor: pointer;
-
-}
-
-
-.service-checkbox span {
-
-    cursor: pointer;
-
-}
-
-
-.service-checkbox:has(
-    input:checked
-) {
-
-    color: white;
-
-    border-color:
-        #ff3d02;
-
-    background:
-        rgba(
-            255,
-            61,
-            2,
-            0.10
-        );
-
-    box-shadow:
-        0 0 12px
-        rgba(
-            255,
-            61,
-            2,
-            0.12
-        );
-
-}
-
-
-@media (max-width: 600px) {
-
-    .service-checkboxes {
-
-        grid-template-columns:
-            1fr;
-
-    }
-
-}
-
