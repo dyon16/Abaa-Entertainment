@@ -405,20 +405,11 @@ body {
 
     border-radius: 5px;
 
-    background: #080808;
-
-    box-shadow:
-        0 0 30px rgba(255, 61, 2, 0.18);
+   
 
     transition: 0.3s;
 }
 
-.big-box:hover {
-    border-color: #ff3d02;
-
-    box-shadow:
-        0 0 40px rgba(255, 61, 2, 0.30);
-}
 
 .big-box img {
     width: auto;
