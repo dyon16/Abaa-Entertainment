@@ -702,7 +702,7 @@ if ($admin) {
 
             </a>
 
-    <a href="/admin-bookings">
+    <a href="/admin/bookings">
 
         <i class="fa-solid fa-calendar-check"></i>
 
@@ -713,7 +713,7 @@ if ($admin) {
     </a>
 
 
-    <a href="/admin-events">
+    <a href="/admin/events">
 
         <i class="fa-solid fa-photo-film"></i>
 
