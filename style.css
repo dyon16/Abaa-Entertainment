@@ -310,20 +310,6 @@ body::-webkit-scrollbar {
     border-bottom: 2px solid #222;
 }
 
-.about-hero::before {
-    content: "";
-
-    position: absolute;
-
-    left: 0;
-    top: 0;
-
-    width: 6px;
-    height: 100%;
-
-    background: #ff3d02;
-}
-
 
 /* ==================================================
    HERO CONTENT
@@ -415,16 +401,12 @@ body::-webkit-scrollbar {
 
     border-radius: 5px;
 
-    box-shadow:
-        0 0 25px rgba(255, 61, 2, 0.25);
+  
 
     transition: 0.3s;
 }
 
-.big-box:hover {
-    box-shadow:
-        0 0 35px rgba(255, 61, 2, 0.45);
-}
+
 
 .big-box img {
     width: 100%;
@@ -437,9 +419,6 @@ body::-webkit-scrollbar {
     transition: 0.6s;
 }
 
-.big-box:hover img {
-    transform: scale(1.04);
-}
 
 
 /* ==================================================
