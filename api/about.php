@@ -91,24 +91,70 @@ include(__DIR__ . '/conn.php');
      ABOUT HERO
 ================================================== -->
 
-<section class="about-hero">
+<section class="about-us" id="about">
 
-    <div class="about-hero-content">
-
-        <p class="small-title">
-            ABOUT ABAA ENTERTAINMENT
-        </p>
+    <div class="about-content">
 
         <h1>
-            <span>Powered by Passion.</span><br>
-            <span>Driven by Excellence.</span>
+            ABAA Entertainment
         </h1>
 
-        <p class="hero-description">
-            We create unforgettable experiences through
-            creativity, technology, passion, and professional
-            event production.
+        <p>
+
+            ABAA Entertainment is a forward-thinking
+            entertainment company committed to developing
+            talent, producing high-quality entertainment,
+            and creating meaningful opportunities within
+            the industry.
+
+            <br><br>
+
+            Built on creativity, professionalism, and
+            innovation, ABAA Entertainment provides a
+            platform where artists, performers, and creative
+            professionals can showcase their talents and
+            reach wider audiences.
+
+            <br><br>
+
+            The company focuses on nurturing emerging talent,
+            developing engaging entertainment projects, and
+            building strong partnerships that contribute to
+            the growth of the entertainment community.
+
+            <br><br>
+
+            With a vision of becoming a trusted and
+            influential name in the industry, ABAA
+            Entertainment continues to pursue excellence
+            while delivering fresh, inspiring, and memorable
+            entertainment experiences.
+
         </p>
+
+    </div>
+
+
+    <div class="about-video">
+
+        <video
+            controls
+            autoplay
+            muted
+            loop
+            playsinline
+            preload="auto"
+        >
+
+            <source
+                src="/ads.mp4"
+                type="video/mp4"
+            >
+
+            Your browser does not support
+            the video tag.
+
+        </video>
 
     </div>
 
