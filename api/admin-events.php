@@ -1971,7 +1971,7 @@ foreach (
 
 
         <a
-            href="/admin-events"
+            href="#"
             class="active"
         >
 
@@ -1984,7 +1984,7 @@ foreach (
         </a>
 
 
-        <a href="/admin-services">
+        <a href="/admin/services">
 
             <i class="fa-solid fa-screwdriver-wrench"></i>
 
