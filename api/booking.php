@@ -267,7 +267,7 @@ try {
         $pdo->prepare($sql);
 
 
-   $stmt->execute([
+  $stmt->execute([
 
     $name,
 
@@ -290,6 +290,9 @@ try {
     "Pending"
 
 ]);
+
+$bookingId = (int) $pdo->lastInsertId();
+
 
 } catch (PDOException $e) {
 
@@ -550,6 +553,103 @@ try {
             }
 
         }
+       .booking-id-box {
+
+    margin: 25px 0 30px;
+
+    padding: 20px;
+
+    background: rgba(255, 61, 2, 0.08);
+
+    border: 1px solid #ff3d02;
+
+    border-radius: 8px;
+
+    text-align: center;
+
+}
+
+
+.booking-id-box span {
+
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #ff8b68;
+
+    font-size: 12px;
+
+    font-weight: bold;
+
+    letter-spacing: 2px;
+
+}
+
+
+.booking-id-box strong {
+
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #ff3d02;
+
+    font-size: 32px;
+
+    letter-spacing: 2px;
+
+}
+
+
+.booking-id-box small {
+
+    display: block;
+
+    color: #999;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+
+}
+.status-button {
+
+    display: inline-block;
+
+    margin-right: 10px;
+
+    padding: 14px 28px;
+
+    background: transparent;
+
+    color: #ff3d02;
+
+    text-decoration: none;
+
+    font-weight: bold;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1px;
+
+    border-radius: 50px;
+
+    border: 2px solid #ff3d02;
+
+    transition: 0.3s;
+
+}
+
+
+.status-button:hover {
+
+    background: #ff3d02;
+
+    color: white;
+
+}
+
 
     </style>
 
@@ -574,20 +674,39 @@ try {
 
         <p>
 
-            Thank you,
+    Thank you,
 
-            <strong>
-                <?= htmlspecialchars($name) ?>
-            </strong>.
+    <strong>
+        <?= htmlspecialchars($name) ?>
+    </strong>.
 
-            Your booking request has been
-            successfully submitted to
-            ABAA Entertainment.
+    Your booking request has been
+    successfully submitted to
+    ABAA Entertainment.
 
-            Our team will review your request
-            and contact you soon.
+    Our team will review your request
+    and contact you soon.
 
-        </p>
+</p>
+
+
+<div class="booking-id-box">
+
+    <span>
+        YOUR BOOKING ID
+    </span>
+
+    <strong>
+        #<?= $bookingId ?>
+    </strong>
+
+    <small>
+        Please save this number.
+        You will need it to check your booking status.
+    </small>
+
+</div>
+
 
 
         <a
@@ -596,6 +715,12 @@ try {
         >
             Back To Home
         </a>
+<a
+    href="/booking-status?id=<?= $bookingId ?>&email=<?= urlencode($email) ?>"
+    class="status-button"
+>
+    Check Booking Status
+</a>
 
 
     </div>
