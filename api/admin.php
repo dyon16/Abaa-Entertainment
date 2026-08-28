@@ -702,6 +702,27 @@ if ($admin) {
 
             </a>
 
+    <a href="/admin-bookings">
+
+        <i class="fa-solid fa-calendar-check"></i>
+
+        <span>
+            Bookings
+        </span>
+
+    </a>
+
+
+    <a href="/admin-events">
+
+        <i class="fa-solid fa-photo-film"></i>
+
+        <span>
+            Events
+        </span>
+
+    </a>
+
 
             <a href="/">
 
