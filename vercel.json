@@ -1,32 +1,47 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
+"$schema": "https://openapi.vercel.sh/vercel.json",
 
-  "functions": {
-    "api/*.php": {
-      "runtime": "vercel-php@0.9.0"
-    }
-  },
+"functions": {
+"api/*.php": {
+"runtime": "vercel-php@0.9.0"
+}
+},
 
-  "rewrites": [
-    {
-      "source": "/",
-      "destination": "/api/index.php"
-    },
-    {
-      "source": "/about",
-      "destination": "/api/about.php"
-    },
-    {
-      "source": "/service",
-      "destination": "/api/service.php"
-    },
-    {
-      "source": "/booking",
-      "destination": "/api/booking.php"
-    },
-    {
-      "source": "/admin",
-      "destination": "/api/admin.php"
-    }
-  ]
+"rewrites": [
+{
+"source": "/",
+"destination": "/api/index.php"
+},
+{
+"source": "/about",
+"destination": "/api/about.php"
+},
+{
+"source": "/service",
+"destination": "/api/service.php"
+},
+{
+"source": "/booking",
+"destination": "/api/booking.php"
+},
+
+{
+  "source": "/admin",
+  "destination": "/api/admin.php"
+},
+{
+  "source": "/admin/bookings",
+  "destination": "/api/admin-bookings.php"
+},
+{
+  "source": "/admin/events",
+  "destination": "/api/admin-events.php"
+},
+{
+  "source": "/admin/services",
+  "destination": "/api/admin-services.php"
+}
+
+
+]
 }
