@@ -407,7 +407,7 @@ if ($admin) {
     <meta charset="UTF-8">
 
     <meta
-        name="viewport"
+        name="port"
         content="width=device-width, initial-scale=1.0"
     >
 
@@ -935,14 +935,14 @@ if ($admin) {
 
                 <h1>
 
-                    Booking Overview
+                    Booking Over
 
                 </h1>
 
 
                 <p>
 
-                    Review and manage your latest event
+                    Re and manage your latest event
                     booking requests.
 
                 </p>
@@ -953,10 +953,12 @@ if ($admin) {
 
             <a
                 href="/"
-                class="view-site-button"
+                target="_blank" 
+                rel="noopener noreferrer"
+                class="-site-button"
             >
 
-                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                 <i class="fa-solid fa-globe"></i>
 
                 View Website
 
