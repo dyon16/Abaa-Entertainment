@@ -68,16 +68,13 @@ function verifyAdminCookie($cookie, $secret)
     }
 
     $payloadEncoded = $parts[0];
+    $providedSignature = $parts[1];
 
-    $providedSignature =
-        $parts[1];
-
-    $expectedSignature =
-        hash_hmac(
-            'sha256',
-            $payloadEncoded,
-            $secret
-        );
+    $expectedSignature = hash_hmac(
+        'sha256',
+        $payloadEncoded,
+        $secret
+    );
 
     if (!hash_equals(
         $expectedSignature,
@@ -86,20 +83,18 @@ function verifyAdminCookie($cookie, $secret)
         return false;
     }
 
-    $payloadJson =
-        base64UrlDecode(
-            $payloadEncoded
-        );
+    $payloadJson = base64UrlDecode(
+        $payloadEncoded
+    );
 
     if ($payloadJson === false) {
         return false;
     }
 
-    $payload =
-        json_decode(
-            $payloadJson,
-            true
-        );
+    $payload = json_decode(
+        $payloadJson,
+        true
+    );
 
     if (!is_array($payload)) {
         return false;
@@ -132,11 +127,10 @@ $admin = false;
 
 if (isset($_COOKIE[$cookieName])) {
 
-    $admin =
-        verifyAdminCookie(
-            $_COOKIE[$cookieName],
-            $authSecret
-        );
+    $admin = verifyAdminCookie(
+        $_COOKIE[$cookieName],
+        $authSecret
+    );
 }
 
 /*
@@ -200,10 +194,9 @@ function uploadToVercelBlob(
         ];
     }
 
-    $fileContents =
-        file_get_contents(
-            $tmpFile
-        );
+    $fileContents = file_get_contents(
+        $tmpFile
+    );
 
     if ($fileContents === false) {
 
@@ -224,8 +217,16 @@ function uploadToVercelBlob(
         'https://blob.vercel-storage.com/' .
         rawurlencode($fileName);
 
-    $ch =
-        curl_init($url);
+    $ch = curl_init($url);
+
+    if ($ch === false) {
+
+        return [
+            'success' => false,
+            'error' =>
+                'Unable to initialize Blob upload.'
+        ];
+    }
 
     curl_setopt_array(
         $ch,
@@ -255,19 +256,28 @@ function uploadToVercelBlob(
         ]
     );
 
-    $response =
-        curl_exec($ch);
+    $response = curl_exec($ch);
 
-    $curlError =
-        curl_error($ch);
+    $curlError = curl_error($ch);
 
-    $httpCode =
-        curl_getinfo(
-            $ch,
-            CURLINFO_HTTP_CODE
-        );
+    $httpCode = curl_getinfo(
+        $ch,
+        CURLINFO_HTTP_CODE
+    );
 
-    curl_close($ch);
+    /*
+    |--------------------------------------------------------------------------
+    | PHP 8.5 FIX
+    |--------------------------------------------------------------------------
+    |
+    | curl_close() is deprecated since PHP 8.5 because CurlHandle
+    | objects are automatically cleaned up.
+    |
+    | Do NOT use curl_close($ch).
+    |--------------------------------------------------------------------------
+    */
+
+    unset($ch);
 
     if ($response === false) {
 
@@ -298,11 +308,10 @@ function uploadToVercelBlob(
         ];
     }
 
-    $data =
-        json_decode(
-            $response,
-            true
-        );
+    $data = json_decode(
+        $response,
+        true
+    );
 
     if (!is_array($data)) {
 
@@ -351,8 +360,11 @@ function deleteFromVercelBlob(
         return false;
     }
 
-    $ch =
-        curl_init($blobUrl);
+    $ch = curl_init($blobUrl);
+
+    if ($ch === false) {
+        return false;
+    }
 
     curl_setopt_array(
         $ch,
@@ -374,16 +386,23 @@ function deleteFromVercelBlob(
         ]
     );
 
-    $response =
-        curl_exec($ch);
+    $response = curl_exec($ch);
 
-    $httpCode =
-        curl_getinfo(
-            $ch,
-            CURLINFO_HTTP_CODE
-        );
+    $httpCode = curl_getinfo(
+        $ch,
+        CURLINFO_HTTP_CODE
+    );
 
-    curl_close($ch);
+    /*
+    |--------------------------------------------------------------------------
+    | PHP 8.5 FIX
+    |--------------------------------------------------------------------------
+    |
+    | curl_close() is deprecated since PHP 8.5.
+    |--------------------------------------------------------------------------
+    */
+
+    unset($ch);
 
     return (
         $response !== false &&
@@ -1017,7 +1036,8 @@ if (
 | POST → REDIRECT → GET
 |--------------------------------------------------------------------------
 |
-| This is the important fix.
+| This prevents duplicate form submissions and ensures that
+| headers are sent before any HTML output.
 |--------------------------------------------------------------------------
 */
 
