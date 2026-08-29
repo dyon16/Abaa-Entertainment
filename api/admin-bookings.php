@@ -1,13 +1,420 @@
-<?php include(__DIR__ . '/conn.php'); 
-/* |-------------------------------------------------------------------------- | 
-ADMIN AUTHENTICATION 
-|-------------------------------------------------------------------------- */ 
-$authSecret = getenv('ADMIN_AUTH_SECRET'); 
-if (!$authSecret) 
-{
+<?php
+
+session_start();
+
+include(__DIR__ . '/conn.php');
+
+/*
+|--------------------------------------------------------------------------
+| ADMIN AUTHENTICATION
+|--------------------------------------------------------------------------
+*/
+
+$authSecret = getenv('ADMIN_AUTH_SECRET');
+
+if (!$authSecret) {
     $authSecret = 'ABAA_CHANGE_THIS_SECRET_2026';
-} $cookieName = 'abaa_admin_auth'; 
-/* |-------------------------------------------------------------------------- | BASE64 URL DECODE |-------------------------------------------------------------------------- */ function base64UrlDecode($data) { $remainder = strlen($data) % 4; if ($remainder > 0) { $data .= str_repeat('=', 4 - $remainder); } return base64_decode( strtr($data, '-_', '+/'), true ); } /* |-------------------------------------------------------------------------- | VERIFY ADMIN COOKIE |-------------------------------------------------------------------------- */ function verifyAdminCookie($cookie, $secret) { if (empty($cookie)) { return false; } $parts = explode('.', $cookie); if (count($parts) !== 2) { return false; } $payloadEncoded = $parts[0]; $providedSignature = $parts[1]; $expectedSignature = hash_hmac( 'sha256', $payloadEncoded, $secret ); if (!hash_equals( $expectedSignature, $providedSignature )) { return false; } $payloadJson = base64UrlDecode($payloadEncoded); if ($payloadJson === false) { return false; } $payload = json_decode( $payloadJson, true ); if (!is_array($payload)) { return false; } if ( !isset($payload['id']) || !isset($payload['username']) || !isset($payload['exp']) ) { return false; } if ((int) $payload['exp'] < time()) { return false; } return $payload; } /* |-------------------------------------------------------------------------- | CHECK LOGIN |-------------------------------------------------------------------------- */ $admin = false; if (isset($_COOKIE[$cookieName])) { $admin = verifyAdminCookie( $_COOKIE[$cookieName], $authSecret ); } /* |-------------------------------------------------------------------------- | REDIRECT IF NOT LOGGED IN |-------------------------------------------------------------------------- */ if (!$admin) { header('Location: /admin'); exit; } /* |-------------------------------------------------------------------------- | STATUS SETTINGS |-------------------------------------------------------------------------- */ $allowedStatuses = [ 'Pending', 'Confirmed', 'In Progress', 'Completed', 'Cancelled' ]; $statusMessage = ''; $statusError = ''; /* |-------------------------------------------------------------------------- | UPDATE BOOKING STATUS |-------------------------------------------------------------------------- */ if ( $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status']) ) { $bookingId = (int) ($_POST['booking_id'] ?? 0); $newStatus = trim( $_POST['status'] ?? '' ); if ( $bookingId <= 0 || !in_array( $newStatus, $allowedStatuses, true ) ) { $statusError = 'Invalid booking status.'; } else { try { $stmt = $pdo->prepare( "UPDATE bookings SET status = :status WHERE id = :id" ); $stmt->execute([ ':status' => $newStatus, ':id' => $bookingId ]); $statusMessage = 'Booking status updated successfully.'; } catch (PDOException $e) { error_log( 'Booking status update error: ' . $e->getMessage() ); $statusError = 'Unable to update booking status.'; } } } /* |-------------------------------------------------------------------------- | DELETE BOOKING |-------------------------------------------------------------------------- */ if ( $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_booking']) ) { $bookingId = (int) ($_POST['booking_id'] ?? 0); if ($bookingId > 0) { try { $stmt = $pdo->prepare( "DELETE FROM bookings WHERE id = :id" ); $stmt->execute([ ':id' => $bookingId ]); $statusMessage = 'Booking deleted successfully.'; } catch (PDOException $e) { error_log( 'Booking delete error: ' . $e->getMessage() ); $statusError = 'Unable to delete booking.'; } } } /* |-------------------------------------------------------------------------- | LOAD BOOKINGS |-------------------------------------------------------------------------- */ $bookings = []; try { $stmt = $pdo->query( "SELECT id, name, phone, email, event_type, event_date, cname, contact_person, service, message, created_at, status FROM bookings ORDER BY id DESC" ); $bookings = $stmt->fetchAll(PDO::FETCH_ASSOC); } catch (PDOException $e) { error_log( 'Booking query error: ' . $e->getMessage() ); $statusError = 'Unable to load bookings.'; } /* |-------------------------------------------------------------------------- | BOOKING COUNTS |-------------------------------------------------------------------------- */ $totalBookings = count($bookings); $pendingBookings = 0; $confirmedBookings = 0; $inProgressBookings = 0; $completedBookings = 0; $cancelledBookings = 0; foreach ($bookings as $booking) { $status = $booking['status'] ?? 'Pending'; switch ($status) { case 'Confirmed': $confirmedBookings++; break; case 'In Progress': $inProgressBookings++; break; case 'Completed': $completedBookings++; break; case 'Cancelled': $cancelledBookings++; break; default: $pendingBookings++; break; } } /* |-------------------------------------------------------------------------- | HELPER FUNCTIONS |-------------------------------------------------------------------------- */ function e($value) { return htmlspecialchars( (string) ($value ?? ''), ENT_QUOTES, 'UTF-8' ); } function statusClass($status) { return strtolower( str_replace( ' ', '-', trim($status) ) ); } ?> <!DOCTYPE html> <html lang="en"> <head>
+}
+
+$cookieName = 'abaa_admin_auth';
+
+/*
+|--------------------------------------------------------------------------
+| BASE64 URL DECODE
+|--------------------------------------------------------------------------
+*/
+
+function base64UrlDecode($data)
+{
+    $remainder = strlen($data) % 4;
+
+    if ($remainder > 0) {
+        $data .= str_repeat('=', 4 - $remainder);
+    }
+
+    return base64_decode(
+        strtr($data, '-_', '+/'),
+        true
+    );
+}
+
+/*
+|--------------------------------------------------------------------------
+| VERIFY ADMIN COOKIE
+|--------------------------------------------------------------------------
+*/
+
+function verifyAdminCookie($cookie, $secret)
+{
+    if (empty($cookie)) {
+        return false;
+    }
+
+    $parts = explode('.', $cookie);
+
+    if (count($parts) !== 2) {
+        return false;
+    }
+
+    $payloadEncoded = $parts[0];
+    $providedSignature = $parts[1];
+
+    $expectedSignature = hash_hmac(
+        'sha256',
+        $payloadEncoded,
+        $secret
+    );
+
+    if (!hash_equals(
+        $expectedSignature,
+        $providedSignature
+    )) {
+        return false;
+    }
+
+    $payloadJson = base64UrlDecode($payloadEncoded);
+
+    if ($payloadJson === false) {
+        return false;
+    }
+
+    $payload = json_decode(
+        $payloadJson,
+        true
+    );
+
+    if (!is_array($payload)) {
+        return false;
+    }
+
+    if (
+        !isset($payload['id']) ||
+        !isset($payload['username']) ||
+        !isset($payload['exp'])
+    ) {
+        return false;
+    }
+
+    if ((int) $payload['exp'] < time()) {
+        return false;
+    }
+
+    return $payload;
+}
+
+/*
+|--------------------------------------------------------------------------
+| CHECK LOGIN
+|--------------------------------------------------------------------------
+*/
+
+$admin = false;
+
+if (isset($_COOKIE[$cookieName])) {
+    $admin = verifyAdminCookie(
+        $_COOKIE[$cookieName],
+        $authSecret
+    );
+}
+
+/*
+|--------------------------------------------------------------------------
+| REDIRECT IF NOT LOGGED IN
+|--------------------------------------------------------------------------
+*/
+
+if (!$admin) {
+    header('Location: /admin');
+    exit;
+}
+
+/*
+|--------------------------------------------------------------------------
+| STATUS SETTINGS
+|--------------------------------------------------------------------------
+*/
+
+$allowedStatuses = [
+    'Pending',
+    'Confirmed',
+    'In Progress',
+    'Completed',
+    'Cancelled'
+];
+
+/*
+|--------------------------------------------------------------------------
+| FLASH MESSAGES
+|--------------------------------------------------------------------------
+*/
+
+$statusMessage = $_SESSION['booking_status_message'] ?? '';
+$statusError = $_SESSION['booking_status_error'] ?? '';
+
+unset(
+    $_SESSION['booking_status_message'],
+    $_SESSION['booking_status_error']
+);
+
+/*
+|--------------------------------------------------------------------------
+| UPDATE BOOKING STATUS
+|--------------------------------------------------------------------------
+*/
+
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST' &&
+    isset($_POST['update_status'])
+) {
+
+    $bookingId = (int) (
+        $_POST['booking_id'] ?? 0
+    );
+
+    $newStatus = trim(
+        $_POST['status'] ?? ''
+    );
+
+    if (
+        $bookingId <= 0 ||
+        !in_array(
+            $newStatus,
+            $allowedStatuses,
+            true
+        )
+    ) {
+
+        $statusError =
+            'Invalid booking status.';
+
+    } else {
+
+        try {
+
+            $stmt = $pdo->prepare(
+                "UPDATE bookings
+                 SET status = :status
+                 WHERE id = :id"
+            );
+
+            $stmt->execute([
+                ':status' => $newStatus,
+                ':id' => $bookingId
+            ]);
+
+            $statusMessage =
+                'Booking status updated successfully.';
+
+        } catch (PDOException $e) {
+
+            error_log(
+                'Booking status update error: ' .
+                $e->getMessage()
+            );
+
+            $statusError =
+                'Unable to update booking status.';
+        }
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| DELETE BOOKING
+|--------------------------------------------------------------------------
+*/
+
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST' &&
+    isset($_POST['delete_booking'])
+) {
+
+    $bookingId = (int) (
+        $_POST['booking_id'] ?? 0
+    );
+
+    if ($bookingId > 0) {
+
+        try {
+
+            $stmt = $pdo->prepare(
+                "DELETE FROM bookings
+                 WHERE id = :id"
+            );
+
+            $stmt->execute([
+                ':id' => $bookingId
+            ]);
+
+            $statusMessage =
+                'Booking deleted successfully.';
+
+        } catch (PDOException $e) {
+
+            error_log(
+                'Booking delete error: ' .
+                $e->getMessage()
+            );
+
+            $statusError =
+                'Unable to delete booking.';
+        }
+    } else {
+
+        $statusError =
+            'Invalid booking.';
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| POST → REDIRECT → GET
+|--------------------------------------------------------------------------
+|
+| This prevents browser refresh from resubmitting
+| the previous POST request.
+|--------------------------------------------------------------------------
+*/
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    if ($statusMessage !== '') {
+
+        $_SESSION['booking_status_message'] =
+            $statusMessage;
+    }
+
+    if ($statusError !== '') {
+
+        $_SESSION['booking_status_error'] =
+            $statusError;
+    }
+
+    header('Location: /admin/bookings');
+    exit;
+}
+
+/*
+|--------------------------------------------------------------------------
+| LOAD BOOKINGS
+|--------------------------------------------------------------------------
+*/
+
+$bookings = [];
+
+try {
+
+    $stmt = $pdo->query(
+        "SELECT
+            id,
+            name,
+            phone,
+            email,
+            event_type,
+            event_date,
+            cname,
+            contact_person,
+            service,
+            message,
+            created_at,
+            status
+         FROM bookings
+         ORDER BY id DESC"
+    );
+
+    $bookings =
+        $stmt->fetchAll(
+            PDO::FETCH_ASSOC
+        );
+
+} catch (PDOException $e) {
+
+    error_log(
+        'Booking query error: ' .
+        $e->getMessage()
+    );
+
+    $statusError =
+        'Unable to load bookings.';
+}
+
+/*
+|--------------------------------------------------------------------------
+| BOOKING COUNTS
+|--------------------------------------------------------------------------
+*/
+
+$totalBookings = count($bookings);
+
+$pendingBookings = 0;
+$confirmedBookings = 0;
+$inProgressBookings = 0;
+$completedBookings = 0;
+$cancelledBookings = 0;
+
+foreach ($bookings as $booking) {
+
+    $status =
+        $booking['status'] ?? 'Pending';
+
+    switch ($status) {
+
+        case 'Confirmed':
+            $confirmedBookings++;
+            break;
+
+        case 'In Progress':
+            $inProgressBookings++;
+            break;
+
+        case 'Completed':
+            $completedBookings++;
+            break;
+
+        case 'Cancelled':
+            $cancelledBookings++;
+            break;
+
+        default:
+            $pendingBookings++;
+            break;
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| HELPER FUNCTIONS
+|--------------------------------------------------------------------------
+*/
+
+function e($value)
+{
+    return htmlspecialchars(
+        (string) ($value ?? ''),
+        ENT_QUOTES,
+        'UTF-8'
+    );
+}
+
+function statusClass($status)
+{
+    return strtolower(
+        str_replace(
+            ' ',
+            '-',
+            trim($status)
+        )
+    );
+}
+
+?>
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
 <meta charset="UTF-8">
 
 <meta
@@ -34,7 +441,12 @@ if (!$authSecret)
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
 >
 
-</head> <body> <div class="admin-layout">
+</head>
+
+<body>
+
+<div class="admin-layout">
+
 <!-- ==================================================
      SIDEBAR
 ================================================== -->
@@ -81,12 +493,9 @@ if (!$authSecret)
 
 
         <a
-            <a
-    href="/admin/bookings"
-    class="active"
->
-
-        
+            href="/admin/bookings"
+            class="active"
+        >
 
             <i class="fa-solid fa-calendar-check"></i>
 
@@ -195,7 +604,6 @@ if (!$authSecret)
 </aside>
 
 
-
 <!-- ==================================================
      MAIN
 ================================================== -->
@@ -254,7 +662,6 @@ if (!$authSecret)
     </div>
 
 
-
     <!-- HEADER -->
 
     <header class="admin-header">
@@ -279,7 +686,7 @@ if (!$authSecret)
 
         <a
             href="/"
-            target="_blank" 
+            target="_blank"
             rel="noopener noreferrer"
             class="view-site-button"
         >
@@ -291,7 +698,6 @@ if (!$authSecret)
         </a>
 
     </header>
-
 
 
     <!-- NOTIFICATIONS -->
@@ -320,7 +726,6 @@ if (!$authSecret)
         </div>
 
     <?php endif; ?>
-
 
 
     <!-- STATISTICS -->
@@ -412,7 +817,6 @@ if (!$authSecret)
     </section>
 
 
-
     <!-- BOOKING LIST -->
 
     <section class="bookings-section">
@@ -459,7 +863,6 @@ if (!$authSecret)
             </div>
 
         </div>
-
 
 
         <?php if (empty($bookings)): ?>
@@ -556,11 +959,15 @@ if (!$authSecret)
                         <?php foreach ($bookings as $booking): ?>
 
                             <?php
+
                             $currentStatus =
                                 $booking['status'] ?? 'Pending';
 
                             $statusCss =
-                                statusClass($currentStatus);
+                                statusClass(
+                                    $currentStatus
+                                );
+
                             ?>
 
 
@@ -715,7 +1122,7 @@ if (!$authSecret)
 
                                         <form
                                             method="POST"
-                                             action="/admin/bookings"
+                                            action="/admin/bookings"
                                             class="status-form"
                                         >
 
@@ -760,12 +1167,11 @@ if (!$authSecret)
                                         </form>
 
 
-
                                         <!-- DELETE FORM -->
 
                                         <form
                                             method="POST"
-                                             action="/admin/bookings"
+                                            action="/admin/bookings"
                                             onsubmit="return confirm('Are you sure you want to delete this booking?');"
                                         >
 
@@ -813,7 +1219,6 @@ if (!$authSecret)
     </section>
 
 
-
     <!-- FOOTER -->
 
     <footer class="admin-footer">
@@ -831,4 +1236,8 @@ if (!$authSecret)
 
 </main>
 
-</div> </body> </html>
+</div>
+
+</body>
+
+</html>
