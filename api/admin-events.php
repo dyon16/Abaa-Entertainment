@@ -1447,6 +1447,8 @@ if (
 
     <a
         href="/"
+        target="_blank" 
+        rel="noopener noreferrer"
         class="view-site-button"
     >
 
