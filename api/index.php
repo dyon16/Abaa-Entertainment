@@ -224,7 +224,7 @@ $firstMimeType =
     <div class="about-hero-content">
 
         <p class="small-title">
-            ABOUT ABAA ENTERTAINMENT
+            ABAA ENTERTAINMENT
         </p>
 
 
