@@ -955,7 +955,7 @@ if ($admin) {
                 href="/"
                 target="_blank" 
                 rel="noopener noreferrer"
-                class="-site-button"
+                class="view-site-button"
             >
 
                  <i class="fa-solid fa-globe"></i>
