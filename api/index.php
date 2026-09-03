@@ -41,49 +41,6 @@ try {
 
 /*
 |--------------------------------------------------------------------------
-| LOAD AVAILABLE SERVICES
-|--------------------------------------------------------------------------
-|
-| Services are managed from admin-services.php.
-|
-| Only services where is_available = 1
-| are displayed on the public website.
-|
-*/
-
-$services = [];
-
-try {
-
-    $stmt = $pdo->query(
-        "SELECT
-            id,
-            name,
-            slug,
-            image_url,
-            description,
-            details,
-            is_available,
-            sort_order
-         FROM services
-         WHERE is_available = 1
-         ORDER BY sort_order ASC, id ASC"
-    );
-
-    $services = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-} catch (PDOException $e) {
-
-    error_log(
-        'Service query error: ' .
-        $e->getMessage()
-    );
-
-}
-
-
-/*
-|--------------------------------------------------------------------------
 | HELPER
 |--------------------------------------------------------------------------
 */
@@ -340,79 +297,111 @@ $firstMimeType =
         </p>
 
 
-        <?php if (empty($services)): ?>
+        <div class="boxes">
 
 
-            <div class="empty-services">
+            <a
+                href="/service?service=led-wall"
+                class="image-button"
+            >
 
-                <p>
-                    No services are currently available.
-                </p>
+                <img
+                    src="/service1.png"
+                    alt="LED Wall"
+                >
 
-            </div>
+                <div class="image-title">
+                    LED Wall
+                </div>
 
-
-        <?php else: ?>
-
-
-            <div class="boxes">
-
-
-                <?php foreach ($services as $service): ?>
-
-
-                    <a
-                        href="/service?service=<?= e(
-                            $service['slug']
-                        ) ?>"
-                        class="image-button"
-                    >
+            </a>
 
 
-                        <?php if (
-                            !empty($service['image_url'])
-                        ): ?>
+            <a
+                href="/service?service=lights-sound"
+                class="image-button"
+            >
 
-                            <img
-                                src="<?= e(
-                                    $service['image_url']
-                                ) ?>"
-                                alt="<?= e(
-                                    $service['name']
-                                ) ?>"
-                            >
+                <img
+                    src="/service2.png"
+                    alt="Lights and Sound"
+                >
 
-                        <?php else: ?>
+                <div class="image-title">
+                    Lights and Sound
+                </div>
 
-                            <img
-                                src="/logo.png"
-                                alt="<?= e(
-                                    $service['name']
-                                ) ?>"
-                            >
-
-                        <?php endif; ?>
+            </a>
 
 
-                        <div class="image-title">
+            <a
+                href="/service?service=live-feed"
+                class="image-button"
+            >
 
-                            <?= e(
-                                $service['name']
-                            ) ?>
+                <img
+                    src="/service3.png"
+                    alt="Live Feed"
+                >
 
-                        </div>
+                <div class="image-title">
+                    Live Feed
+                </div>
 
-
-                    </a>
-
-
-                <?php endforeach; ?>
-
-
-            </div>
+            </a>
 
 
-        <?php endif; ?>
+            <a
+                href="/service?service=stage"
+                class="image-button"
+            >
+
+                <img
+                    src="/service4.png"
+                    alt="Stage Production"
+                >
+
+                <div class="image-title">
+                    Stage
+                </div>
+
+            </a>
+
+
+            <a
+                href="/service?service=music-studio"
+                class="image-button"
+            >
+
+                <img
+                    src="/service5.png"
+                    alt="Music Studio"
+                >
+
+                <div class="image-title">
+                    Music Studio
+                </div>
+
+            </a>
+
+
+            <a
+                href="/service?service=trusses"
+                class="image-button"
+            >
+
+                <img
+                    src="/service6.png"
+                    alt="Trusses"
+                >
+
+                <div class="image-title">
+                    Trusses
+                </div>
+
+            </a>
+
+        </div>
 
     </section>
 
@@ -576,7 +565,7 @@ $firstMimeType =
 
                     <!-- ==========================================
                          IMAGE EVENT
-                    ========================================== -->
+                    =========================================== -->
 
                     <img
                         id="featuredImage"
@@ -587,7 +576,7 @@ $firstMimeType =
 
                     <!-- ==========================================
                          HIDDEN VIDEO
-                    ========================================== -->
+                    =========================================== -->
 
                     <video
                         id="featuredVideo"
@@ -610,6 +599,7 @@ $firstMimeType =
 
 
                 <?php endif; ?>
+
 
 
                 <!-- ==========================================
@@ -796,10 +786,6 @@ $firstMimeType =
     <div class="footer-container">
 
 
-        <!-- ==================================================
-             FOOTER BRAND
-        ================================================== -->
-
         <div class="footer-section footer-brand">
 
             <img
@@ -819,10 +805,6 @@ $firstMimeType =
         </div>
 
 
-
-        <!-- ==================================================
-             QUICK LINKS
-        ================================================== -->
 
         <div class="footer-section">
 
@@ -857,57 +839,39 @@ $firstMimeType =
 
 
 
-        <!-- ==================================================
-             DYNAMIC SERVICES
-        ================================================== -->
-
         <div class="footer-section">
 
             <h3>
                 Our Services
             </h3>
 
+            <a href="/service?service=led-wall">
+                LED Wall
+            </a>
 
-            <?php if (!empty($services)): ?>
+            <a href="/service?service=lights-sound">
+                Lights & Sound
+            </a>
 
+            <a href="/service?service=live-feed">
+                Live Feed
+            </a>
 
-                <?php foreach ($services as $service): ?>
+            <a href="/service?service=stage">
+                Stage Production
+            </a>
 
+            <a href="/service?service=music-studio">
+                Music Studio
+            </a>
 
-                    <a
-                        href="/service?service=<?= e(
-                            $service['slug']
-                        ) ?>"
-                    >
-
-                        <?= e(
-                            $service['name']
-                        ) ?>
-
-                    </a>
-
-
-                <?php endforeach; ?>
-
-
-            <?php else: ?>
-
-
-                <span>
-                    No services available
-                </span>
-
-
-            <?php endif; ?>
-
+            <a href="/service?service=trusses">
+                Trusses
+            </a>
 
         </div>
 
 
-
-        <!-- ==================================================
-             CONTACT
-        ================================================== -->
 
         <div class="footer-section">
 
@@ -1009,10 +973,6 @@ $firstMimeType =
 
 
 
-    <!-- ==================================================
-         FOOTER BOTTOM
-    ================================================== -->
-
     <div class="footer-bottom">
 
         <p>
@@ -1089,10 +1049,6 @@ $firstMimeType =
         >
 
 
-            <!-- ==========================================
-                 NAME / PHONE
-            =========================================== -->
-
             <div class="form-row">
 
 
@@ -1129,14 +1085,9 @@ $firstMimeType =
 
                 </div>
 
-
             </div>
 
 
-
-            <!-- ==========================================
-                 EMAIL / CONTACT PERSON
-            =========================================== -->
 
             <div class="form-row">
 
@@ -1174,14 +1125,9 @@ $firstMimeType =
 
                 </div>
 
-
             </div>
 
 
-
-            <!-- ==========================================
-                 EVENT TYPE / DATE
-            =========================================== -->
 
             <div class="form-row">
 
@@ -1259,10 +1205,6 @@ $firstMimeType =
 
 
 
-            <!-- ==========================================
-                 COMPANY
-            =========================================== -->
-
             <div class="form-group">
 
                 <label for="booking_company">
@@ -1281,10 +1223,6 @@ $firstMimeType =
 
 
 
-            <!-- ==========================================
-                 DYNAMIC SERVICES NEEDED
-            =========================================== -->
-
             <div class="form-group">
 
                 <label>
@@ -1295,45 +1233,109 @@ $firstMimeType =
                 <div class="service-checkboxes">
 
 
-                    <?php if (!empty($services)): ?>
+                    <label class="service-checkbox">
+
+                        <input
+                            type="checkbox"
+                            name="service[]"
+                            value="LED Wall"
+                        >
+
+                        <span>
+                            LED Wall
+                        </span>
+
+                    </label>
 
 
-                        <?php foreach ($services as $service): ?>
+                    <label class="service-checkbox">
+
+                        <input
+                            type="checkbox"
+                            name="service[]"
+                            value="Lights & Sound"
+                        >
+
+                        <span>
+                            Lights & Sound
+                        </span>
+
+                    </label>
 
 
-                            <label class="service-checkbox">
+                    <label class="service-checkbox">
 
-                                <input
-                                    type="checkbox"
-                                    name="service[]"
-                                    value="<?= e(
-                                        $service['name']
-                                    ) ?>"
-                                >
+                        <input
+                            type="checkbox"
+                            name="service[]"
+                            value="Live Feed"
+                        >
 
-                                <span>
+                        <span>
+                            Live Feed
+                        </span>
 
-                                    <?= e(
-                                        $service['name']
-                                    ) ?>
-
-                                </span>
-
-                            </label>
+                    </label>
 
 
-                        <?php endforeach; ?>
+                    <label class="service-checkbox">
+
+                        <input
+                            type="checkbox"
+                            name="service[]"
+                            value="Stage Production"
+                        >
+
+                        <span>
+                            Stage Production
+                        </span>
+
+                    </label>
 
 
-                    <?php else: ?>
+                    <label class="service-checkbox">
+
+                        <input
+                            type="checkbox"
+                            name="service[]"
+                            value="Music Studio"
+                        >
+
+                        <span>
+                            Music Studio
+                        </span>
+
+                    </label>
 
 
-                        <p>
-                            No services are currently available.
-                        </p>
+                    <label class="service-checkbox">
+
+                        <input
+                            type="checkbox"
+                            name="service[]"
+                            value="Trusses"
+                        >
+
+                        <span>
+                            Trusses
+                        </span>
+
+                    </label>
 
 
-                    <?php endif; ?>
+                    <label class="service-checkbox">
+
+                        <input
+                            type="checkbox"
+                            name="service[]"
+                            value="Full Event Production"
+                        >
+
+                        <span>
+                            Full Event Production
+                        </span>
+
+                    </label>
 
 
                 </div>
@@ -1341,10 +1343,6 @@ $firstMimeType =
             </div>
 
 
-
-            <!-- ==========================================
-                 EVENT DETAILS
-            =========================================== -->
 
             <div class="form-group">
 
@@ -1363,10 +1361,6 @@ $firstMimeType =
 
 
 
-            <!-- ==========================================
-                 SUBMIT
-            =========================================== -->
-
             <button
                 type="submit"
                 class="booking-submit"
@@ -1379,7 +1373,6 @@ $firstMimeType =
                 <i class="fa-solid fa-arrow-right"></i>
 
             </button>
-
 
         </form>
 
@@ -1564,7 +1557,6 @@ function showEvent(
 
 
         return;
-
     }
 
 
@@ -1576,11 +1568,8 @@ function showEvent(
 
     if (type === "video") {
 
-
         /*
-        |--------------------------------------------------------------------------
-        | SET THUMBNAIL
-        |--------------------------------------------------------------------------
+        | Set thumbnail
         */
 
         if (thumbnail) {
@@ -1603,9 +1592,7 @@ function showEvent(
 
 
         /*
-        |--------------------------------------------------------------------------
-        | SET VIDEO SOURCE
-        |--------------------------------------------------------------------------
+        | Set video source
         */
 
         videoSource.src =
@@ -1618,18 +1605,15 @@ function showEvent(
 
 
         /*
-        |--------------------------------------------------------------------------
-        | RELOAD VIDEO
-        |--------------------------------------------------------------------------
+        | Reload
         */
 
         video.load();
 
 
         /*
-        |--------------------------------------------------------------------------
-        | SHOW THUMBNAIL FIRST
-        |--------------------------------------------------------------------------
+        | If thumbnail exists,
+        | show thumbnail first.
         */
 
         if (thumbnail) {
@@ -1646,6 +1630,11 @@ function showEvent(
             }
 
         } else {
+
+            /*
+            | No thumbnail:
+            | show video immediately.
+            */
 
             video.style.display =
                 "block";
@@ -1699,9 +1688,7 @@ function playFeaturedVideo()
 
 
     /*
-    |--------------------------------------------------------------------------
-    | HIDE THUMBNAIL
-    |--------------------------------------------------------------------------
+    | Hide thumbnail
     */
 
     if (image) {
@@ -1713,9 +1700,7 @@ function playFeaturedVideo()
 
 
     /*
-    |--------------------------------------------------------------------------
-    | SHOW VIDEO
-    |--------------------------------------------------------------------------
+    | Show video
     */
 
     video.style.display =
@@ -1723,9 +1708,7 @@ function playFeaturedVideo()
 
 
     /*
-    |--------------------------------------------------------------------------
-    | HIDE PLAY BUTTON
-    |--------------------------------------------------------------------------
+    | Hide play button
     */
 
     if (playButton) {
@@ -1737,18 +1720,17 @@ function playFeaturedVideo()
 
 
     /*
-    |--------------------------------------------------------------------------
-    | ALLOW AUDIO
-    |--------------------------------------------------------------------------
+    | Make sure video is NOT forced muted.
+    |
+    | The user can now use the browser
+    | volume/unmute controls.
     */
 
     video.muted = false;
 
 
     /*
-    |--------------------------------------------------------------------------
-    | PLAY
-    |--------------------------------------------------------------------------
+    | Play
     */
 
     const playPromise =
@@ -1909,7 +1891,7 @@ function closeBookingModal()
 
 /*
 |--------------------------------------------------------------------------
-| CLICK OUTSIDE BOOKING MODAL
+| CLICK OUTSIDE MODAL
 |--------------------------------------------------------------------------
 */
 
