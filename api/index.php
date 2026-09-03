@@ -41,6 +41,47 @@ try {
 
 /*
 |--------------------------------------------------------------------------
+| LOAD AVAILABLE SERVICES
+|--------------------------------------------------------------------------
+|
+| Services are now controlled from admin-services.php.
+| Only services marked as available will appear publicly.
+|
+*/
+
+$services = [];
+
+try {
+
+    $stmt = $pdo->query(
+        "SELECT
+            id,
+            name,
+            slug,
+            image_url,
+            description,
+            details,
+            is_available,
+            sort_order
+         FROM services
+         WHERE is_available = 1
+         ORDER BY sort_order ASC, id ASC"
+    );
+
+    $services = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+} catch (PDOException $e) {
+
+    error_log(
+        'Service query error: ' .
+        $e->getMessage()
+    );
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
 | HELPER
 |--------------------------------------------------------------------------
 */
@@ -297,111 +338,67 @@ $firstMimeType =
         </p>
 
 
-        <div class="boxes">
+        <?php if (empty($services)): ?>
+
+            <div class="empty-services">
+
+                <p>
+                    No services are currently available.
+                </p>
+
+            </div>
+
+        <?php else: ?>
 
 
-            <a
-                href="/service?service=led-wall"
-                class="image-button"
-            >
-
-                <img
-                    src="/service1.png"
-                    alt="LED Wall"
-                >
-
-                <div class="image-title">
-                    LED Wall
-                </div>
-
-            </a>
+            <div class="boxes">
 
 
-            <a
-                href="/service?service=lights-sound"
-                class="image-button"
-            >
-
-                <img
-                    src="/service2.png"
-                    alt="Lights and Sound"
-                >
-
-                <div class="image-title">
-                    Lights and Sound
-                </div>
-
-            </a>
+                <?php foreach ($services as $service): ?>
 
 
-            <a
-                href="/service?service=live-feed"
-                class="image-button"
-            >
-
-                <img
-                    src="/service3.png"
-                    alt="Live Feed"
-                >
-
-                <div class="image-title">
-                    Live Feed
-                </div>
-
-            </a>
+                    <a
+                        href="/service?service=<?= e($service['slug']) ?>"
+                        class="image-button"
+                    >
 
 
-            <a
-                href="/service?service=stage"
-                class="image-button"
-            >
+                        <?php if (
+                            !empty($service['image_url'])
+                        ): ?>
 
-                <img
-                    src="/service4.png"
-                    alt="Stage Production"
-                >
+                            <img
+                                src="<?= e($service['image_url']) ?>"
+                                alt="<?= e($service['name']) ?>"
+                            >
 
-                <div class="image-title">
-                    Stage
-                </div>
+                        <?php else: ?>
 
-            </a>
+                            <img
+                                src="/logo.png"
+                                alt="<?= e($service['name']) ?>"
+                            >
 
-
-            <a
-                href="/service?service=music-studio"
-                class="image-button"
-            >
-
-                <img
-                    src="/service5.png"
-                    alt="Music Studio"
-                >
-
-                <div class="image-title">
-                    Music Studio
-                </div>
-
-            </a>
+                        <?php endif; ?>
 
 
-            <a
-                href="/service?service=trusses"
-                class="image-button"
-            >
+                        <div class="image-title">
 
-                <img
-                    src="/service6.png"
-                    alt="Trusses"
-                >
+                            <?= e($service['name']) ?>
 
-                <div class="image-title">
-                    Trusses
-                </div>
+                        </div>
 
-            </a>
 
-        </div>
+                    </a>
+
+
+                <?php endforeach; ?>
+
+
+            </div>
+
+
+        <?php endif; ?>
 
     </section>
 
@@ -669,7 +666,7 @@ $firstMimeType =
                                 json_encode($eventFile),
                                 ENT_QUOTES,
                                 'UTF-8'
-                            ) ?>,
+                            ?>,
                             <?= htmlspecialchars(
                                 json_encode($eventTitle),
                                 ENT_QUOTES,
@@ -839,35 +836,43 @@ $firstMimeType =
 
 
 
+        <!-- ==================================================
+             DYNAMIC FOOTER SERVICES
+        ================================================== -->
+
         <div class="footer-section">
 
             <h3>
                 Our Services
             </h3>
 
-            <a href="/service?service=led-wall">
-                LED Wall
-            </a>
 
-            <a href="/service?service=lights-sound">
-                Lights & Sound
-            </a>
+            <?php if (!empty($services)): ?>
 
-            <a href="/service?service=live-feed">
-                Live Feed
-            </a>
+                <?php foreach ($services as $service): ?>
 
-            <a href="/service?service=stage">
-                Stage Production
-            </a>
+                    <a
+                        href="/service?service=<?= e(
+                            $service['slug']
+                        ) ?>"
+                    >
 
-            <a href="/service?service=music-studio">
-                Music Studio
-            </a>
+                        <?= e(
+                            $service['name']
+                        ) ?>
 
-            <a href="/service?service=trusses">
-                Trusses
-            </a>
+                    </a>
+
+                <?php endforeach; ?>
+
+            <?php else: ?>
+
+                <span>
+                    No services available
+                </span>
+
+            <?php endif; ?>
+
 
         </div>
 
@@ -1223,6 +1228,10 @@ $firstMimeType =
 
 
 
+            <!-- ==================================================
+                 DYNAMIC SERVICES NEEDED
+            ================================================== -->
+
             <div class="form-group">
 
                 <label>
@@ -1233,109 +1242,45 @@ $firstMimeType =
                 <div class="service-checkboxes">
 
 
-                    <label class="service-checkbox">
-
-                        <input
-                            type="checkbox"
-                            name="service[]"
-                            value="LED Wall"
-                        >
-
-                        <span>
-                            LED Wall
-                        </span>
-
-                    </label>
+                    <?php if (!empty($services)): ?>
 
 
-                    <label class="service-checkbox">
-
-                        <input
-                            type="checkbox"
-                            name="service[]"
-                            value="Lights & Sound"
-                        >
-
-                        <span>
-                            Lights & Sound
-                        </span>
-
-                    </label>
+                        <?php foreach ($services as $service): ?>
 
 
-                    <label class="service-checkbox">
+                            <label class="service-checkbox">
 
-                        <input
-                            type="checkbox"
-                            name="service[]"
-                            value="Live Feed"
-                        >
+                                <input
+                                    type="checkbox"
+                                    name="service[]"
+                                    value="<?= e(
+                                        $service['name']
+                                    ) ?>"
+                                >
 
-                        <span>
-                            Live Feed
-                        </span>
+                                <span>
 
-                    </label>
+                                    <?= e(
+                                        $service['name']
+                                    ) ?>
 
+                                </span>
 
-                    <label class="service-checkbox">
-
-                        <input
-                            type="checkbox"
-                            name="service[]"
-                            value="Stage Production"
-                        >
-
-                        <span>
-                            Stage Production
-                        </span>
-
-                    </label>
+                            </label>
 
 
-                    <label class="service-checkbox">
-
-                        <input
-                            type="checkbox"
-                            name="service[]"
-                            value="Music Studio"
-                        >
-
-                        <span>
-                            Music Studio
-                        </span>
-
-                    </label>
+                        <?php endforeach; ?>
 
 
-                    <label class="service-checkbox">
-
-                        <input
-                            type="checkbox"
-                            name="service[]"
-                            value="Trusses"
-                        >
-
-                        <span>
-                            Trusses
-                        </span>
-
-                    </label>
+                    <?php else: ?>
 
 
-                    <label class="service-checkbox">
+                        <p>
+                            No services are currently available.
+                        </p>
 
-                        <input
-                            type="checkbox"
-                            name="service[]"
-                            value="Full Event Production"
-                        >
 
-                        <span>
-                            Full Event Production
-                        </span>
-
-                    </label>
+                    <?php endif; ?>
 
 
                 </div>
@@ -1612,8 +1557,7 @@ function showEvent(
 
 
         /*
-        | If thumbnail exists,
-        | show thumbnail first.
+        | Thumbnail first
         */
 
         if (thumbnail) {
@@ -1630,11 +1574,6 @@ function showEvent(
             }
 
         } else {
-
-            /*
-            | No thumbnail:
-            | show video immediately.
-            */
 
             video.style.display =
                 "block";
@@ -1687,10 +1626,6 @@ function playFeaturedVideo()
     }
 
 
-    /*
-    | Hide thumbnail
-    */
-
     if (image) {
 
         image.style.display =
@@ -1699,17 +1634,9 @@ function playFeaturedVideo()
     }
 
 
-    /*
-    | Show video
-    */
-
     video.style.display =
         "block";
 
-
-    /*
-    | Hide play button
-    */
 
     if (playButton) {
 
@@ -1719,19 +1646,8 @@ function playFeaturedVideo()
     }
 
 
-    /*
-    | Make sure video is NOT forced muted.
-    |
-    | The user can now use the browser
-    | volume/unmute controls.
-    */
-
     video.muted = false;
 
-
-    /*
-    | Play
-    */
 
     const playPromise =
         video.play();
