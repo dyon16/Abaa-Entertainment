@@ -44,8 +44,10 @@ try {
 | LOAD AVAILABLE SERVICES
 |--------------------------------------------------------------------------
 |
-| Services are now controlled from admin-services.php.
-| Only services marked as available will appear publicly.
+| Services are managed from admin-services.php.
+|
+| Only services where is_available = 1
+| are displayed on the public website.
 |
 */
 
@@ -340,6 +342,7 @@ $firstMimeType =
 
         <?php if (empty($services)): ?>
 
+
             <div class="empty-services">
 
                 <p>
@@ -347,6 +350,7 @@ $firstMimeType =
                 </p>
 
             </div>
+
 
         <?php else: ?>
 
@@ -358,7 +362,9 @@ $firstMimeType =
 
 
                     <a
-                        href="/service?service=<?= e($service['slug']) ?>"
+                        href="/service?service=<?= e(
+                            $service['slug']
+                        ) ?>"
                         class="image-button"
                     >
 
@@ -368,15 +374,21 @@ $firstMimeType =
                         ): ?>
 
                             <img
-                                src="<?= e($service['image_url']) ?>"
-                                alt="<?= e($service['name']) ?>"
+                                src="<?= e(
+                                    $service['image_url']
+                                ) ?>"
+                                alt="<?= e(
+                                    $service['name']
+                                ) ?>"
                             >
 
                         <?php else: ?>
 
                             <img
                                 src="/logo.png"
-                                alt="<?= e($service['name']) ?>"
+                                alt="<?= e(
+                                    $service['name']
+                                ) ?>"
                             >
 
                         <?php endif; ?>
@@ -384,7 +396,9 @@ $firstMimeType =
 
                         <div class="image-title">
 
-                            <?= e($service['name']) ?>
+                            <?= e(
+                                $service['name']
+                            ) ?>
 
                         </div>
 
@@ -562,7 +576,7 @@ $firstMimeType =
 
                     <!-- ==========================================
                          IMAGE EVENT
-                    =========================================== -->
+                    ========================================== -->
 
                     <img
                         id="featuredImage"
@@ -573,7 +587,7 @@ $firstMimeType =
 
                     <!-- ==========================================
                          HIDDEN VIDEO
-                    =========================================== -->
+                    ========================================== -->
 
                     <video
                         id="featuredVideo"
@@ -596,7 +610,6 @@ $firstMimeType =
 
 
                 <?php endif; ?>
-
 
 
                 <!-- ==========================================
@@ -666,7 +679,7 @@ $firstMimeType =
                                 json_encode($eventFile),
                                 ENT_QUOTES,
                                 'UTF-8'
-                            ?>,
+                            ) ?>,
                             <?= htmlspecialchars(
                                 json_encode($eventTitle),
                                 ENT_QUOTES,
@@ -783,6 +796,10 @@ $firstMimeType =
     <div class="footer-container">
 
 
+        <!-- ==================================================
+             FOOTER BRAND
+        ================================================== -->
+
         <div class="footer-section footer-brand">
 
             <img
@@ -802,6 +819,10 @@ $firstMimeType =
         </div>
 
 
+
+        <!-- ==================================================
+             QUICK LINKS
+        ================================================== -->
 
         <div class="footer-section">
 
@@ -837,7 +858,7 @@ $firstMimeType =
 
 
         <!-- ==================================================
-             DYNAMIC FOOTER SERVICES
+             DYNAMIC SERVICES
         ================================================== -->
 
         <div class="footer-section">
@@ -849,7 +870,9 @@ $firstMimeType =
 
             <?php if (!empty($services)): ?>
 
+
                 <?php foreach ($services as $service): ?>
+
 
                     <a
                         href="/service?service=<?= e(
@@ -863,13 +886,17 @@ $firstMimeType =
 
                     </a>
 
+
                 <?php endforeach; ?>
 
+
             <?php else: ?>
+
 
                 <span>
                     No services available
                 </span>
+
 
             <?php endif; ?>
 
@@ -877,6 +904,10 @@ $firstMimeType =
         </div>
 
 
+
+        <!-- ==================================================
+             CONTACT
+        ================================================== -->
 
         <div class="footer-section">
 
@@ -978,6 +1009,10 @@ $firstMimeType =
 
 
 
+    <!-- ==================================================
+         FOOTER BOTTOM
+    ================================================== -->
+
     <div class="footer-bottom">
 
         <p>
@@ -1054,6 +1089,10 @@ $firstMimeType =
         >
 
 
+            <!-- ==========================================
+                 NAME / PHONE
+            =========================================== -->
+
             <div class="form-row">
 
 
@@ -1090,9 +1129,14 @@ $firstMimeType =
 
                 </div>
 
+
             </div>
 
 
+
+            <!-- ==========================================
+                 EMAIL / CONTACT PERSON
+            =========================================== -->
 
             <div class="form-row">
 
@@ -1130,9 +1174,14 @@ $firstMimeType =
 
                 </div>
 
+
             </div>
 
 
+
+            <!-- ==========================================
+                 EVENT TYPE / DATE
+            =========================================== -->
 
             <div class="form-row">
 
@@ -1210,6 +1259,10 @@ $firstMimeType =
 
 
 
+            <!-- ==========================================
+                 COMPANY
+            =========================================== -->
+
             <div class="form-group">
 
                 <label for="booking_company">
@@ -1228,9 +1281,9 @@ $firstMimeType =
 
 
 
-            <!-- ==================================================
+            <!-- ==========================================
                  DYNAMIC SERVICES NEEDED
-            ================================================== -->
+            =========================================== -->
 
             <div class="form-group">
 
@@ -1289,6 +1342,10 @@ $firstMimeType =
 
 
 
+            <!-- ==========================================
+                 EVENT DETAILS
+            =========================================== -->
+
             <div class="form-group">
 
                 <label for="booking_message">
@@ -1306,6 +1363,10 @@ $firstMimeType =
 
 
 
+            <!-- ==========================================
+                 SUBMIT
+            =========================================== -->
+
             <button
                 type="submit"
                 class="booking-submit"
@@ -1318,6 +1379,7 @@ $firstMimeType =
                 <i class="fa-solid fa-arrow-right"></i>
 
             </button>
+
 
         </form>
 
@@ -1502,6 +1564,7 @@ function showEvent(
 
 
         return;
+
     }
 
 
@@ -1513,8 +1576,11 @@ function showEvent(
 
     if (type === "video") {
 
+
         /*
-        | Set thumbnail
+        |--------------------------------------------------------------------------
+        | SET THUMBNAIL
+        |--------------------------------------------------------------------------
         */
 
         if (thumbnail) {
@@ -1537,7 +1603,9 @@ function showEvent(
 
 
         /*
-        | Set video source
+        |--------------------------------------------------------------------------
+        | SET VIDEO SOURCE
+        |--------------------------------------------------------------------------
         */
 
         videoSource.src =
@@ -1550,14 +1618,18 @@ function showEvent(
 
 
         /*
-        | Reload
+        |--------------------------------------------------------------------------
+        | RELOAD VIDEO
+        |--------------------------------------------------------------------------
         */
 
         video.load();
 
 
         /*
-        | Thumbnail first
+        |--------------------------------------------------------------------------
+        | SHOW THUMBNAIL FIRST
+        |--------------------------------------------------------------------------
         */
 
         if (thumbnail) {
@@ -1626,6 +1698,12 @@ function playFeaturedVideo()
     }
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | HIDE THUMBNAIL
+    |--------------------------------------------------------------------------
+    */
+
     if (image) {
 
         image.style.display =
@@ -1634,9 +1712,21 @@ function playFeaturedVideo()
     }
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | SHOW VIDEO
+    |--------------------------------------------------------------------------
+    */
+
     video.style.display =
         "block";
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | HIDE PLAY BUTTON
+    |--------------------------------------------------------------------------
+    */
 
     if (playButton) {
 
@@ -1646,8 +1736,20 @@ function playFeaturedVideo()
     }
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | ALLOW AUDIO
+    |--------------------------------------------------------------------------
+    */
+
     video.muted = false;
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | PLAY
+    |--------------------------------------------------------------------------
+    */
 
     const playPromise =
         video.play();
@@ -1807,7 +1909,7 @@ function closeBookingModal()
 
 /*
 |--------------------------------------------------------------------------
-| CLICK OUTSIDE MODAL
+| CLICK OUTSIDE BOOKING MODAL
 |--------------------------------------------------------------------------
 */
 
