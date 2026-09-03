@@ -1,5 +1,3 @@
-ChatGPT said:
-Absolutely. Below is the complete updated about.php, keeping your existing design/content but making the Services section fully clickable and adding Full Event Production.
 
 <?php include(__DIR__ . '/conn.php'); ?> <!DOCTYPE html> <html lang="en"> <head>
 <meta charset="UTF-8">
