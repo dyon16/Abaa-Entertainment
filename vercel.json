@@ -39,7 +39,7 @@
 },
 {
   "source": "/admin/services",
-  "destination": "/api/admin-services.php"
+  "destination": "/api/admin-service.php"
 },{
   "source": "/booking-status",
   "destination": "/api/booking-status.php"
