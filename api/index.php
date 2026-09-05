@@ -1,48 +1,112 @@
-<?php include(__DIR__ . '/conn.php'); 
-/* |-------------------------------------------------------------------------- 
-| LOAD VISIBLE EVENTS |
--------------------------------------------------------------------------- */ 
-$events = []; 
-try 
-    {
-        $stmt = $pdo->query( "SELECT id, title, type, file_url, thumbnail_url, is_visible, created_at FROM events WHERE is_visible = 1 ORDER BY id DESC" );
-        $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    } 
-catch (PDOException $e) 
-{ 
-    error_log( 'Event query error: ' . $e->getMessage() ); 
-} 
-/* |-------------------------------------------------------------------------- | HELPER |-------------------------------------------------------------------------- */
-function e($value) 
-    { 
-        return htmlspecialchars( (string)($value ?? ''), ENT_QUOTES, 'UTF-8' ); 
-    } 
-/* |-------------------------------------------------------------------------- | GET VIDEO MIME TYPE |-------------------------------------------------------------------------- */
+<?php
+
+include(__DIR__ . '/conn.php');
+
+$events = [];
+
+try {
+
+    $stmt = $pdo->query(
+        "SELECT
+            id,
+            title,
+            type,
+            file_url,
+            thumbnail_url,
+            is_visible,
+            created_at
+         FROM events
+         WHERE is_visible = 1
+         ORDER BY id DESC"
+    );
+
+    $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+} catch (PDOException $e) {
+
+    error_log(
+        'Event query error: ' .
+        $e->getMessage()
+    );
+
+}
+
+function e($value)
+{
+    return htmlspecialchars(
+        (string)($value ?? ''),
+        ENT_QUOTES,
+        'UTF-8'
+    );
+}
+
 function getVideoMimeType($url)
-    {
-        $path = parse_url( $url, PHP_URL_PATH ); $extension = strtolower( pathinfo( $path, PATHINFO_EXTENSION ) );
-     switch ($extension) 
-     { 
-        case 'webm': return 'video/webm'; 
-        case 'ogg': return 'video/ogg';
-        case 'mov': return 'video/quicktime';
-        case 'm4v': return 'video/mp4'; 
-        case 'mp4': default: return 'video/mp4'; 
-     }
-    } 
-/* |-------------------------------------------------------------------------- 
-| FIRST EVENT |
--------------------------------------------------------------------------- */ 
-$firstEvent = !empty($events) ? $events[0] : null;
-$firstType = $firstEvent ? $firstEvent['type'] : '';
-$firstFile = $firstEvent ? $firstEvent['file_url'] : ''; 
-$firstTitle = $firstEvent ? $firstEvent['title'] : ''; 
-$firstThumbnail = $firstEvent ? $firstEvent['thumbnail_url'] : ''; 
-$firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : ''; 
-?> 
-<!DOCTYPE html> 
+{
+    $path = parse_url(
+        $url,
+        PHP_URL_PATH
+    );
+
+    $extension = strtolower(
+        pathinfo(
+            $path,
+            PATHINFO_EXTENSION
+        )
+    );
+
+    switch ($extension) {
+
+        case 'webm':
+            return 'video/webm';
+
+        case 'ogg':
+            return 'video/ogg';
+
+        case 'mov':
+            return 'video/quicktime';
+
+        case 'm4v':
+            return 'video/mp4';
+
+        case 'mp4':
+        default:
+            return 'video/mp4';
+    }
+}
+
+$firstEvent = !empty($events)
+    ? $events[0]
+    : null;
+
+$firstType = $firstEvent
+    ? $firstEvent['type']
+    : '';
+
+$firstFile = $firstEvent
+    ? $firstEvent['file_url']
+    : '';
+
+$firstTitle = $firstEvent
+    ? $firstEvent['title']
+    : '';
+
+$firstThumbnail = $firstEvent
+    ? $firstEvent['thumbnail_url']
+    : '';
+
+$firstMimeType =
+    $firstType === 'video'
+        ? getVideoMimeType($firstFile)
+        : '';
+
+?>
+
+<!DOCTYPE html>
+
 <html lang="en">
-    <head>
+
+<head>
+
 <meta charset="UTF-8">
 
 <meta
@@ -54,233 +118,121 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
     ABAA Entertainment
 </title>
 
-
 <link
     rel="stylesheet"
     href="/style.css"
 >
-
 
 <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
 >
 
-
 <style>
 
-    /*
-    |--------------------------------------------------------------------------
-    | FEATURED VIDEO
-    |--------------------------------------------------------------------------
-    */
+.featured-event {
+    position: relative;
+}
 
-    .featured-event {
-        position: relative;
-    }
+.featured-event video,
+.featured-event > img {
+    width: 100%;
+    display: block;
+}
 
+.featured-play-button {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 70px;
+    height: 70px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 90, 31, .95);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 20;
+    box-shadow: 0 8px 30px rgba(0,0,0,.30);
+    transition:
+        transform .2s ease,
+        background .2s ease;
+}
 
-    .featured-event video,
-    .featured-event > img {
-        width: 100%;
-        display: block;
-    }
+.featured-play-button:hover {
+    transform:
+        translate(-50%, -50%)
+        scale(1.08);
+    background: #ff4510;
+}
 
+.featured-play-button i {
+    font-size: 25px;
+    margin-left: 4px;
+}
 
-    /*
-    |--------------------------------------------------------------------------
-    | PLAY BUTTON
-    |--------------------------------------------------------------------------
-    */
+.video-thumbnail {
+    position: relative;
+}
 
-    .featured-play-button {
-        position: absolute;
+.video-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
 
-        left: 50%;
-        top: 50%;
+.video-thumbnail-play {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 90, 31, .92);
+    color: white;
+}
 
-        transform: translate(
-            -50%,
-            -50%
-        );
+.featured-video-loading {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 4px solid rgba(255, 255, 255, .35);
+    border-top-color: #ff5a1f;
+    animation: featuredVideoSpin .8s linear infinite;
+    z-index: 30;
+    display: none;
+}
 
-        width: 70px;
-        height: 70px;
+@keyframes featuredVideoSpin {
 
-        border: none;
-        border-radius: 50%;
-
-        background: rgba(
-            255,
-            90,
-            31,
-            .95
-        );
-
-        color: white;
-
-        display: flex;
-
-        align-items: center;
-        justify-content: center;
-
-        cursor: pointer;
-
-        z-index: 20;
-
-        box-shadow:
-            0 8px 30px
-            rgba(0,0,0,.30);
-
-        transition:
-            transform .2s ease,
-            background .2s ease;
-    }
-
-
-    .featured-play-button:hover {
-
+    to {
         transform:
-            translate(
-                -50%,
-                -50%
-            )
-            scale(1.08);
-
-        background:
-            #ff4510;
+            translate(-50%, -50%)
+            rotate(360deg);
     }
 
-
-    .featured-play-button i {
-
-        font-size: 25px;
-
-        margin-left: 4px;
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | VIDEO THUMBNAIL
-    |--------------------------------------------------------------------------
-    */
-
-    .video-thumbnail {
-        position: relative;
-    }
-
-
-    .video-thumbnail img {
-
-        width: 100%;
-        height: 100%;
-
-        object-fit: cover;
-
-        display: block;
-    }
-
-
-    .video-thumbnail-play {
-
-        position: absolute;
-
-        left: 50%;
-        top: 50%;
-
-        transform:
-            translate(
-                -50%,
-                -50%
-            );
-
-        width: 42px;
-        height: 42px;
-
-        border-radius: 50%;
-
-        display: flex;
-
-        align-items: center;
-        justify-content: center;
-
-        background:
-            rgba(
-                255,
-                90,
-                31,
-                .92
-            );
-
-        color: white;
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | VIDEO LOADING
-    |--------------------------------------------------------------------------
-    */
-
-    .featured-video-loading {
-
-        position: absolute;
-
-        left: 50%;
-        top: 50%;
-
-        transform:
-            translate(
-                -50%,
-                -50%
-            );
-
-        width: 48px;
-        height: 48px;
-
-        border-radius: 50%;
-
-        border:
-            4px solid
-            rgba(
-                255,
-                255,
-                255,
-                .35
-            );
-
-        border-top-color:
-            #ff5a1f;
-
-        animation:
-            featuredVideoSpin
-            .8s linear infinite;
-
-        z-index: 30;
-
-        display: none;
-    }
-
-
-    @keyframes featuredVideoSpin {
-
-        to {
-
-            transform:
-                translate(
-                    -50%,
-                    -50%
-                )
-                rotate(360deg);
-
-        }
-
-    }
+}
 
 </style>
 
-</head> <body> <!-- ================================================== HEADER ================================================== --> <header class="header">
+</head>
+
+<body>
+
+<header class="header">
+
 <a
     href="/"
     class="logo"
@@ -292,7 +244,6 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
     >
 
 </a>
-
 
 <nav>
 
@@ -322,13 +273,15 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
 </nav>
 
-</header> <!-- ================================================== ABOUT HERO ================================================== --> <section class="about-hero">
+</header>
+
+<section class="about-hero">
+
 <div class="about-hero-content">
 
     <p class="small-title">
         ABAA ENTERTAINMENT
     </p>
-
 
     <h1>
 
@@ -344,7 +297,6 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
     </h1>
 
-
     <p class="hero-description">
 
         We create unforgettable experiences through
@@ -355,10 +307,9 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
 </div>
 
-</section> <main class="main-container">
-<!-- ==================================================
-     ABOUT / LOGO
-================================================== -->
+</section>
+
+<main class="main-container">
 
 <section class="big-box">
 
@@ -369,12 +320,6 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
 </section>
 
-
-
-<!-- ==================================================
-     SERVICES
-================================================== -->
-
 <section
     class="services"
     id="services"
@@ -384,7 +329,6 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
         Services
     </h2>
 
-
     <p class="services-description">
 
         Professional entertainment and event services
@@ -392,9 +336,7 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
     </p>
 
-
     <div class="boxes">
-
 
         <a
             href="/service?service=led-wall"
@@ -412,7 +354,6 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
         </a>
 
-
         <a
             href="/service?service=lights-sound"
             class="image-button"
@@ -428,7 +369,6 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
             </div>
 
         </a>
-
 
         <a
             href="/service?service=live-feed"
@@ -446,7 +386,6 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
         </a>
 
-
         <a
             href="/service?service=stage"
             class="image-button"
@@ -463,7 +402,6 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
         </a>
 
-
         <a
             href="/service?service=music-studio"
             class="image-button"
@@ -479,7 +417,6 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
             </div>
 
         </a>
-
 
         <a
             href="/service?service=trusses"
@@ -501,12 +438,6 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
 </section>
 
-
-
-<!-- ==================================================
-     EVENTS
-================================================== -->
-
 <section
     class="events"
     id="events"
@@ -516,7 +447,6 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
         Events
     </h2>
 
-
     <p class="events-description">
 
         Explore our latest events, performances,
@@ -524,14 +454,7 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
     </p>
 
-
-
     <?php if (empty($events)): ?>
-
-
-        <!-- ==================================================
-             NO EVENTS
-        ================================================== -->
 
         <div class="featured-event">
 
@@ -540,7 +463,6 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
                 src="/logo.png"
                 alt="ABAA Entertainment"
             >
-
 
             <video
                 id="featuredVideo"
@@ -555,7 +477,6 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
             </video>
 
-
             <button
                 type="button"
                 id="featuredPlayButton"
@@ -569,7 +490,6 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
             </button>
 
-
             <div
                 class="featured-title"
                 id="featuredTitle"
@@ -581,24 +501,12 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
         </div>
 
-
-
     <?php else: ?>
-
-
-        <!-- ==================================================
-             FEATURED EVENT
-        ================================================== -->
 
         <div
             class="featured-event"
             id="featuredEvent"
         >
-
-
-            <!-- ==========================================
-                 FEATURED IMAGE
-            =========================================== -->
 
             <img
                 id="featuredImage"
@@ -619,11 +527,6 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
                     : ''
                 ?>
             >
-
-
-            <!-- ==========================================
-                 FEATURED VIDEO
-            =========================================== -->
 
             <video
                 id="featuredVideo"
@@ -649,26 +552,15 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
                 <?php endif; ?>
 
-
                 Your browser does not support
                 the video tag.
 
             </video>
 
-
-            <!-- ==========================================
-                 LOADING SPINNER
-            =========================================== -->
-
             <div
                 id="featuredVideoLoading"
                 class="featured-video-loading"
             ></div>
-
-
-            <!-- ==========================================
-                 PLAY BUTTON
-            =========================================== -->
 
             <button
                 type="button"
@@ -689,11 +581,6 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
             </button>
 
-
-            <!-- ==========================================
-                 FEATURED TITLE
-            =========================================== -->
-
             <div
                 class="featured-title"
                 id="featuredTitle"
@@ -705,19 +592,11 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
         </div>
 
-
-
-        <!-- ==================================================
-             EVENT THUMBNAILS
-        ================================================== -->
-
         <div class="event-thumbnails">
-
 
             <?php foreach (
                 $events as $index => $event
             ): ?>
-
 
                 <?php
 
@@ -742,7 +621,6 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
                 ?>
 
-
                 <button
                     type="button"
                     class="event-thumbnail <?= $index === 0
@@ -751,57 +629,39 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
                     ?>"
                     onclick="showEvent(
                         <?= htmlspecialchars(
-                            json_encode(
-                                $eventType
-                            ),
+                            json_encode($eventType),
                             ENT_QUOTES,
                             'UTF-8'
                         ) ?>,
                         <?= htmlspecialchars(
-                            json_encode(
-                                $eventFile
-                            ),
+                            json_encode($eventFile),
                             ENT_QUOTES,
                             'UTF-8'
                         ) ?>,
                         <?= htmlspecialchars(
-                            json_encode(
-                                $eventTitle
-                            ),
+                            json_encode($eventTitle),
                             ENT_QUOTES,
                             'UTF-8'
                         ) ?>,
                         this,
                         <?= htmlspecialchars(
-                            json_encode(
-                                $eventThumbnail
-                            ),
+                            json_encode($eventThumbnail),
                             ENT_QUOTES,
                             'UTF-8'
                         ) ?>,
                         <?= htmlspecialchars(
-                            json_encode(
-                                $eventMimeType
-                            ),
+                            json_encode($eventMimeType),
                             ENT_QUOTES,
                             'UTF-8'
                         ) ?>
                     )"
                 >
 
-
                     <?php if (
                         $eventType === 'video'
                     ): ?>
 
-
-                        <!-- ==================================
-                             VIDEO THUMBNAIL
-                        =================================== -->
-
-                        <div
-                            class="video-thumbnail"
-                        >
+                        <div class="video-thumbnail">
 
                             <img
                                 src="<?= e(
@@ -812,7 +672,6 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
                                     $eventTitle
                                 ) ?>"
                             >
-
 
                             <span
                                 class="video-thumbnail-play"
@@ -826,13 +685,7 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
                         </div>
 
-
                     <?php else: ?>
-
-
-                        <!-- ==================================
-                             IMAGE THUMBNAIL
-                        =================================== -->
 
                         <img
                             src="<?= e(
@@ -843,13 +696,7 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
                             ) ?>"
                         >
 
-
                     <?php endif; ?>
-
-
-                    <!-- ======================================
-                         THUMBNAIL TITLE
-                    ======================================= -->
 
                     <span class="event-thumbnail-title">
 
@@ -859,24 +706,21 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
                     </span>
 
-
                 </button>
-
 
             <?php endforeach; ?>
 
-
         </div>
-
 
     <?php endif; ?>
 
-
 </section>
 
-</main> <!-- ================================================== FOOTER ================================================== --> <footer class="footer">
-<div class="footer-container">
+</main>
 
+<footer class="footer">
+
+<div class="footer-container">
 
     <div class="footer-section footer-brand">
 
@@ -895,8 +739,6 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
         </p>
 
     </div>
-
-
 
     <div class="footer-section">
 
@@ -928,8 +770,6 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
         </a>
 
     </div>
-
-
 
     <div class="footer-section">
 
@@ -963,14 +803,11 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
     </div>
 
-
-
     <div class="footer-section">
 
         <h3>
             Contact Us
         </h3>
-
 
         <a
             href="https://www.google.com/maps/place/ABAA+Entertainment/@14.4652755,121.1915078,19z"
@@ -990,7 +827,6 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
         </a>
 
-
         <a
             href="tel:+639231476552"
             class="contact-item"
@@ -1003,7 +839,6 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
             </span>
 
         </a>
-
 
         <a
             href="mailto:abaaentertainment@gmail.com"
@@ -1018,9 +853,7 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
         </a>
 
-
         <div class="social-links">
-
 
             <a
                 href="https://www.facebook.com/ABAAEntertainment"
@@ -1033,7 +866,6 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
             </a>
 
-
             <a
                 href="#"
                 aria-label="Instagram"
@@ -1042,7 +874,6 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
                 <i class="fa-brands fa-instagram"></i>
 
             </a>
-
 
             <a
                 href="https://www.tiktok.com/@markebpmbta?_r=1&_t=ZS-99DpdJXY5sD"
@@ -1055,15 +886,11 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
             </a>
 
-
         </div>
 
     </div>
 
-
 </div>
-
-
 
 <div class="footer-bottom">
 
@@ -1075,7 +902,6 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
     </p>
 
-
     <p>
 
         Entertainment • Events • Experiences
@@ -1084,9 +910,15 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
 </div>
 
-</footer> <!-- ================================================== BOOKING MODAL ================================================== --> <div class="booking-overlay" id="bookingModal" aria-hidden="true" >
-<div class="booking-modal">
+</footer>
 
+<div
+    class="booking-overlay"
+    id="bookingModal"
+    aria-hidden="true"
+>
+
+<div class="booking-modal">
 
     <button
         type="button"
@@ -1098,7 +930,6 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
         <i class="fa-solid fa-xmark"></i>
 
     </button>
-
 
     <div class="booking-header">
 
@@ -1119,17 +950,13 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
     </div>
 
-
-
     <form
         action="/booking"
         method="POST"
         class="booking-form"
     >
 
-
         <div class="form-row">
-
 
             <div class="form-group">
 
@@ -1146,7 +973,6 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
                 >
 
             </div>
-
 
             <div class="form-group">
 
@@ -1166,10 +992,7 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
         </div>
 
-
-
         <div class="form-row">
-
 
             <div class="form-group">
 
@@ -1186,7 +1009,6 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
                 >
 
             </div>
-
 
             <div class="form-group">
 
@@ -1206,10 +1028,7 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
         </div>
 
-
-
         <div class="form-row">
-
 
             <div class="form-group">
 
@@ -1263,7 +1082,6 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
             </div>
 
-
             <div class="form-group">
 
                 <label for="booking_date">
@@ -1279,10 +1097,7 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
             </div>
 
-
         </div>
-
-
 
         <div class="form-group">
 
@@ -1300,17 +1115,13 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
         </div>
 
-
-
         <div class="form-group">
 
             <label>
                 Services Needed
             </label>
 
-
             <div class="service-checkboxes">
-
 
                 <label class="service-checkbox">
 
@@ -1326,7 +1137,6 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
                 </label>
 
-
                 <label class="service-checkbox">
 
                     <input
@@ -1340,7 +1150,6 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
                     </span>
 
                 </label>
-
 
                 <label class="service-checkbox">
 
@@ -1356,7 +1165,6 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
                 </label>
 
-
                 <label class="service-checkbox">
 
                     <input
@@ -1370,7 +1178,6 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
                     </span>
 
                 </label>
-
 
                 <label class="service-checkbox">
 
@@ -1386,7 +1193,6 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
                 </label>
 
-
                 <label class="service-checkbox">
 
                     <input
@@ -1400,7 +1206,6 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
                     </span>
 
                 </label>
-
 
                 <label class="service-checkbox">
 
@@ -1416,12 +1221,9 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
                 </label>
 
-
             </div>
 
         </div>
-
-
 
         <div class="form-group">
 
@@ -1437,8 +1239,6 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
             ></textarea>
 
         </div>
-
-
 
         <button
             type="submit"
@@ -1457,47 +1257,516 @@ $firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : '';
 
 </div>
 
-</div> 
-    <!-- ================================================== JAVASCRIPT ================================================== --> 
-    <script> 
-        /* |-------------------------------------------------------------------------- | EVENT SWITCHER |-------------------------------------------------------------------------- | 
-        | This version completely resets the video element before | loading another event. | */ 
-        function showEvent( type, source, title, button, thumbnail, mimeType ) 
-        { 
-            const image = document.getElementById( "featuredImage" ); 
-            const video = document.getElementById( "featuredVideo" ); 
-            const videoSource = document.getElementById( "featuredVideoSource" ); 
-            const featuredTitle = document.getElementById( "featuredTitle" ); 
-            const playButton = document.getElementById( "featuredPlayButton" ); 
-            const loading = document.getElementById( "featuredVideoLoading" ); 
-            /* |-------------------------------------------------------------------------- | CHECK ELEMENTS |-------------------------------------------------------------------------- */ 
-            if ( !image || !video || !featuredTitle ) 
-            { 
-                console.error( "Featured event elements are missing." ); 
-                return; 
-            } 
-            /* |-------------------------------------------------------------------------- | REMOVE ACTIVE FROM ALL THUMBNAILS |-------------------------------------------------------------------------- */
-            document .querySelectorAll( ".event-thumbnail" ) .forEach( function(item) 
-            { 
-                item.classList.remove( "active" ); 
-            } ); 
-            /* |-------------------------------------------------------------------------- | ACTIVE THUMBNAIL |-------------------------------------------------------------------------- */ 
-            if (button) 
-            { button.classList.add( "active" ); } 
-                /* |-------------------------------------------------------------------------- | UPDATE TITLE |-------------------------------------------------------------------------- */ 
-            featuredTitle.textContent = title;
-            /* |-------------------------------------------------------------------------- | STOP CURRENT VIDEO |-------------------------------------------------------------------------- */ 
-            try 
-            { 
-                video.pause(); 
-            } 
-            catch (error) 
-            { 
-                console.log( "Could not pause video:", error ); 
-            } 
-            /* |-------------------------------------------------------------------------- | RESET VIDEO |-------------------------------------------------------------------------- */ 
-            video.removeAttribute( "src" ); if (videoSource) { videoSource.removeAttribute( "src" ); videoSource.removeAttribute( "type" ); } video.load(); 
-            /* |-------------------------------------------------------------------------- | HIDE LOADING |-------------------------------------------------------------------------- */ 
-            if (loading) { loading.style.display = "none"; } 
-                /* |-------------------------------------------------------------------------- | IMAGE EVENT |-------------------------------------------------------------------------- */ 
-            if (type === "image") { /* | Show image */ image.src = source; image.alt = title; image.style.display = "block"; /* | Hide video */ video.style.display = "none"; /* | Hide play button */ if (playButton) { playButton.style.display = "none"; } return; } /* |-------------------------------------------------------------------------- | VIDEO EVENT |-------------------------------------------------------------------------- */ if (type === "video") { /* |-------------------------------------------------------------------------- | SET VIDEO THUMBNAIL |-------------------------------------------------------------------------- */ if (thumbnail) { image.src = thumbnail; image.alt = title; image.style.display = "block"; } else { image.style.display = "none"; } /* |-------------------------------------------------------------------------- | SET VIDEO SOURCE |-------------------------------------------------------------------------- | | We set the source directly on the video element. | This is more reliable when switching between videos. | */ video.src = source; /* |-------------------------------------------------------------------------- | MIME TYPE |-------------------------------------------------------------------------- */ if (mimeType) { video.type = mimeType; } /* |-------------------------------------------------------------------------- | LOAD VIDEO |-------------------------------------------------------------------------- */ video.load(); /* |-------------------------------------------------------------------------- | VIDEO HAS THUMBNAIL |-------------------------------------------------------------------------- */ if (thumbnail) { /* | Keep video hidden until user presses play. */ video.style.display = "none"; /* | Show play button. */ if (playButton) { playButton.style.display = "flex"; } } else { /* | No thumbnail. | | Show video directly. */ image.style.display = "none"; video.style.display = "block"; if (playButton) { playButton.style.display = "none"; } } } } /* |-------------------------------------------------------------------------- | PLAY FEATURED VIDEO |-------------------------------------------------------------------------- */ function playFeaturedVideo() { const image = document.getElementById( "featuredImage" ); const video = document.getElementById( "featuredVideo" ); const playButton = document.getElementById( "featuredPlayButton" ); const loading = document.getElementById( "featuredVideoLoading" ); /* |-------------------------------------------------------------------------- | CHECK VIDEO |-------------------------------------------------------------------------- */ if (!video) { console.error( "Featured video element not found." ); return; } /* |-------------------------------------------------------------------------- | HIDE THUMBNAIL |-------------------------------------------------------------------------- */ if (image) { image.style.display = "none"; } /* |-------------------------------------------------------------------------- | SHOW VIDEO |-------------------------------------------------------------------------- */ video.style.display = "block"; /* |-------------------------------------------------------------------------- | HIDE PLAY BUTTON |-------------------------------------------------------------------------- */ if (playButton) { playButton.style.display = "none"; } /* |-------------------------------------------------------------------------- | SHOW LOADING |-------------------------------------------------------------------------- */ if (loading) { loading.style.display = "block"; } /* |-------------------------------------------------------------------------- | AUDIO |-------------------------------------------------------------------------- */ video.muted = false; /* |-------------------------------------------------------------------------- | PLAY |-------------------------------------------------------------------------- */ const playPromise = video.play(); if ( playPromise !== undefined ) { playPromise .then( function() { if (loading) { loading.style.display = "none"; } } ) .catch( function(error) { if (loading) { loading.style.display = "none"; } console.error( "Video play failed:", error ); /* |-------------------------------------------------------------------------- | SHOW VIDEO AGAIN |-------------------------------------------------------------------------- */ video.style.display = "block"; } ); } } /* |-------------------------------------------------------------------------- | VIDEO EVENTS |-------------------------------------------------------------------------- */ document.addEventListener( "DOMContentLoaded", function() { const video = document.getElementById( "featuredVideo" ); const loading = document.getElementById( "featuredVideoLoading" ); const playButton = document.getElementById( "featuredPlayButton" ); if (!video) { return; } /* |-------------------------------------------------------------------------- | CAN PLAY |-------------------------------------------------------------------------- */ video.addEventListener( "canplay", function() { if (loading) { loading.style.display = "none"; } } ); /* |-------------------------------------------------------------------------- | WAITING |-------------------------------------------------------------------------- */ video.addEventListener( "waiting", function() { if ( video.style.display !== "none" ) { if (loading) { loading.style.display = "block"; } } } ); /* |-------------------------------------------------------------------------- | PLAYING |-------------------------------------------------------------------------- */ video.addEventListener( "playing", function() { if (loading) { loading.style.display = "none"; } } ); /* |-------------------------------------------------------------------------- | ENDED |-------------------------------------------------------------------------- */ video.addEventListener( "ended", function() { if (playButton) { /* | Do not automatically show | the thumbnail again. */ playButton.style.display = "none"; } } ); /* |-------------------------------------------------------------------------- | VIDEO ERROR |-------------------------------------------------------------------------- */ video.addEventListener( "error", function() { if (loading) { loading.style.display = "none"; } console.error( "================================" ); console.error( "VIDEO LOAD ERROR" ); console.error( "Video URL:", video.currentSrc ); console.error( "Video error:", video.error ); console.error( "================================" ); } ); } ); /* |-------------------------------------------------------------------------- | OPEN BOOKING MODAL |-------------------------------------------------------------------------- */ function openBookingModal(event) { if (event) { event.preventDefault(); } const modal = document.getElementById( "bookingModal" ); if (!modal) { return; } modal.classList.add( "active" ); modal.setAttribute( "aria-hidden", "false" ); document.body.style.overflow = "hidden"; } /* |-------------------------------------------------------------------------- | CLOSE BOOKING MODAL |-------------------------------------------------------------------------- */ function closeBookingModal() { const modal = document.getElementById( "bookingModal" ); if (!modal) { return; } modal.classList.remove( "active" ); modal.setAttribute( "aria-hidden", "true" ); document.body.style.overflow = ""; } /* |-------------------------------------------------------------------------- | CLICK OUTSIDE MODAL |-------------------------------------------------------------------------- */ document.addEventListener( "click", function(event) { const modal = document.getElementById( "bookingModal" ); if ( modal && event.target === modal ) { closeBookingModal(); } } ); /* |-------------------------------------------------------------------------- | ESC KEY |-------------------------------------------------------------------------- */ document.addEventListener( "keydown", function(event) { if ( event.key === "Escape" ) { closeBookingModal(); } } ); </script> </body> </html>
+</div>
+
+<script>
+
+function showEvent(
+    type,
+    source,
+    title,
+    button,
+    thumbnail,
+    mimeType
+) {
+
+    const image =
+        document.getElementById(
+            "featuredImage"
+        );
+
+    const video =
+        document.getElementById(
+            "featuredVideo"
+        );
+
+    const featuredTitle =
+        document.getElementById(
+            "featuredTitle"
+        );
+
+    const playButton =
+        document.getElementById(
+            "featuredPlayButton"
+        );
+
+    const loading =
+        document.getElementById(
+            "featuredVideoLoading"
+        );
+
+    if (
+        !image ||
+        !video ||
+        !featuredTitle
+    ) {
+
+        console.error(
+            "Featured event elements are missing."
+        );
+
+        return;
+    }
+
+    document
+        .querySelectorAll(
+            ".event-thumbnail"
+        )
+        .forEach(
+            function(item) {
+
+                item.classList.remove(
+                    "active"
+                );
+
+            }
+        );
+
+    if (button) {
+
+        button.classList.add(
+            "active"
+        );
+
+    }
+
+    featuredTitle.textContent =
+        title;
+
+    try {
+
+        video.pause();
+
+    } catch (error) {
+
+        console.log(
+            "Could not pause video:",
+            error
+        );
+
+    }
+
+    video.removeAttribute(
+        "src"
+    );
+
+    video.load();
+
+    if (loading) {
+
+        loading.style.display =
+            "none";
+
+    }
+
+    if (type === "image") {
+
+        image.src =
+            source;
+
+        image.alt =
+            title;
+
+        image.style.display =
+            "block";
+
+        video.style.display =
+            "none";
+
+        if (playButton) {
+
+            playButton.style.display =
+                "none";
+
+        }
+
+        return;
+    }
+
+    if (type === "video") {
+
+        if (thumbnail) {
+
+            image.src =
+                thumbnail;
+
+            image.alt =
+                title;
+
+            image.style.display =
+                "block";
+
+        } else {
+
+            image.style.display =
+                "none";
+
+        }
+
+        video.src =
+            source;
+
+        if (mimeType) {
+
+            video.setAttribute(
+                "type",
+                mimeType
+            );
+
+        }
+
+        video.load();
+
+        if (thumbnail) {
+
+            video.style.display =
+                "none";
+
+            if (playButton) {
+
+                playButton.style.display =
+                    "flex";
+
+            }
+
+        } else {
+
+            image.style.display =
+                "none";
+
+            video.style.display =
+                "block";
+
+            if (playButton) {
+
+                playButton.style.display =
+                    "none";
+
+            }
+
+        }
+
+    }
+
+}
+
+function playFeaturedVideo()
+{
+
+    const image =
+        document.getElementById(
+            "featuredImage"
+        );
+
+    const video =
+        document.getElementById(
+            "featuredVideo"
+        );
+
+    const playButton =
+        document.getElementById(
+            "featuredPlayButton"
+        );
+
+    const loading =
+        document.getElementById(
+            "featuredVideoLoading"
+        );
+
+    if (!video) {
+
+        return;
+
+    }
+
+    if (image) {
+
+        image.style.display =
+            "none";
+
+    }
+
+    video.style.display =
+        "block";
+
+    if (playButton) {
+
+        playButton.style.display =
+            "none";
+
+    }
+
+    if (loading) {
+
+        loading.style.display =
+            "block";
+
+    }
+
+    video.muted =
+        false;
+
+    const playPromise =
+        video.play();
+
+    if (
+        playPromise !== undefined
+    ) {
+
+        playPromise
+            .then(
+                function() {
+
+                    if (loading) {
+
+                        loading.style.display =
+                            "none";
+
+                    }
+
+                }
+            )
+            .catch(
+                function(error) {
+
+                    if (loading) {
+
+                        loading.style.display =
+                            "none";
+
+                    }
+
+                    console.error(
+                        "Video play failed:",
+                        error
+                    );
+
+                }
+            );
+
+    }
+
+}
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+        const video =
+            document.getElementById(
+                "featuredVideo"
+            );
+
+        const loading =
+            document.getElementById(
+                "featuredVideoLoading"
+            );
+
+        const playButton =
+            document.getElementById(
+                "featuredPlayButton"
+            );
+
+        if (!video) {
+
+            return;
+
+        }
+
+        video.addEventListener(
+            "canplay",
+            function() {
+
+                if (loading) {
+
+                    loading.style.display =
+                        "none";
+
+                }
+
+            }
+        );
+
+        video.addEventListener(
+            "waiting",
+            function() {
+
+                if (
+                    video.style.display !==
+                    "none"
+                ) {
+
+                    if (loading) {
+
+                        loading.style.display =
+                            "block";
+
+                    }
+
+                }
+
+            }
+        );
+
+        video.addEventListener(
+            "playing",
+            function() {
+
+                if (loading) {
+
+                    loading.style.display =
+                        "none";
+
+                }
+
+            }
+        );
+
+        video.addEventListener(
+            "ended",
+            function() {
+
+                if (playButton) {
+
+                    playButton.style.display =
+                        "none";
+
+                }
+
+            }
+        );
+
+        video.addEventListener(
+            "error",
+            function() {
+
+                if (loading) {
+
+                    loading.style.display =
+                        "none";
+
+                }
+
+                console.error(
+                    "VIDEO LOAD ERROR"
+                );
+
+                console.error(
+                    "Video URL:",
+                    video.currentSrc
+                );
+
+                console.error(
+                    "Video error:",
+                    video.error
+                );
+
+            }
+        );
+
+    }
+);
+
+function openBookingModal(event)
+{
+
+    if (event) {
+
+        event.preventDefault();
+
+    }
+
+    const modal =
+        document.getElementById(
+            "bookingModal"
+        );
+
+    if (!modal) {
+
+        return;
+
+    }
+
+    modal.classList.add(
+        "active"
+    );
+
+    modal.setAttribute(
+        "aria-hidden",
+        "false"
+    );
+
+    document.body.style.overflow =
+        "hidden";
+
+}
+
+function closeBookingModal()
+{
+
+    const modal =
+        document.getElementById(
+            "bookingModal"
+        );
+
+    if (!modal) {
+
+        return;
+
+    }
+
+    modal.classList.remove(
+        "active"
+    );
+
+    modal.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+    document.body.style.overflow =
+        "";
+
+}
+
+document.addEventListener(
+    "click",
+    function(event) {
+
+        const modal =
+            document.getElementById(
+                "bookingModal"
+            );
+
+        if (
+            modal &&
+            event.target === modal
+        ) {
+
+            closeBookingModal();
+
+        }
+
+    }
+);
+
+document.addEventListener(
+    "keydown",
+    function(event) {
+
+        if (
+            event.key === "Escape"
+        ) {
+
+            closeBookingModal();
+
+        }
+
+    }
+);
+
+</script>
+
+</body>
+
+</html>
