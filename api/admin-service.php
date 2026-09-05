@@ -226,139 +226,24 @@ function parseDetails($details)
 
 /*
 |--------------------------------------------------------------------------
-| VALIDATE UPLOAD
-|--------------------------------------------------------------------------
-*/
-
-function validateServiceImage($file)
-{
-    if (
-        !isset($file) ||
-        !is_array($file)
-    ) {
-        return [
-            'success' => false,
-            'error' => 'No image was uploaded.'
-        ];
-    }
-
-    if (
-        !isset($file['error']) ||
-        $file['error'] !== UPLOAD_ERR_OK
-    ) {
-
-        $error = $file['error'] ?? UPLOAD_ERR_NO_FILE;
-
-        $messages = [
-            UPLOAD_ERR_INI_SIZE =>
-                'The uploaded image is too large for the server.',
-            UPLOAD_ERR_FORM_SIZE =>
-                'The uploaded image is too large.',
-            UPLOAD_ERR_PARTIAL =>
-                'The image upload was incomplete.',
-            UPLOAD_ERR_NO_FILE =>
-                'Please select an image.',
-            UPLOAD_ERR_NO_TMP_DIR =>
-                'Server temporary upload directory is missing.',
-            UPLOAD_ERR_CANT_WRITE =>
-                'Server could not write the uploaded image.',
-            UPLOAD_ERR_EXTENSION =>
-                'The image upload was blocked by a server extension.'
-        ];
-
-        return [
-            'success' => false,
-            'error' =>
-                $messages[$error] ??
-                'Image upload failed.'
-        ];
-    }
-
-    if (
-        empty($file['tmp_name']) ||
-        !is_uploaded_file($file['tmp_name'])
-    ) {
-        return [
-            'success' => false,
-            'error' => 'Invalid uploaded image.'
-        ];
-    }
-
-    $maxSize = 10 * 1024 * 1024;
-
-    if (
-        isset($file['size']) &&
-        (int)$file['size'] > $maxSize
-    ) {
-        return [
-            'success' => false,
-            'error' =>
-                'Image is too large. Maximum size is 10MB.'
-        ];
-    }
-
-    $imageInfo = @getimagesize(
-        $file['tmp_name']
-    );
-
-    if ($imageInfo === false) {
-        return [
-            'success' => false,
-            'error' => 'The uploaded file is not a valid image.'
-        ];
-    }
-
-    $mimeType = $imageInfo['mime'] ?? '';
-
-    $allowedMimeTypes = [
-        'image/jpeg' => 'jpg',
-        'image/png'  => 'png',
-        'image/webp' => 'webp'
-    ];
-
-    if (
-        !isset(
-            $allowedMimeTypes[$mimeType]
-        )
-    ) {
-        return [
-            'success' => false,
-            'error' =>
-                'Invalid image type. Only JPG, PNG, and WEBP are allowed.'
-        ];
-    }
-
-    return [
-        'success' => true,
-        'mime' => $mimeType,
-        'extension' =>
-            $allowedMimeTypes[$mimeType]
-    ];
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| CREATE SAFE BLOB FILE NAME
+| GENERATE SAFE BLOB FILE NAME
 |--------------------------------------------------------------------------
 |
 | IMPORTANT:
-| Service images are uploaded directly to the ROOT
-| of the existing Vercel Blob storage.
+| NO services/ FOLDER IS USED.
 |
-| NO "services/" FOLDER IS CREATED.
+| Files will look like:
+|
+| LED-Wall-a83f92d1.jpg
 |
 */
 
-function createBlobFileName(
-    $name,
-    $extension
-) {
-
+function createBlobFileName($serviceName, $extension)
+{
     $safeName = preg_replace(
         '/[^a-zA-Z0-9_-]+/',
         '-',
-        $name
+        $serviceName
     );
 
     $safeName = trim(
@@ -376,7 +261,7 @@ function createBlobFileName(
             random_bytes(8)
         ) .
         '.' .
-        $extension;
+        strtolower($extension);
 }
 
 
@@ -384,6 +269,11 @@ function createBlobFileName(
 |--------------------------------------------------------------------------
 | BLOB UPLOAD
 |--------------------------------------------------------------------------
+|
+| Uploads directly to Blob root.
+|
+| NO services/ DIRECTORY.
+|
 */
 
 function uploadToVercelBlob(
@@ -393,7 +283,7 @@ function uploadToVercelBlob(
     $blobToken
 ) {
 
-    if (empty($blobToken)) {
+    if (!$blobToken) {
 
         return [
             'success' => false,
@@ -402,15 +292,12 @@ function uploadToVercelBlob(
         ];
     }
 
-    if (
-        empty($tmpFile) ||
-        !is_file($tmpFile)
-    ) {
+    if (!is_file($tmpFile)) {
 
         return [
             'success' => false,
             'error' =>
-                'Temporary upload file was not found.'
+                'Temporary uploaded file was not found.'
         ];
     }
 
@@ -423,26 +310,21 @@ function uploadToVercelBlob(
         return [
             'success' => false,
             'error' =>
-                'Unable to read uploaded image.'
+                'Unable to read uploaded file.'
         ];
     }
-
 
     /*
     |--------------------------------------------------------------------------
     | IMPORTANT
     |--------------------------------------------------------------------------
-    | File is uploaded directly to Blob root.
     |
-    | Example:
+    | File is uploaded directly to:
     |
-    | https://....blob.vercel-storage.com/
-    | LED-Wall-a83f21c9.jpg
+    | https://blob.vercel-storage.com/FILENAME
     |
-    | NOT:
+    | There is NO services/ prefix.
     |
-    | /services/LED-Wall-a83f21c9.jpg
-    |--------------------------------------------------------------------------
     */
 
     $url =
@@ -457,7 +339,7 @@ function uploadToVercelBlob(
         return [
             'success' => false,
             'error' =>
-                'Unable to initialize Blob upload.'
+                'Unable to initialize Blob connection.'
         ];
     }
 
@@ -470,11 +352,14 @@ function uploadToVercelBlob(
             CURLOPT_POSTFIELDS =>
                 $fileContents,
 
-            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_RETURNTRANSFER =>
+                true,
 
-            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_FOLLOWLOCATION =>
+                true,
 
             CURLOPT_HTTPHEADER => [
+
                 'Authorization: Bearer ' .
                     $blobToken,
 
@@ -484,38 +369,33 @@ function uploadToVercelBlob(
                 'x-api-version: 7',
 
                 'x-content-type: ' .
-                    $mimeType
+                    $mimeType,
             ],
 
             CURLOPT_TIMEOUT => 300,
 
             CURLOPT_CONNECTTIMEOUT => 30,
-
-            CURLOPT_SSL_VERIFYPEER => true,
-
-            CURLOPT_SSL_VERIFYHOST => 2
         ]
     );
 
 
-    $response = curl_exec($ch);
+    $response =
+        curl_exec($ch);
 
-    $curlError = curl_error($ch);
+    $curlError =
+        curl_error($ch);
 
-    $httpCode = curl_getinfo(
-        $ch,
-        CURLINFO_HTTP_CODE
-    );
+    $httpCode =
+        curl_getinfo(
+            $ch,
+            CURLINFO_HTTP_CODE
+        );
+
 
     curl_close($ch);
 
 
     if ($response === false) {
-
-        error_log(
-            'Vercel Blob CURL error: ' .
-            $curlError
-        );
 
         return [
             'success' => false,
@@ -532,7 +412,7 @@ function uploadToVercelBlob(
     ) {
 
         error_log(
-            'Vercel Blob upload error. HTTP ' .
+            'Vercel Blob upload error: HTTP ' .
             $httpCode .
             ' Response: ' .
             $response
@@ -542,71 +422,72 @@ function uploadToVercelBlob(
             'success' => false,
             'error' =>
                 'Vercel Blob rejected the upload. HTTP ' .
-                $httpCode
+                $httpCode .
+                '.'
         ];
     }
 
 
-    $data = json_decode(
-        $response,
-        true
-    );
+    $data =
+        json_decode(
+            $response,
+            true
+        );
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | BLOB RESPONSE
-    |--------------------------------------------------------------------------
-    */
+    if (!is_array($data)) {
 
-    if (is_array($data)) {
+        return [
+            'success' => false,
+            'error' =>
+                'Invalid response from Vercel Blob.'
+        ];
+    }
 
-        $blobUrl =
-            $data['url'] ??
-            $data['downloadUrl'] ??
-            null;
 
-        if ($blobUrl) {
+    $blobUrl =
+        $data['url'] ??
+        $data['downloadUrl'] ??
+        null;
 
-            return [
-                'success' => true,
-                'url' => $blobUrl
-            ];
+
+    if (!$blobUrl) {
+
+        /*
+        |--------------------------------------------------------------------------
+        | Some Blob responses may return a URL-like field.
+        |--------------------------------------------------------------------------
+        */
+
+        if (
+            isset($data['pathname']) &&
+            isset($data['url'])
+        ) {
+
+            $blobUrl =
+                $data['url'];
         }
     }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | SOME BLOB RESPONSES MAY RETURN THE URL DIRECTLY
-    |--------------------------------------------------------------------------
-    */
+    if (!$blobUrl) {
 
-    if (
-        is_string($response) &&
-        filter_var(
-            trim($response),
-            FILTER_VALIDATE_URL
-        )
-    ) {
+        error_log(
+            'Vercel Blob response: ' .
+            $response
+        );
 
         return [
-            'success' => true,
-            'url' => trim($response)
+            'success' => false,
+            'error' =>
+                'Vercel Blob did not return a file URL.'
         ];
     }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | FALLBACK
-    |--------------------------------------------------------------------------
-    */
-
     return [
-        'success' => false,
-        'error' =>
-            'Blob upload succeeded but no image URL was returned.'
+        'success' => true,
+        'url' => $blobUrl
     ];
 }
 
@@ -630,9 +511,24 @@ function deleteFromVercelBlob(
     }
 
 
-    $ch = curl_init(
-        $blobUrl
-    );
+    /*
+    |--------------------------------------------------------------------------
+    | Only delete Vercel Blob URLs.
+    |--------------------------------------------------------------------------
+    */
+
+    if (
+        strpos(
+            $blobUrl,
+            'blob.vercel-storage.com'
+        ) === false
+    ) {
+        return false;
+    }
+
+
+    $ch =
+        curl_init($blobUrl);
 
 
     if ($ch === false) {
@@ -643,40 +539,39 @@ function deleteFromVercelBlob(
     curl_setopt_array(
         $ch,
         [
-            CURLOPT_CUSTOMREQUEST => 'DELETE',
+            CURLOPT_CUSTOMREQUEST =>
+                'DELETE',
 
-            CURLOPT_RETURNTRANSFER => true,
-
-            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_RETURNTRANSFER =>
+                true,
 
             CURLOPT_HTTPHEADER => [
+
                 'Authorization: Bearer ' .
                     $blobToken,
 
-                'x-api-version: 7'
+                'x-api-version: 7',
             ],
 
-            CURLOPT_TIMEOUT => 60
+            CURLOPT_TIMEOUT => 60,
         ]
     );
 
 
-    $response = curl_exec($ch);
+    $response =
+        curl_exec($ch);
 
-    $httpCode = curl_getinfo(
-        $ch,
-        CURLINFO_HTTP_CODE
-    );
+    $httpCode =
+        curl_getinfo(
+            $ch,
+            CURLINFO_HTTP_CODE
+        );
 
     curl_close($ch);
 
 
-    if ($response === false) {
-        return false;
-    }
-
-
     return (
+        $response !== false &&
         $httpCode >= 200 &&
         $httpCode < 300
     );
@@ -721,22 +616,24 @@ if (
     if ($serviceId <= 0) {
 
         $statusError =
-            'Invalid service.';
+            'Invalid service ID.';
 
     } else {
 
         try {
 
-            $stmt = $pdo->prepare(
-                "SELECT image_url
-                 FROM services
-                 WHERE id = :id
-                 LIMIT 1"
-            );
+            $stmt =
+                $pdo->prepare(
+                    "SELECT image_url
+                     FROM services
+                     WHERE id = :id
+                     LIMIT 1"
+                );
 
 
             $stmt->execute([
-                ':id' => $serviceId
+                ':id' =>
+                    $serviceId
             ]);
 
 
@@ -752,7 +649,6 @@ if (
                     'Service not found.';
 
             } else {
-
 
                 /*
                 |--------------------------------------------------------------------------
@@ -779,21 +675,22 @@ if (
                 |--------------------------------------------------------------------------
                 */
 
-                $stmt = $pdo->prepare(
-                    "DELETE FROM services
-                     WHERE id = :id"
-                );
+                $stmt =
+                    $pdo->prepare(
+                        "DELETE FROM services
+                         WHERE id = :id"
+                    );
 
 
                 $stmt->execute([
-                    ':id' => $serviceId
+                    ':id' =>
+                        $serviceId
                 ]);
 
 
                 $statusMessage =
                     'Service deleted successfully.';
             }
-
 
         } catch (PDOException $e) {
 
@@ -804,7 +701,8 @@ if (
 
 
             $statusError =
-                'Unable to delete service.';
+                'Unable to delete service: ' .
+                $e->getMessage();
         }
     }
 }
@@ -830,32 +728,33 @@ if (
     if ($serviceId <= 0) {
 
         $statusError =
-            'Invalid service.';
+            'Invalid service ID.';
 
     } else {
 
         try {
 
-            $stmt = $pdo->prepare(
-                "UPDATE services
-                 SET is_available =
-                    CASE
-                        WHEN is_available = 1
-                        THEN 0
-                        ELSE 1
-                    END
-                 WHERE id = :id"
-            );
+            $stmt =
+                $pdo->prepare(
+                    "UPDATE services
+                     SET is_available =
+                         CASE
+                             WHEN is_available = 1
+                             THEN 0
+                             ELSE 1
+                         END
+                     WHERE id = :id"
+                );
 
 
             $stmt->execute([
-                ':id' => $serviceId
+                ':id' =>
+                    $serviceId
             ]);
 
 
             $statusMessage =
                 'Service availability updated.';
-
 
         } catch (PDOException $e) {
 
@@ -866,7 +765,8 @@ if (
 
 
             $statusError =
-                'Unable to update availability.';
+                'Unable to update availability: ' .
+                $e->getMessage();
         }
     }
 }
@@ -940,13 +840,12 @@ if (
 
 
         foreach (
-            $detailsInput
-            as $detail
+            $detailsInput as $detail
         ) {
 
             $detail =
                 trim(
-                    (string)$detail
+                    $detail
                 );
 
 
@@ -963,6 +862,13 @@ if (
                 $details,
                 JSON_UNESCAPED_UNICODE
             );
+
+
+        if ($detailsJson === false) {
+
+            $detailsJson =
+                '[]';
+        }
 
 
         /*
@@ -986,18 +892,22 @@ if (
             |--------------------------------------------------------------------------
             */
 
-            $stmt = $pdo->prepare(
-                "SELECT id
-                 FROM services
-                 WHERE slug = :slug
-                 AND id != :id
-                 LIMIT 1"
-            );
+            $stmt =
+                $pdo->prepare(
+                    "SELECT id
+                     FROM services
+                     WHERE slug = :slug
+                     AND id != :id
+                     LIMIT 1"
+                );
 
 
             $stmt->execute([
-                ':slug' => $slug,
-                ':id' => $serviceId
+                ':slug' =>
+                    $slug,
+
+                ':id' =>
+                    $serviceId
             ]);
 
 
@@ -1023,16 +933,20 @@ if (
             if ($serviceId > 0) {
 
 
-                $stmt = $pdo->prepare(
-                    "SELECT *
-                     FROM services
-                     WHERE id = :id
-                     LIMIT 1"
-                );
+                $stmt =
+                    $pdo->prepare(
+                        "SELECT
+                            id,
+                            image_url
+                         FROM services
+                         WHERE id = :id
+                         LIMIT 1"
+                    );
 
 
                 $stmt->execute([
-                    ':id' => $serviceId
+                    ':id' =>
+                        $serviceId
                 ]);
 
 
@@ -1051,12 +965,12 @@ if (
 
 
                     $imageUrl =
-                        $existing['image_url'];
+                        $existing['image_url'] ?? null;
 
 
                     /*
                     |--------------------------------------------------------------------------
-                    | CHECK FOR NEW IMAGE
+                    | CHECK NEW IMAGE
                     |--------------------------------------------------------------------------
                     */
 
@@ -1067,148 +981,215 @@ if (
                         isset(
                             $_FILES['image']['error']
                         ) &&
-                        $_FILES['image']['error'] !==
-                            UPLOAD_ERR_NO_FILE;
+                        $_FILES['image']['error'] ===
+                            UPLOAD_ERR_OK;
 
 
                     if ($hasNewImage) {
 
 
+                        $file =
+                            $_FILES['image'];
+
+
                         /*
                         |--------------------------------------------------------------------------
-                        | VALIDATE NEW IMAGE
+                        | FILE SIZE
                         |--------------------------------------------------------------------------
                         */
 
-                        $validation =
-                            validateServiceImage(
-                                $_FILES['image']
-                            );
+                        $maxFileSize =
+                            10 * 1024 * 1024;
 
 
                         if (
-                            !$validation['success']
+                            (int)$file['size'] >
+                            $maxFileSize
                         ) {
 
                             $statusError =
-                                $validation['error'];
+                                'Image is too large. Maximum size is 10 MB.';
 
                         } else {
 
 
-                            $file =
-                                $_FILES['image'];
-
-
                             /*
                             |--------------------------------------------------------------------------
-                            | CREATE ROOT BLOB FILE NAME
+                            | CHECK EXTENSION
                             |--------------------------------------------------------------------------
                             */
 
-                            $newFileName =
-                                createBlobFileName(
-                                    $name,
-                                    $validation['extension']
+                            $extension =
+                                strtolower(
+                                    pathinfo(
+                                        $file['name'],
+                                        PATHINFO_EXTENSION
+                                    )
                                 );
 
 
-                            /*
-                            |--------------------------------------------------------------------------
-                            | UPLOAD NEW IMAGE
-                            |--------------------------------------------------------------------------
-                            */
-
-                            $uploadResult =
-                                uploadToVercelBlob(
-                                    $file['tmp_name'],
-                                    $newFileName,
-                                    $validation['mime'],
-                                    $blobToken
-                                );
+                            $allowedExtensions =
+                                [
+                                    'jpg',
+                                    'jpeg',
+                                    'png',
+                                    'webp'
+                                ];
 
 
                             if (
-                                !$uploadResult['success']
+                                !in_array(
+                                    $extension,
+                                    $allowedExtensions,
+                                    true
+                                )
                             ) {
 
                                 $statusError =
-                                    $uploadResult['error'];
+                                    'Invalid image type. Please use JPG, JPEG, PNG, or WEBP.';
 
                             } else {
 
 
-                                $imageUrl =
-                                    $uploadResult['url'];
-
-
                                 /*
                                 |--------------------------------------------------------------------------
-                                | UPDATE DATABASE
+                                | CHECK MIME
                                 |--------------------------------------------------------------------------
                                 */
 
-                                $stmt =
-                                    $pdo->prepare(
-                                        "UPDATE services
-                                         SET
-                                            name = :name,
-                                            slug = :slug,
-                                            image_url = :image_url,
-                                            description = :description,
-                                            details = :details,
-                                            sort_order = :sort_order
-                                         WHERE id = :id"
+                                $mimeType =
+                                    mime_content_type(
+                                        $file['tmp_name']
                                     );
 
 
-                                $stmt->execute([
-                                    ':name' =>
-                                        $name,
+                                $allowedMimeTypes =
+                                    [
+                                        'image/jpeg',
+                                        'image/png',
+                                        'image/webp'
+                                    ];
 
-                                    ':slug' =>
-                                        $slug,
-
-                                    ':image_url' =>
-                                        $imageUrl,
-
-                                    ':description' =>
-                                        $description,
-
-                                    ':details' =>
-                                        $detailsJson,
-
-                                    ':sort_order' =>
-                                        $sortOrder,
-
-                                    ':id' =>
-                                        $serviceId
-                                ]);
-
-
-                                /*
-                                |--------------------------------------------------------------------------
-                                | DELETE OLD IMAGE
-                                |--------------------------------------------------------------------------
-                                */
 
                                 if (
-                                    !empty(
-                                        $existing['image_url']
-                                    ) &&
-                                    $existing['image_url'] !==
-                                        $imageUrl
+                                    !in_array(
+                                        $mimeType,
+                                        $allowedMimeTypes,
+                                        true
+                                    )
                                 ) {
 
-                                    deleteFromVercelBlob(
-                                        $existing['image_url'],
-                                        $blobToken
-                                    );
+                                    $statusError =
+                                        'Invalid image file.';
+
+                                } else {
+
+
+                                    /*
+                                    |--------------------------------------------------------------------------
+                                    | CREATE ROOT-LEVEL BLOB FILE
+                                    |--------------------------------------------------------------------------
+                                    */
+
+                                    $newFileName =
+                                        createBlobFileName(
+                                            $name,
+                                            $extension
+                                        );
+
+
+                                    $uploadResult =
+                                        uploadToVercelBlob(
+                                            $file['tmp_name'],
+                                            $newFileName,
+                                            $mimeType,
+                                            $blobToken
+                                        );
+
+
+                                    if (
+                                        !$uploadResult['success']
+                                    ) {
+
+                                        $statusError =
+                                            $uploadResult['error'];
+
+                                    } else {
+
+
+                                        $newImageUrl =
+                                            $uploadResult['url'];
+
+
+                                        /*
+                                        |--------------------------------------------------------------------------
+                                        | UPDATE DATABASE
+                                        |--------------------------------------------------------------------------
+                                        */
+
+                                        $stmt =
+                                            $pdo->prepare(
+                                                "UPDATE services
+                                                 SET
+                                                    name = :name,
+                                                    slug = :slug,
+                                                    image_url = :image_url,
+                                                    description = :description,
+                                                    details = :details,
+                                                    sort_order = :sort_order
+                                                 WHERE id = :id"
+                                            );
+
+
+                                        $stmt->execute([
+                                            ':name' =>
+                                                $name,
+
+                                            ':slug' =>
+                                                $slug,
+
+                                            ':image_url' =>
+                                                $newImageUrl,
+
+                                            ':description' =>
+                                                $description,
+
+                                            ':details' =>
+                                                $detailsJson,
+
+                                            ':sort_order' =>
+                                                $sortOrder,
+
+                                            ':id' =>
+                                                $serviceId
+                                        ]);
+
+
+                                        /*
+                                        |--------------------------------------------------------------------------
+                                        | DELETE OLD IMAGE
+                                        |--------------------------------------------------------------------------
+                                        */
+
+                                        if (
+                                            !empty(
+                                                $existing['image_url']
+                                            ) &&
+                                            $existing['image_url'] !==
+                                                $newImageUrl
+                                        ) {
+
+                                            deleteFromVercelBlob(
+                                                $existing['image_url'],
+                                                $blobToken
+                                            );
+                                        }
+
+
+                                        $statusMessage =
+                                            'Service updated successfully.';
+                                    }
                                 }
-
-
-                                $statusMessage =
-                                    'Service updated successfully.';
                             }
                         }
 
@@ -1222,42 +1203,46 @@ if (
                         |--------------------------------------------------------------------------
                         */
 
-                        $stmt =
-                            $pdo->prepare(
-                                "UPDATE services
-                                 SET
-                                    name = :name,
-                                    slug = :slug,
-                                    description = :description,
-                                    details = :details,
-                                    sort_order = :sort_order
-                                 WHERE id = :id"
-                            );
+                        if ($statusError === '') {
 
 
-                        $stmt->execute([
-                            ':name' =>
-                                $name,
-
-                            ':slug' =>
-                                $slug,
-
-                            ':description' =>
-                                $description,
-
-                            ':details' =>
-                                $detailsJson,
-
-                            ':sort_order' =>
-                                $sortOrder,
-
-                            ':id' =>
-                                $serviceId
-                        ]);
+                            $stmt =
+                                $pdo->prepare(
+                                    "UPDATE services
+                                     SET
+                                        name = :name,
+                                        slug = :slug,
+                                        description = :description,
+                                        details = :details,
+                                        sort_order = :sort_order
+                                     WHERE id = :id"
+                                );
 
 
-                        $statusMessage =
-                            'Service updated successfully.';
+                            $stmt->execute([
+                                ':name' =>
+                                    $name,
+
+                                ':slug' =>
+                                    $slug,
+
+                                ':description' =>
+                                    $description,
+
+                                ':details' =>
+                                    $detailsJson,
+
+                                ':sort_order' =>
+                                    $sortOrder,
+
+                                ':id' =>
+                                    $serviceId
+                            ]);
+
+
+                            $statusMessage =
+                                'Service updated successfully.';
+                        }
                     }
                 }
 
@@ -1275,168 +1260,285 @@ if (
                     !isset(
                         $_FILES['image']
                     ) ||
-                    $_FILES['image']['error'] ===
-                        UPLOAD_ERR_NO_FILE
+                    !isset(
+                        $_FILES['image']['error']
+                    ) ||
+                    $_FILES['image']['error'] !==
+                        UPLOAD_ERR_OK
                 ) {
 
-                    $statusError =
-                        'Please select a service image.';
+
+                    $uploadErrorCode =
+                        $_FILES['image']['error'] ??
+                        null;
+
+
+                    if (
+                        $uploadErrorCode ===
+                        UPLOAD_ERR_INI_SIZE
+                    ) {
+
+                        $statusError =
+                            'The uploaded image is larger than the server allows.';
+
+                    } elseif (
+                        $uploadErrorCode ===
+                        UPLOAD_ERR_FORM_SIZE
+                    ) {
+
+                        $statusError =
+                            'The uploaded image is too large.';
+
+                    } elseif (
+                        $uploadErrorCode ===
+                        UPLOAD_ERR_NO_FILE ||
+                        $uploadErrorCode === null
+                    ) {
+
+                        $statusError =
+                            'Please select a service image.';
+
+                    } else {
+
+                        $statusError =
+                            'Image upload failed. Upload error code: ' .
+                            $uploadErrorCode;
+                    }
+
 
                 } else {
 
 
+                    $file =
+                        $_FILES['image'];
+
+
                     /*
                     |--------------------------------------------------------------------------
-                    | VALIDATE IMAGE
+                    | FILE SIZE
                     |--------------------------------------------------------------------------
                     */
 
-                    $validation =
-                        validateServiceImage(
-                            $_FILES['image']
-                        );
+                    $maxFileSize =
+                        10 * 1024 * 1024;
 
 
                     if (
-                        !$validation['success']
+                        (int)$file['size'] >
+                        $maxFileSize
                     ) {
 
                         $statusError =
-                            $validation['error'];
+                            'Image is too large. Maximum size is 10 MB.';
 
                     } else {
 
 
-                        $file =
-                            $_FILES['image'];
-
-
                         /*
                         |--------------------------------------------------------------------------
-                        | ROOT BLOB FILE NAME
+                        | EXTENSION
                         |--------------------------------------------------------------------------
                         */
 
-                        $newFileName =
-                            createBlobFileName(
-                                $name,
-                                $validation['extension']
+                        $extension =
+                            strtolower(
+                                pathinfo(
+                                    $file['name'],
+                                    PATHINFO_EXTENSION
+                                )
                             );
 
 
-                        /*
-                        |--------------------------------------------------------------------------
-                        | UPLOAD
-                        |--------------------------------------------------------------------------
-                        */
-
-                        $uploadResult =
-                            uploadToVercelBlob(
-                                $file['tmp_name'],
-                                $newFileName,
-                                $validation['mime'],
-                                $blobToken
-                            );
+                        $allowedExtensions =
+                            [
+                                'jpg',
+                                'jpeg',
+                                'png',
+                                'webp'
+                            ];
 
 
                         if (
-                            !$uploadResult['success']
+                            !in_array(
+                                $extension,
+                                $allowedExtensions,
+                                true
+                            )
                         ) {
 
                             $statusError =
-                                $uploadResult['error'];
+                                'Invalid image type. Please use JPG, JPEG, PNG, or WEBP.';
 
                         } else {
 
 
-                            $imageUrl =
-                                $uploadResult['url'];
+                            /*
+                            |--------------------------------------------------------------------------
+                            | MIME
+                            |--------------------------------------------------------------------------
+                            */
+
+                            $mimeType =
+                                mime_content_type(
+                                    $file['tmp_name']
+                                );
 
 
-                            try {
+                            $allowedMimeTypes =
+                                [
+                                    'image/jpeg',
+                                    'image/png',
+                                    'image/webp'
+                                ];
+
+
+                            if (
+                                !in_array(
+                                    $mimeType,
+                                    $allowedMimeTypes,
+                                    true
+                                )
+                            ) {
+
+                                $statusError =
+                                    'Invalid image file.';
+
+                            } else {
 
 
                                 /*
                                 |--------------------------------------------------------------------------
-                                | INSERT DATABASE
+                                | CREATE ROOT-LEVEL BLOB NAME
                                 |--------------------------------------------------------------------------
                                 */
 
-                                $stmt =
-                                    $pdo->prepare(
-                                        "INSERT INTO services
-                                        (
-                                            name,
-                                            slug,
-                                            image_url,
-                                            description,
-                                            details,
-                                            is_available,
-                                            sort_order,
-                                            created_at
-                                        )
-                                        VALUES
-                                        (
-                                            :name,
-                                            :slug,
-                                            :image_url,
-                                            :description,
-                                            :details,
-                                            1,
-                                            :sort_order,
-                                            NOW()
-                                        )"
+                                $newFileName =
+                                    createBlobFileName(
+                                        $name,
+                                        $extension
                                     );
 
 
-                                $stmt->execute([
-                                    ':name' =>
-                                        $name,
-
-                                    ':slug' =>
-                                        $slug,
-
-                                    ':image_url' =>
-                                        $imageUrl,
-
-                                    ':description' =>
-                                        $description,
-
-                                    ':details' =>
-                                        $detailsJson,
-
-                                    ':sort_order' =>
-                                        $sortOrder
-                                ]);
-
-
-                                $statusMessage =
-                                    'Service created successfully.';
-
-
-                            } catch (PDOException $e) {
-
-
                                 /*
                                 |--------------------------------------------------------------------------
-                                | DELETE BLOB IF DATABASE INSERT FAILED
+                                | UPLOAD TO VERCEL BLOB
                                 |--------------------------------------------------------------------------
                                 */
 
-                                deleteFromVercelBlob(
-                                    $imageUrl,
-                                    $blobToken
-                                );
+                                $uploadResult =
+                                    uploadToVercelBlob(
+                                        $file['tmp_name'],
+                                        $newFileName,
+                                        $mimeType,
+                                        $blobToken
+                                    );
 
 
-                                error_log(
-                                    'Service insert error: ' .
-                                    $e->getMessage()
-                                );
+                                if (
+                                    !$uploadResult['success']
+                                ) {
+
+                                    $statusError =
+                                        $uploadResult['error'];
+
+                                } else {
 
 
-                                $statusError =
-                                    'Unable to save service.';
+                                    $imageUrl =
+                                        $uploadResult['url'];
+
+
+                                    try {
+
+
+                                        /*
+                                        |--------------------------------------------------------------------------
+                                        | INSERT SERVICE
+                                        |--------------------------------------------------------------------------
+                                        */
+
+                                        $stmt =
+                                            $pdo->prepare(
+                                                "INSERT INTO services
+                                                (
+                                                    name,
+                                                    slug,
+                                                    image_url,
+                                                    description,
+                                                    details,
+                                                    is_available,
+                                                    sort_order,
+                                                    created_at
+                                                )
+                                                VALUES
+                                                (
+                                                    :name,
+                                                    :slug,
+                                                    :image_url,
+                                                    :description,
+                                                    :details,
+                                                    1,
+                                                    :sort_order,
+                                                    NOW()
+                                                )"
+                                            );
+
+
+                                        $stmt->execute([
+                                            ':name' =>
+                                                $name,
+
+                                            ':slug' =>
+                                                $slug,
+
+                                            ':image_url' =>
+                                                $imageUrl,
+
+                                            ':description' =>
+                                                $description,
+
+                                            ':details' =>
+                                                $detailsJson,
+
+                                            ':sort_order' =>
+                                                $sortOrder
+                                        ]);
+
+
+                                        $statusMessage =
+                                            'Service created successfully.';
+
+
+                                    } catch (PDOException $e) {
+
+
+                                        /*
+                                        |--------------------------------------------------------------------------
+                                        | DATABASE FAILED
+                                        |--------------------------------------------------------------------------
+                                        |
+                                        | Delete uploaded image so we don't
+                                        | leave an unused Blob behind.
+                                        |--------------------------------------------------------------------------
+                                        */
+
+                                        deleteFromVercelBlob(
+                                            $imageUrl,
+                                            $blobToken
+                                        );
+
+
+                                        error_log(
+                                            'Service insert error: ' .
+                                            $e->getMessage()
+                                        );
+
+
+                                        $statusError =
+                                            'Unable to save service: ' .
+                                            $e->getMessage();
+                                    }
+                                }
                             }
                         }
                     }
@@ -1446,6 +1548,7 @@ if (
 
         } catch (PDOException $e) {
 
+
             error_log(
                 'Service save error: ' .
                 $e->getMessage()
@@ -1453,7 +1556,8 @@ if (
 
 
             $statusError =
-                'Unable to save service.';
+                'Database error: ' .
+                $e->getMessage();
         }
     }
 }
@@ -1502,20 +1606,22 @@ $services = [];
 
 try {
 
-    $stmt = $pdo->query(
-        "SELECT
-            id,
-            name,
-            slug,
-            image_url,
-            description,
-            details,
-            is_available,
-            sort_order,
-            created_at
-         FROM services
-         ORDER BY sort_order ASC, id ASC"
-    );
+
+    $stmt =
+        $pdo->query(
+            "SELECT
+                id,
+                name,
+                slug,
+                image_url,
+                description,
+                details,
+                is_available,
+                sort_order,
+                created_at
+             FROM services
+             ORDER BY sort_order ASC, id ASC"
+        );
 
 
     $services =
@@ -1526,14 +1632,22 @@ try {
 
 } catch (PDOException $e) {
 
+
     error_log(
         'Service query error: ' .
         $e->getMessage()
     );
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | SHOW ACTUAL DATABASE ERROR
+    |--------------------------------------------------------------------------
+    */
+
     $statusError =
-        'Unable to load services.';
+        'Unable to load services: ' .
+        $e->getMessage();
 }
 
 
@@ -1547,16 +1661,17 @@ $totalServices =
     count($services);
 
 
-$availableServices = 0;
+$availableServices =
+    0;
 
 
 foreach (
-    $services
-    as $service
+    $services as $service
 ) {
 
     if (
-        (int)$service['is_available'] === 1
+        (int)$service['is_available'] ===
+        1
     ) {
 
         $availableServices++;
@@ -1565,395 +1680,961 @@ foreach (
 
 ?>
 
+
 <!DOCTYPE html>
 
 <html lang="en">
 
+
 <head>
 
+
 <meta charset="UTF-8">
+
 
 <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0"
 >
 
+
 <meta
     name="theme-color"
     content="#ff5a1f"
 >
 
+
 <title>
     Services - ABAA Admin
 </title>
+
 
 <link
     rel="stylesheet"
     href="/admin.css"
 >
 
+
 <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
 >
 
+
 <style>
 
+
+/*
+|--------------------------------------------------------------------------
+| SERVICE ADMIN
+|--------------------------------------------------------------------------
+*/
+
 .service-upload-card {
+
     background: white;
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 25px;
-    margin-bottom: 30px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.03);
+
+    border:
+        1px solid var(--border);
+
+    border-radius:
+        16px;
+
+    padding:
+        25px;
+
+    margin-bottom:
+        30px;
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,.03);
+
 }
+
 
 .service-upload-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 22px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        12px;
+
+    margin-bottom:
+        22px;
+
 }
+
 
 .service-upload-icon {
-    width: 42px;
-    height: 42px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--orange);
-    background: var(--orange-light);
+
+    width:
+        42px;
+
+    height:
+        42px;
+
+    border-radius:
+        10px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    color:
+        var(--orange);
+
+    background:
+        var(--orange-light);
+
 }
+
 
 .service-upload-header span {
-    display: block;
-    color: var(--orange);
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 1.5px;
+
+    display:
+        block;
+
+    color:
+        var(--orange);
+
+    font-size:
+        10px;
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        1.5px;
+
 }
+
 
 .service-upload-header h2 {
-    margin-top: 4px;
-    font-size: 20px;
-    color: var(--dark);
+
+    margin-top:
+        4px;
+
+    font-size:
+        20px;
+
+    color:
+        var(--dark);
+
 }
+
 
 .service-form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 18px;
+
+    display:
+        grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap:
+        18px;
+
 }
+
 
 .service-form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    gap:
+        7px;
+
 }
+
 
 .service-form-group.full {
-    grid-column: 1 / -1;
+
+    grid-column:
+        1 / -1;
+
 }
 
+
 .service-form-group label {
-    font-size: 12px;
-    font-weight: 700;
-    color: #374151;
+
+    font-size:
+        12px;
+
+    font-weight:
+        700;
+
+    color:
+        #374151;
+
 }
+
 
 .service-form-group input,
 .service-form-group textarea {
-    width: 100%;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 11px 12px;
-    background: #fafafa;
-    color: var(--text);
-    outline: none;
-    font-family: inherit;
-    box-sizing: border-box;
+
+    width:
+        100%;
+
+    border:
+        1px solid var(--border);
+
+    border-radius:
+        8px;
+
+    padding:
+        11px 12px;
+
+    background:
+        #fafafa;
+
+    color:
+        var(--text);
+
+    outline:
+        none;
+
+    font-family:
+        inherit;
+
+    box-sizing:
+        border-box;
+
 }
+
 
 .service-form-group input {
-    height: 45px;
+
+    height:
+        45px;
+
 }
 
+
 .service-form-group textarea {
-    min-height: 110px;
-    resize: vertical;
+
+    min-height:
+        110px;
+
+    resize:
+        vertical;
+
 }
+
 
 .service-form-group input:focus,
 .service-form-group textarea:focus {
-    background: white;
-    border-color: var(--orange);
-    box-shadow: 0 0 0 3px rgba(255,90,31,.08);
+
+    background:
+        white;
+
+    border-color:
+        var(--orange);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(255,90,31,.08);
+
 }
+
 
 .service-help {
-    color: #9ca3af;
-    font-size: 11px;
+
+    color:
+        #9ca3af;
+
+    font-size:
+        11px;
+
 }
+
 
 .details-editor {
-    display: flex;
-    flex-direction: column;
-    gap: 9px;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    gap:
+        9px;
+
 }
+
 
 .detail-row {
-    display: flex;
-    gap: 8px;
+
+    display:
+        flex;
+
+    gap:
+        8px;
+
 }
+
 
 .detail-row input {
-    flex: 1;
+
+    flex:
+        1;
+
 }
+
 
 .remove-detail {
-    width: 42px;
-    border: 1px solid #fecaca;
-    background: #fef2f2;
-    color: #dc2626;
-    border-radius: 8px;
-    cursor: pointer;
+
+    width:
+        42px;
+
+    border:
+        1px solid #fecaca;
+
+    background:
+        #fef2f2;
+
+    color:
+        #dc2626;
+
+    border-radius:
+        8px;
+
+    cursor:
+        pointer;
+
 }
+
 
 .remove-detail:hover {
-    background: #dc2626;
-    color: white;
+
+    background:
+        #dc2626;
+
+    color:
+        white;
+
 }
+
 
 .add-detail {
-    align-self: flex-start;
-    border: 1px solid #fed7aa;
-    background: #fff7ed;
-    color: var(--orange);
-    border-radius: 8px;
-    padding: 9px 13px;
-    font-size: 11px;
-    font-weight: 700;
-    cursor: pointer;
+
+    align-self:
+        flex-start;
+
+    border:
+        1px solid #fed7aa;
+
+    background:
+        #fff7ed;
+
+    color:
+        var(--orange);
+
+    border-radius:
+        8px;
+
+    padding:
+        9px 13px;
+
+    font-size:
+        11px;
+
+    font-weight:
+        700;
+
+    cursor:
+        pointer;
+
 }
+
 
 .service-submit {
-    margin-top: 20px;
-    border: none;
-    border-radius: 9px;
-    padding: 12px 18px;
-    background: var(--orange);
-    color: white;
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 9px;
+
+    margin-top:
+        20px;
+
+    border:
+        none;
+
+    border-radius:
+        9px;
+
+    padding:
+        12px 18px;
+
+    background:
+        var(--orange);
+
+    color:
+        white;
+
+    font-size:
+        13px;
+
+    font-weight:
+        700;
+
+    cursor:
+        pointer;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    gap:
+        9px;
+
 }
+
 
 .service-submit:hover {
-    background: var(--orange-dark);
-    transform: translateY(-1px);
+
+    background:
+        var(--orange-dark);
+
+    transform:
+        translateY(-1px);
+
 }
+
+
+/*
+|--------------------------------------------------------------------------
+| SERVICE CARDS
+|--------------------------------------------------------------------------
+*/
 
 .service-admin-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    padding: 25px;
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap:
+        20px;
+
+    padding:
+        25px;
+
 }
+
 
 .service-admin-card {
-    border: 1px solid var(--border);
-    border-radius: 13px;
-    overflow: hidden;
-    background: white;
-    box-shadow: 0 2px 8px rgba(0,0,0,.04);
+
+    border:
+        1px solid var(--border);
+
+    border-radius:
+        13px;
+
+    overflow:
+        hidden;
+
+    background:
+        white;
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,.04);
+
 }
+
 
 .service-preview {
-    height: 190px;
-    background: #111;
-    position: relative;
-    overflow: hidden;
+
+    height:
+        190px;
+
+    background:
+        #111;
+
+    position:
+        relative;
+
+    overflow:
+        hidden;
+
 }
+
 
 .service-preview img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
+
+    width:
+        100%;
+
+    height:
+        100%;
+
+    object-fit:
+        cover;
+
+    display:
+        block;
+
 }
+
 
 .service-availability {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    padding: 6px 9px;
-    border-radius: 6px;
-    color: white;
-    font-size: 10px;
-    font-weight: 800;
+
+    position:
+        absolute;
+
+    top:
+        10px;
+
+    right:
+        10px;
+
+    padding:
+        6px 9px;
+
+    border-radius:
+        6px;
+
+    color:
+        white;
+
+    font-size:
+        10px;
+
+    font-weight:
+        800;
+
 }
+
 
 .service-availability.available {
-    background: #16a34a;
+
+    background:
+        #16a34a;
+
 }
+
 
 .service-availability.unavailable {
-    background: #6b7280;
+
+    background:
+        #6b7280;
+
 }
+
 
 .service-sort {
-    position: absolute;
-    left: 10px;
-    top: 10px;
-    padding: 6px 9px;
-    border-radius: 6px;
-    background: rgba(0,0,0,.75);
-    color: white;
-    font-size: 10px;
-    font-weight: 800;
+
+    position:
+        absolute;
+
+    left:
+        10px;
+
+    top:
+        10px;
+
+    padding:
+        6px 9px;
+
+    border-radius:
+        6px;
+
+    background:
+        rgba(0,0,0,.75);
+
+    color:
+        white;
+
+    font-size:
+        10px;
+
+    font-weight:
+        800;
+
 }
+
 
 .service-admin-content {
-    padding: 16px;
+
+    padding:
+        16px;
+
 }
+
 
 .service-admin-content h3 {
-    font-size: 17px;
-    color: var(--dark);
-    margin-bottom: 6px;
+
+    font-size:
+        17px;
+
+    color:
+        var(--dark);
+
+    margin-bottom:
+        6px;
+
 }
+
 
 .service-admin-slug {
-    color: #9ca3af;
-    font-size: 11px;
-    margin-bottom: 12px;
+
+    color:
+        #9ca3af;
+
+    font-size:
+        11px;
+
+    margin-bottom:
+        12px;
+
 }
+
 
 .service-admin-description {
-    color: #6b7280;
-    font-size: 12px;
-    line-height: 1.6;
-    min-height: 38px;
-    margin-bottom: 14px;
+
+    color:
+        #6b7280;
+
+    font-size:
+        12px;
+
+    line-height:
+        1.6;
+
+    min-height:
+        38px;
+
+    margin-bottom:
+        14px;
+
 }
+
 
 .service-admin-actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr 40px;
-    gap: 8px;
+
+    display:
+        grid;
+
+    grid-template-columns:
+        1fr 1fr 40px;
+
+    gap:
+        8px;
+
 }
+
+
+.service-admin-actions form {
+
+    margin:
+        0;
+
+}
+
 
 .service-action-button {
-    min-height: 36px;
-    border-radius: 7px;
-    border: 1px solid var(--border);
-    background: white;
-    color: #374151;
-    font-size: 11px;
-    font-weight: 700;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    width: 100%;
+
+    width:
+        100%;
+
+    min-height:
+        36px;
+
+    border-radius:
+        7px;
+
+    border:
+        1px solid var(--border);
+
+    background:
+        white;
+
+    color:
+        #374151;
+
+    font-size:
+        11px;
+
+    font-weight:
+        700;
+
+    cursor:
+        pointer;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    gap:
+        6px;
+
 }
+
 
 .service-action-button:hover {
-    border-color: var(--orange);
-    color: var(--orange);
+
+    border-color:
+        var(--orange);
+
+    color:
+        var(--orange);
+
 }
+
 
 .service-action-button.delete {
-    color: #dc2626;
-    border-color: #fecaca;
-    background: #fef2f2;
+
+    color:
+        #dc2626;
+
+    border-color:
+        #fecaca;
+
+    background:
+        #fef2f2;
+
 }
+
 
 .service-action-button.delete:hover {
-    background: #dc2626;
-    color: white;
+
+    background:
+        #dc2626;
+
+    color:
+        white;
+
 }
+
+
+/*
+|--------------------------------------------------------------------------
+| EDIT MODAL
+|--------------------------------------------------------------------------
+*/
 
 .service-modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.65);
-    z-index: 9999;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
+
+    position:
+        fixed;
+
+    inset:
+        0;
+
+    background:
+        rgba(0,0,0,.65);
+
+    z-index:
+        9999;
+
+    display:
+        none;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    padding:
+        20px;
+
 }
+
 
 .service-modal-overlay.active {
-    display: flex;
+
+    display:
+        flex;
+
 }
+
 
 .service-modal {
-    width: 100%;
-    max-width: 760px;
-    max-height: 90vh;
-    overflow-y: auto;
-    background: white;
-    border-radius: 16px;
-    padding: 25px;
-    position: relative;
+
+    width:
+        100%;
+
+    max-width:
+        760px;
+
+    max-height:
+        90vh;
+
+    overflow-y:
+        auto;
+
+    background:
+        white;
+
+    border-radius:
+        16px;
+
+    padding:
+        25px;
+
+    position:
+        relative;
+
 }
+
 
 .service-modal-close {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    width: 38px;
-    height: 38px;
-    border: none;
-    border-radius: 50%;
-    background: #f3f4f6;
-    color: #374151;
-    cursor: pointer;
+
+    position:
+        absolute;
+
+    top:
+        15px;
+
+    right:
+        15px;
+
+    width:
+        38px;
+
+    height:
+        38px;
+
+    border:
+        none;
+
+    border-radius:
+        50%;
+
+    background:
+        #f3f4f6;
+
+    color:
+        #374151;
+
+    cursor:
+        pointer;
+
 }
+
 
 .service-modal h2 {
-    margin: 0 0 20px;
-    color: var(--dark);
+
+    margin:
+        0 0 20px;
+
+    color:
+        var(--dark);
+
 }
+
+
+/*
+|--------------------------------------------------------------------------
+| ERROR BOX
+|--------------------------------------------------------------------------
+*/
+
+.service-error-details {
+
+    margin-top:
+        8px;
+
+    font-family:
+        monospace;
+
+    font-size:
+        11px;
+
+    white-space:
+        pre-wrap;
+
+    word-break:
+        break-word;
+
+    color:
+        #991b1b;
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| RESPONSIVE
+|--------------------------------------------------------------------------
+*/
 
 @media (max-width: 1000px) {
+
     .service-admin-grid {
-        grid-template-columns: repeat(2, 1fr);
+
+        grid-template-columns:
+            repeat(2, 1fr);
+
     }
+
 }
 
+
 @media (max-width: 600px) {
+
     .service-form-grid {
-        grid-template-columns: 1fr;
+
+        grid-template-columns:
+            1fr;
+
     }
+
 
     .service-form-group.full {
-        grid-column: auto;
+
+        grid-column:
+            auto;
+
     }
+
 
     .service-admin-grid {
-        grid-template-columns: 1fr;
-        padding: 18px;
+
+        grid-template-columns:
+            1fr;
+
+        padding:
+            18px;
+
     }
 
+
     .service-upload-card {
-        padding: 20px;
+
+        padding:
+            20px;
+
     }
+
 }
 
 </style>
+
 
 </head>
 
 
 <body>
+
 
 <div class="admin-layout">
 
@@ -1964,7 +2645,9 @@ foreach (
 
 <aside class="sidebar">
 
+
     <div class="sidebar-brand">
+
 
         <div class="sidebar-logo">
 
@@ -1974,6 +2657,7 @@ foreach (
             >
 
         </div>
+
 
         <div>
 
@@ -1987,10 +2671,12 @@ foreach (
 
         </div>
 
+
     </div>
 
 
     <nav class="sidebar-nav">
+
 
         <a href="/admin">
 
@@ -2038,16 +2724,19 @@ foreach (
 
         </a>
 
+
     </nav>
 
 
     <div class="sidebar-info">
+
 
         <div class="sidebar-info-icon">
 
             <i class="fa-solid fa-bolt"></i>
 
         </div>
+
 
         <div>
 
@@ -2061,18 +2750,22 @@ foreach (
 
         </div>
 
+
     </div>
 
 
     <div class="sidebar-bottom">
 
+
         <div class="admin-user">
+
 
             <div class="admin-avatar">
 
                 <i class="fa-solid fa-user"></i>
 
             </div>
+
 
             <div>
 
@@ -2086,6 +2779,7 @@ foreach (
 
             </div>
 
+
         </div>
 
 
@@ -2093,6 +2787,7 @@ foreach (
             method="POST"
             action="/admin"
         >
+
 
             <button
                 type="submit"
@@ -2108,9 +2803,12 @@ foreach (
 
             </button>
 
+
         </form>
 
+
     </div>
+
 
 </aside>
 
@@ -2124,13 +2822,16 @@ foreach (
 
 <div class="top-panel">
 
+
     <div class="top-panel-left">
+
 
         <div class="top-panel-icon">
 
             <i class="fa-solid fa-screwdriver-wrench"></i>
 
         </div>
+
 
         <div>
 
@@ -2144,10 +2845,12 @@ foreach (
 
         </div>
 
+
     </div>
 
 
     <div class="top-panel-right">
+
 
         <div class="online-status">
 
@@ -2166,27 +2869,34 @@ foreach (
 
         </div>
 
+
     </div>
+
 
 </div>
 
 
 <header class="admin-header">
 
+
     <div>
+
 
         <span class="dashboard-label">
             SERVICES
         </span>
 
+
         <h1>
             Service Management
         </h1>
+
 
         <p>
             Manage your services, availability,
             images, descriptions, and ordering.
         </p>
+
 
     </div>
 
@@ -2204,6 +2914,7 @@ foreach (
 
     </a>
 
+
 </header>
 
 
@@ -2213,26 +2924,55 @@ foreach (
 
 <?php if ($statusMessage): ?>
 
+
     <div class="admin-notification success">
+
 
         <i class="fa-solid fa-circle-check"></i>
 
+
         <?= e($statusMessage) ?>
 
+
     </div>
+
 
 <?php endif; ?>
 
 
 <?php if ($statusError): ?>
 
+
     <div class="admin-notification error">
+
 
         <i class="fa-solid fa-circle-exclamation"></i>
 
-        <?= e($statusError) ?>
+
+        <div>
+
+            <?= e($statusError) ?>
+
+
+            <?php if (
+                strpos(
+                    $statusError,
+                    'SQLSTATE'
+                ) !== false
+            ): ?>
+
+                <div class="service-error-details">
+                    Check your services table columns.
+                </div>
+
+            <?php endif; ?>
+
+
+        </div>
+
 
     </div>
+
 
 <?php endif; ?>
 
@@ -2243,13 +2983,16 @@ foreach (
 
 <section class="stats-grid">
 
+
     <div class="stat-card">
+
 
         <div class="stat-icon orange">
 
             <i class="fa-solid fa-screwdriver-wrench"></i>
 
         </div>
+
 
         <div class="stat-content">
 
@@ -2267,16 +3010,19 @@ foreach (
 
         </div>
 
+
     </div>
 
 
     <div class="stat-card">
+
 
         <div class="stat-icon dark-orange">
 
             <i class="fa-solid fa-circle-check"></i>
 
         </div>
+
 
         <div class="stat-content">
 
@@ -2294,16 +3040,19 @@ foreach (
 
         </div>
 
+
     </div>
 
 
     <div class="stat-card">
+
 
         <div class="stat-icon dark">
 
             <i class="fa-solid fa-eye-slash"></i>
 
         </div>
+
 
         <div class="stat-content">
 
@@ -2321,7 +3070,9 @@ foreach (
 
         </div>
 
+
     </div>
+
 
 </section>
 
@@ -2332,13 +3083,16 @@ foreach (
 
 <section class="service-upload-card">
 
+
     <div class="service-upload-header">
+
 
         <div class="service-upload-icon">
 
             <i class="fa-solid fa-plus"></i>
 
         </div>
+
 
         <div>
 
@@ -2352,6 +3106,7 @@ foreach (
 
         </div>
 
+
     </div>
 
 
@@ -2361,14 +3116,17 @@ foreach (
         action="/admin/services"
     >
 
+
         <div class="service-form-grid">
 
 
             <div class="service-form-group">
 
+
                 <label>
                     Service Name
                 </label>
+
 
                 <input
                     type="text"
@@ -2377,14 +3135,17 @@ foreach (
                     required
                 >
 
+
             </div>
 
 
             <div class="service-form-group">
 
+
                 <label>
                     Sort Order
                 </label>
+
 
                 <input
                     type="number"
@@ -2393,32 +3154,39 @@ foreach (
                     min="0"
                 >
 
+
                 <span class="service-help">
                     Lower numbers appear first.
                 </span>
+
 
             </div>
 
 
             <div class="service-form-group full">
 
+
                 <label>
                     Service Description
                 </label>
+
 
                 <textarea
                     name="description"
                     placeholder="Describe this service..."
                 ></textarea>
 
+
             </div>
 
 
             <div class="service-form-group">
 
+
                 <label>
                     Service Image
                 </label>
+
 
                 <input
                     type="file"
@@ -2427,31 +3195,38 @@ foreach (
                     required
                 >
 
+
                 <span class="service-help">
-                    JPG, PNG, WEBP — maximum 10MB.
+                    JPG, PNG, WEBP — maximum 10 MB.
                 </span>
+
 
             </div>
 
 
             <div class="service-form-group">
 
+
                 <label>
                     Service Details
                 </label>
+
 
                 <div
                     class="details-editor"
                     id="newDetails"
                 >
 
+
                     <div class="detail-row">
+
 
                         <input
                             type="text"
                             name="details[]"
                             placeholder="Example: Professional LED display systems"
                         >
+
 
                         <button
                             type="button"
@@ -2463,7 +3238,9 @@ foreach (
 
                         </button>
 
+
                     </div>
+
 
                 </div>
 
@@ -2479,6 +3256,7 @@ foreach (
                     Add Detail
 
                 </button>
+
 
             </div>
 
@@ -2498,7 +3276,9 @@ foreach (
 
         </button>
 
+
     </form>
+
 
 </section>
 
@@ -2512,9 +3292,12 @@ foreach (
 
     <div class="section-header">
 
+
         <div>
 
+
             <div class="section-title-row">
+
 
                 <span class="section-icon">
 
@@ -2522,39 +3305,52 @@ foreach (
 
                 </span>
 
+
                 <div>
+
 
                     <span class="section-label">
                         SERVICE LIBRARY
                     </span>
 
+
                     <h2>
                         Your Services
                     </h2>
 
+
                 </div>
 
+
             </div>
+
 
         </div>
 
 
         <div class="booking-count">
 
+
             <i class="fa-solid fa-screwdriver-wrench"></i>
+
 
             <?= $totalServices ?>
 
+
             service<?= $totalServices === 1 ? '' : 's' ?>
 
+
         </div>
+
 
     </div>
 
 
     <?php if (empty($services)): ?>
 
+
         <div class="empty-state">
+
 
             <div class="empty-icon">
 
@@ -2562,13 +3358,16 @@ foreach (
 
             </div>
 
+
             <h3>
                 No services yet
             </h3>
 
+
             <p>
                 Add your first service above.
             </p>
+
 
         </div>
 
@@ -2579,7 +3378,19 @@ foreach (
         <div class="service-admin-grid">
 
 
-            <?php foreach ($services as $service): ?>
+            <?php foreach (
+                $services as $service
+            ): ?>
+
+
+                <?php
+
+                $details =
+                    parseDetails(
+                        $service['details'] ?? ''
+                    );
+
+                ?>
 
 
                 <div class="service-admin-card">
@@ -2594,6 +3405,7 @@ foreach (
                             )
                         ): ?>
 
+
                             <img
                                 src="<?= e(
                                     $service['image_url']
@@ -2603,12 +3415,15 @@ foreach (
                                 ) ?>"
                             >
 
+
                         <?php else: ?>
+
 
                             <img
                                 src="/logo.png"
                                 alt="ABAA Entertainment"
                             >
+
 
                         <?php endif; ?>
 
@@ -2624,6 +3439,7 @@ foreach (
                             (int)$service['is_available'] === 1
                         ): ?>
 
+
                             <span
                                 class="service-availability available"
                             >
@@ -2634,7 +3450,9 @@ foreach (
 
                             </span>
 
+
                         <?php else: ?>
+
 
                             <span
                                 class="service-availability unavailable"
@@ -2645,6 +3463,7 @@ foreach (
                                 Unavailable
 
                             </span>
+
 
                         <?php endif; ?>
 
@@ -2695,11 +3514,13 @@ foreach (
                                 action="/admin/services"
                             >
 
+
                                 <input
                                     type="hidden"
                                     name="service_id"
                                     value="<?= (int)$service['id'] ?>"
                                 >
+
 
                                 <button
                                     type="submit"
@@ -2707,23 +3528,30 @@ foreach (
                                     class="service-action-button"
                                 >
 
+
                                     <?php if (
                                         (int)$service['is_available'] === 1
                                     ): ?>
+
 
                                         <i class="fa-solid fa-ban"></i>
 
                                         Disable
 
+
                                     <?php else: ?>
+
 
                                         <i class="fa-solid fa-check"></i>
 
                                         Enable
 
+
                                     <?php endif; ?>
 
+
                                 </button>
+
 
                             </form>
 
@@ -2735,18 +3563,19 @@ foreach (
                                 class="service-action-button"
                                 onclick='openEditService(<?= json_encode(
                                     $service,
-                                    JSON_UNESCAPED_UNICODE |
-                                    JSON_UNESCAPED_SLASHES |
                                     JSON_HEX_TAG |
                                     JSON_HEX_AMP |
                                     JSON_HEX_APOS |
-                                    JSON_HEX_QUOT
+                                    JSON_HEX_QUOT |
+                                    JSON_UNESCAPED_UNICODE
                                 ) ?>)'
                             >
+
 
                                 <i class="fa-solid fa-pen"></i>
 
                                 Edit
+
 
                             </button>
 
@@ -2759,11 +3588,13 @@ foreach (
                                 onsubmit="return confirm('Are you sure you want to delete this service?');"
                             >
 
+
                                 <input
                                     type="hidden"
                                     name="service_id"
                                     value="<?= (int)$service['id'] ?>"
                                 >
+
 
                                 <button
                                     type="submit"
@@ -2772,16 +3603,21 @@ foreach (
                                     title="Delete service"
                                 >
 
+
                                     <i class="fa-solid fa-trash"></i>
 
+
                                 </button>
+
 
                             </form>
 
 
                         </div>
 
+
                     </div>
+
 
                 </div>
 
@@ -2846,9 +3682,11 @@ foreach (
 
                 <div class="service-form-group">
 
+
                     <label>
                         Service Name
                     </label>
+
 
                     <input
                         type="text"
@@ -2857,14 +3695,17 @@ foreach (
                         required
                     >
 
+
                 </div>
 
 
                 <div class="service-form-group">
 
+
                     <label>
                         Sort Order
                     </label>
+
 
                     <input
                         type="number"
@@ -2873,28 +3714,34 @@ foreach (
                         min="0"
                     >
 
+
                 </div>
 
 
                 <div class="service-form-group full">
 
+
                     <label>
                         Description
                     </label>
+
 
                     <textarea
                         name="description"
                         id="edit_description"
                     ></textarea>
 
+
                 </div>
 
 
                 <div class="service-form-group">
 
+
                     <label>
                         Replace Image
                     </label>
+
 
                     <input
                         type="file"
@@ -2902,18 +3749,22 @@ foreach (
                         accept="image/jpeg,image/png,image/webp"
                     >
 
+
                     <span class="service-help">
                         Leave empty to keep the current image.
                     </span>
+
 
                 </div>
 
 
                 <div class="service-form-group">
 
+
                     <label>
                         Current Image
                     </label>
+
 
                     <img
                         id="edit_current_image"
@@ -2928,10 +3779,12 @@ foreach (
                         "
                     >
 
+
                 </div>
 
 
                 <div class="service-form-group full">
+
 
                     <label>
                         Service Details
@@ -2956,6 +3809,7 @@ foreach (
 
                     </button>
 
+
                 </div>
 
 
@@ -2977,7 +3831,9 @@ foreach (
 
         </form>
 
+
     </div>
+
 
 </div>
 
@@ -2988,6 +3844,7 @@ foreach (
 
 <footer class="admin-footer">
 
+
     <span>
 
         © <?= date('Y') ?>
@@ -2996,19 +3853,23 @@ foreach (
 
     </span>
 
+
     <span>
         Service Management
     </span>
+
 
 </footer>
 
 
 </main>
 
+
 </div>
 
 
 <script>
+
 
 /*
 |--------------------------------------------------------------------------
@@ -3019,12 +3880,14 @@ foreach (
 function addDetail(
     containerId,
     value = ""
-) {
+)
+{
 
     const container =
         document.getElementById(
             containerId
         );
+
 
     if (!container) {
         return;
@@ -3032,51 +3895,80 @@ function addDetail(
 
 
     const row =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     row.className =
         "detail-row";
 
 
     const input =
-        document.createElement("input");
+        document.createElement(
+            "input"
+        );
+
 
     input.type =
         "text";
 
+
     input.name =
         "details[]";
+
 
     input.placeholder =
         "Service detail";
 
+
     input.value =
-        value || "";
+        value;
 
 
     const button =
-        document.createElement("button");
+        document.createElement(
+            "button"
+        );
+
 
     button.type =
         "button";
 
+
     button.className =
         "remove-detail";
+
 
     button.innerHTML =
         '<i class="fa-solid fa-xmark"></i>';
 
-    button.onclick =
+
+    button.addEventListener(
+        "click",
         function() {
-            removeDetail(button);
-        };
+
+            removeDetail(
+                button
+            );
+
+        }
+    );
 
 
-    row.appendChild(input);
+    row.appendChild(
+        input
+    );
 
-    row.appendChild(button);
 
-    container.appendChild(row);
+    row.appendChild(
+        button
+    );
+
+
+    container.appendChild(
+        row
+    );
 }
 
 
@@ -3094,12 +3986,12 @@ function removeDetail(button)
             ".detail-row"
         );
 
+
     if (row) {
 
         row.remove();
 
     }
-
 }
 
 
@@ -3210,7 +4102,6 @@ function openEditService(service)
 
             }
         );
-
     }
 
 
@@ -3237,11 +4128,6 @@ function closeEditService()
         document.getElementById(
             "editServiceModal"
         );
-
-
-    if (!modal) {
-        return;
-    }
 
 
     modal.classList.remove(
@@ -3302,6 +4188,7 @@ document.addEventListener(
 
     }
 );
+
 
 </script>
 
