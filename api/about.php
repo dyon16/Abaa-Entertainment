@@ -137,9 +137,10 @@ try {
             Events
         </a>
 
-        <a href="/#">
-            
-        </a>
+            <a href="/#services">
+        Services
+    </a>
+
 
         <a
             href="/about"
