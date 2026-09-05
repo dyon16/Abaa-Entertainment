@@ -484,14 +484,7 @@ body::-webkit-scrollbar {
 
     color: white;
 
-    background:
-        rgba(0, 0, 0, 0.30);
-
-    border-top:
-        1px solid #222;
-
-    border-bottom:
-        1px solid #222;
+  
 }
 
 .services h2 {
@@ -691,14 +684,7 @@ body::-webkit-scrollbar {
 
     color: white;
 
-    background:
-        rgba(0, 0, 0, 0.20);
 
-    border-top:
-        1px solid #222;
-
-    border-bottom:
-        1px solid #222;
 }
 
 .events h2 {
