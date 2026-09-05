@@ -2,34 +2,12 @@
 
 include(__DIR__ . '/conn.php');
 
-$events = [];
 
-try {
-
-    $stmt = $pdo->query(
-        "SELECT
-            id,
-            title,
-            type,
-            file_url,
-            thumbnail_url,
-            is_visible,
-            created_at
-         FROM events
-         WHERE is_visible = 1
-         ORDER BY id DESC"
-    );
-
-    $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-} catch (PDOException $e) {
-
-    error_log(
-        'Event query error: ' .
-        $e->getMessage()
-    );
-
-}
+/*
+|--------------------------------------------------------------------------
+| HELPERS
+|--------------------------------------------------------------------------
+*/
 
 function e($value)
 {
@@ -39,6 +17,36 @@ function e($value)
         'UTF-8'
     );
 }
+
+
+function parseDetails($details)
+{
+    if (empty($details)) {
+        return [];
+    }
+
+    $decoded = json_decode(
+        $details,
+        true
+    );
+
+    if (is_array($decoded)) {
+        return $decoded;
+    }
+
+    return array_values(
+        array_filter(
+            array_map(
+                'trim',
+                preg_split(
+                    '/\r\n|\r|\n/',
+                    $details
+                )
+            )
+        )
+    );
+}
+
 
 function getVideoMimeType($url)
 {
@@ -74,25 +82,120 @@ function getVideoMimeType($url)
     }
 }
 
-$firstEvent = !empty($events)
-    ? $events[0]
-    : null;
 
-$firstType = $firstEvent
-    ? $firstEvent['type']
-    : '';
+/*
+|--------------------------------------------------------------------------
+| LOAD EVENTS
+|--------------------------------------------------------------------------
+*/
 
-$firstFile = $firstEvent
-    ? $firstEvent['file_url']
-    : '';
+$events = [];
 
-$firstTitle = $firstEvent
-    ? $firstEvent['title']
-    : '';
+try {
 
-$firstThumbnail = $firstEvent
-    ? $firstEvent['thumbnail_url']
-    : '';
+    $stmt = $pdo->query(
+        "SELECT
+            id,
+            title,
+            type,
+            file_url,
+            thumbnail_url,
+            is_visible,
+            created_at
+         FROM events
+         WHERE is_visible = 1
+         ORDER BY id DESC"
+    );
+
+    $events =
+        $stmt->fetchAll(
+            PDO::FETCH_ASSOC
+        );
+
+} catch (PDOException $e) {
+
+    error_log(
+        'Event query error: ' .
+        $e->getMessage()
+    );
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| LOAD SERVICES
+|--------------------------------------------------------------------------
+|
+| Services are managed from /admin/services
+|
+*/
+
+$services = [];
+
+try {
+
+    $stmt = $pdo->query(
+        "SELECT
+            id,
+            name,
+            slug,
+            image_url,
+            description,
+            details,
+            is_available,
+            sort_order,
+            created_at
+         FROM services
+         WHERE is_available = 1
+         ORDER BY sort_order ASC, id ASC"
+    );
+
+    $services =
+        $stmt->fetchAll(
+            PDO::FETCH_ASSOC
+        );
+
+} catch (PDOException $e) {
+
+    error_log(
+        'Service query error: ' .
+        $e->getMessage()
+    );
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| FIRST EVENT
+|--------------------------------------------------------------------------
+*/
+
+$firstEvent =
+    !empty($events)
+        ? $events[0]
+        : null;
+
+$firstType =
+    $firstEvent
+        ? $firstEvent['type']
+        : '';
+
+$firstFile =
+    $firstEvent
+        ? $firstEvent['file_url']
+        : '';
+
+$firstTitle =
+    $firstEvent
+        ? $firstEvent['title']
+        : '';
+
+$firstThumbnail =
+    $firstEvent
+        ? $firstEvent['thumbnail_url']
+        : '';
 
 $firstMimeType =
     $firstType === 'video'
@@ -118,110 +221,289 @@ $firstMimeType =
     ABAA Entertainment
 </title>
 
+
 <link
     rel="stylesheet"
     href="/style.css"
 >
+
 
 <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
 >
 
+
 <style>
 
+/*
+|--------------------------------------------------------------------------
+| FEATURED EVENT
+|--------------------------------------------------------------------------
+*/
+
 .featured-event {
-    position: relative;
+
+    position:
+        relative;
+
 }
+
 
 .featured-event video,
 .featured-event > img {
-    width: 100%;
-    display: block;
+
+    width:
+        100%;
+
+    display:
+        block;
+
 }
 
+
 .featured-play-button {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 70px;
-    height: 70px;
-    border: none;
-    border-radius: 50%;
-    background: rgba(255, 90, 31, .95);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 20;
-    box-shadow: 0 8px 30px rgba(0,0,0,.30);
+
+    position:
+        absolute;
+
+    left:
+        50%;
+
+    top:
+        50%;
+
+    transform:
+        translate(-50%, -50%);
+
+    width:
+        70px;
+
+    height:
+        70px;
+
+    border:
+        none;
+
+    border-radius:
+        50%;
+
+    background:
+        rgba(255, 90, 31, .95);
+
+    color:
+        white;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    cursor:
+        pointer;
+
+    z-index:
+        20;
+
+    box-shadow:
+        0 8px 30px rgba(0,0,0,.30);
+
     transition:
         transform .2s ease,
         background .2s ease;
+
 }
 
+
 .featured-play-button:hover {
+
     transform:
         translate(-50%, -50%)
         scale(1.08);
-    background: #ff4510;
+
+    background:
+        #ff4510;
+
 }
+
 
 .featured-play-button i {
-    font-size: 25px;
-    margin-left: 4px;
+
+    font-size:
+        25px;
+
+    margin-left:
+        4px;
+
 }
+
 
 .video-thumbnail {
-    position: relative;
+
+    position:
+        relative;
+
 }
+
 
 .video-thumbnail img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
+
+    width:
+        100%;
+
+    height:
+        100%;
+
+    object-fit:
+        cover;
+
+    display:
+        block;
+
 }
+
 
 .video-thumbnail-play {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 90, 31, .92);
-    color: white;
+
+    position:
+        absolute;
+
+    left:
+        50%;
+
+    top:
+        50%;
+
+    transform:
+        translate(-50%, -50%);
+
+    width:
+        42px;
+
+    height:
+        42px;
+
+    border-radius:
+        50%;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    background:
+        rgba(255, 90, 31, .92);
+
+    color:
+        white;
+
 }
 
+
 .featured-video-loading {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    border: 4px solid rgba(255, 255, 255, .35);
-    border-top-color: #ff5a1f;
-    animation: featuredVideoSpin .8s linear infinite;
-    z-index: 30;
-    display: none;
+
+    position:
+        absolute;
+
+    left:
+        50%;
+
+    top:
+        50%;
+
+    transform:
+        translate(-50%, -50%);
+
+    width:
+        48px;
+
+    height:
+        48px;
+
+    border-radius:
+        50%;
+
+    border:
+        4px solid rgba(255, 255, 255, .35);
+
+    border-top-color:
+        #ff5a1f;
+
+    animation:
+        featuredVideoSpin .8s linear infinite;
+
+    z-index:
+        30;
+
+    display:
+        none;
+
 }
+
 
 @keyframes featuredVideoSpin {
 
     to {
+
         transform:
             translate(-50%, -50%)
             rotate(360deg);
+
     }
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| SERVICE FALLBACK
+|--------------------------------------------------------------------------
+*/
+
+.service-empty {
+
+    width:
+        100%;
+
+    padding:
+        40px 20px;
+
+    text-align:
+        center;
+
+    color:
+        #777;
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| SERVICE IMAGE
+|--------------------------------------------------------------------------
+*/
+
+.image-button img {
+
+    width:
+        100%;
+
+    height:
+        100%;
+
+    object-fit:
+        cover;
+
+    display:
+        block;
 
 }
 
@@ -229,9 +511,16 @@ $firstMimeType =
 
 </head>
 
+
 <body>
 
+
+<!-- =====================================================
+     HEADER
+===================================================== -->
+
 <header class="header">
+
 
 <a
     href="/"
@@ -245,43 +534,61 @@ $firstMimeType =
 
 </a>
 
+
 <nav>
 
     <a href="/">
         Home
     </a>
 
+
     <a href="/#events">
         Events
     </a>
+
 
     <a href="/#services">
         Services
     </a>
 
+
     <a href="/about">
         About
     </a>
+
 
     <a
         href="#"
         class="book-button"
         onclick="openBookingModal(event)"
     >
+
         Book
+
     </a>
 
 </nav>
 
+
 </header>
+
+
+<!-- =====================================================
+     HERO
+===================================================== -->
 
 <section class="about-hero">
 
+
 <div class="about-hero-content">
 
+
     <p class="small-title">
+
         ABAA ENTERTAINMENT
+
     </p>
+
 
     <h1>
 
@@ -297,6 +604,7 @@ $firstMimeType =
 
     </h1>
 
+
     <p class="hero-description">
 
         We create unforgettable experiences through
@@ -305,11 +613,23 @@ $firstMimeType =
 
     </p>
 
+
 </div>
+
 
 </section>
 
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
 <main class="main-container">
+
+
+<!-- =====================================================
+     LOGO / FEATURED BOX
+===================================================== -->
 
 <section class="big-box">
 
@@ -320,14 +640,21 @@ $firstMimeType =
 
 </section>
 
+
+<!-- =====================================================
+     SERVICES
+===================================================== -->
+
 <section
     class="services"
     id="services"
 >
 
+
     <h2>
         Services
     </h2>
+
 
     <p class="services-description">
 
@@ -336,116 +663,101 @@ $firstMimeType =
 
     </p>
 
+
     <div class="boxes">
 
-        <a
-            href="/service?service=led-wall"
-            class="image-button"
-        >
 
-            <img
-                src="/service1.png"
-                alt="LED Wall"
-            >
+        <?php if (empty($services)): ?>
 
-            <div class="image-title">
-                LED Wall
+
+            <div class="service-empty">
+
+                <p>
+                    No services are currently available.
+                </p>
+
             </div>
 
-        </a>
 
-        <a
-            href="/service?service=lights-sound"
-            class="image-button"
-        >
+        <?php else: ?>
 
-            <img
-                src="/service2.png"
-                alt="Lights and Sound"
-            >
 
-            <div class="image-title">
-                Lights and Sound
-            </div>
+            <?php foreach ($services as $service): ?>
 
-        </a>
 
-        <a
-            href="/service?service=live-feed"
-            class="image-button"
-        >
+                <a
+                    href="/service?service=<?= e($service['slug']) ?>"
+                    class="image-button"
+                >
 
-            <img
-                src="/service3.png"
-                alt="Live Feed"
-            >
 
-            <div class="image-title">
-                Live Feed
-            </div>
+                    <?php if (
+                        !empty($service['image_url'])
+                    ): ?>
 
-        </a>
 
-        <a
-            href="/service?service=stage"
-            class="image-button"
-        >
+                        <img
+                            src="<?= e(
+                                $service['image_url']
+                            ) ?>"
+                            alt="<?= e(
+                                $service['name']
+                            ) ?>"
+                        >
 
-            <img
-                src="/service4.png"
-                alt="Stage Production"
-            >
 
-            <div class="image-title">
-                Stage
-            </div>
+                    <?php else: ?>
 
-        </a>
 
-        <a
-            href="/service?service=music-studio"
-            class="image-button"
-        >
+                        <img
+                            src="/logo.png"
+                            alt="<?= e(
+                                $service['name']
+                            ) ?>"
+                        >
 
-            <img
-                src="/service5.png"
-                alt="Music Studio"
-            >
 
-            <div class="image-title">
-                Music Studio
-            </div>
+                    <?php endif; ?>
 
-        </a>
 
-        <a
-            href="/service?service=trusses"
-            class="image-button"
-        >
+                    <div class="image-title">
 
-            <img
-                src="/service6.png"
-                alt="Trusses"
-            >
+                        <?= e(
+                            $service['name']
+                        ) ?>
 
-            <div class="image-title">
-                Trusses
-            </div>
+                    </div>
 
-        </a>
+
+                </a>
+
+
+            <?php endforeach; ?>
+
+
+        <?php endif; ?>
+
 
     </div>
 
+
 </section>
+
+
+<!-- =====================================================
+     EVENTS
+===================================================== -->
 
 <section
     class="events"
     id="events"
 >
 
+
     <h2>
         Events
     </h2>
+
 
     <p class="events-description">
 
@@ -454,15 +766,19 @@ $firstMimeType =
 
     </p>
 
+
     <?php if (empty($events)): ?>
 
+
         <div class="featured-event">
+
 
             <img
                 id="featuredImage"
                 src="/logo.png"
                 alt="ABAA Entertainment"
             >
+
 
             <video
                 id="featuredVideo"
@@ -477,6 +793,7 @@ $firstMimeType =
 
             </video>
 
+
             <button
                 type="button"
                 id="featuredPlayButton"
@@ -490,6 +807,7 @@ $firstMimeType =
 
             </button>
 
+
             <div
                 class="featured-title"
                 id="featuredTitle"
@@ -499,14 +817,18 @@ $firstMimeType =
 
             </div>
 
+
         </div>
 
+
     <?php else: ?>
+
 
         <div
             class="featured-event"
             id="featuredEvent"
         >
+
 
             <img
                 id="featuredImage"
@@ -528,6 +850,7 @@ $firstMimeType =
                 ?>
             >
 
+
             <video
                 id="featuredVideo"
                 controls
@@ -542,7 +865,11 @@ $firstMimeType =
                 ?>
             >
 
-                <?php if ($firstType === 'video'): ?>
+
+                <?php if (
+                    $firstType === 'video'
+                ): ?>
+
 
                     <source
                         id="featuredVideoSource"
@@ -550,17 +877,22 @@ $firstMimeType =
                         type="<?= e($firstMimeType) ?>"
                     >
 
+
                 <?php endif; ?>
+
 
                 Your browser does not support
                 the video tag.
 
+
             </video>
+
 
             <div
                 id="featuredVideoLoading"
                 class="featured-video-loading"
             ></div>
+
 
             <button
                 type="button"
@@ -581,6 +913,7 @@ $firstMimeType =
 
             </button>
 
+
             <div
                 class="featured-title"
                 id="featuredTitle"
@@ -590,13 +923,17 @@ $firstMimeType =
 
             </div>
 
+
         </div>
 
+
         <div class="event-thumbnails">
+
 
             <?php foreach (
                 $events as $index => $event
             ): ?>
+
 
                 <?php
 
@@ -621,6 +958,7 @@ $firstMimeType =
 
                 ?>
 
+
                 <button
                     type="button"
                     class="event-thumbnail <?= $index === 0
@@ -629,39 +967,52 @@ $firstMimeType =
                     ?>"
                     onclick="showEvent(
                         <?= htmlspecialchars(
-                            json_encode($eventType),
+                            json_encode(
+                                $eventType
+                            ),
                             ENT_QUOTES,
                             'UTF-8'
                         ) ?>,
                         <?= htmlspecialchars(
-                            json_encode($eventFile),
+                            json_encode(
+                                $eventFile
+                            ),
                             ENT_QUOTES,
                             'UTF-8'
                         ) ?>,
                         <?= htmlspecialchars(
-                            json_encode($eventTitle),
+                            json_encode(
+                                $eventTitle
+                            ),
                             ENT_QUOTES,
                             'UTF-8'
                         ) ?>,
                         this,
                         <?= htmlspecialchars(
-                            json_encode($eventThumbnail),
+                            json_encode(
+                                $eventThumbnail
+                            ),
                             ENT_QUOTES,
                             'UTF-8'
                         ) ?>,
                         <?= htmlspecialchars(
-                            json_encode($eventMimeType),
+                            json_encode(
+                                $eventMimeType
+                            ),
                             ENT_QUOTES,
                             'UTF-8'
                         ) ?>
                     )"
                 >
 
+
                     <?php if (
                         $eventType === 'video'
                     ): ?>
 
+
                         <div class="video-thumbnail">
+
 
                             <img
                                 src="<?= e(
@@ -673,6 +1024,7 @@ $firstMimeType =
                                 ) ?>"
                             >
 
+
                             <span
                                 class="video-thumbnail-play"
                             >
@@ -683,9 +1035,12 @@ $firstMimeType =
 
                             </span>
 
+
                         </div>
 
+
                     <?php else: ?>
+
 
                         <img
                             src="<?= e(
@@ -696,7 +1051,9 @@ $firstMimeType =
                             ) ?>"
                         >
 
+
                     <?php endif; ?>
+
 
                     <span class="event-thumbnail-title">
 
@@ -706,28 +1063,45 @@ $firstMimeType =
 
                     </span>
 
+
                 </button>
+
 
             <?php endforeach; ?>
 
+
         </div>
+
 
     <?php endif; ?>
 
+
 </section>
+
 
 </main>
 
+
+<!-- =====================================================
+     FOOTER
+===================================================== -->
+
 <footer class="footer">
+
 
 <div class="footer-container">
 
+
+    <!-- BRAND -->
+
     <div class="footer-section footer-brand">
+
 
         <img
             src="/logo.png"
             alt="ABAA Entertainment Logo"
         >
+
 
         <p>
 
@@ -738,76 +1112,110 @@ $firstMimeType =
 
         </p>
 
+
     </div>
 
+
+    <!-- QUICK LINKS -->
+
     <div class="footer-section">
+
 
         <h3>
             Quick Links
         </h3>
 
+
         <a href="/">
             Home
         </a>
+
 
         <a href="/#events">
             Events
         </a>
 
+
         <a href="/#services">
             Services
         </a>
+
 
         <a href="/about">
             About Us
         </a>
 
+
         <a
             href="/booking-status"
             class="booking-status-link"
         >
+
             Check Booking Status
+
         </a>
+
 
     </div>
 
+
+    <!-- DYNAMIC SERVICES -->
+
     <div class="footer-section">
+
 
         <h3>
             Our Services
         </h3>
 
-        <a href="/service?service=led-wall">
-            LED Wall
-        </a>
 
-        <a href="/service?service=lights-sound">
-            Lights & Sound
-        </a>
+        <?php if (empty($services)): ?>
 
-        <a href="/service?service=live-feed">
-            Live Feed
-        </a>
 
-        <a href="/service?service=stage">
-            Stage Production
-        </a>
+            <span>
+                No services available
+            </span>
 
-        <a href="/service?service=music-studio">
-            Music Studio
-        </a>
 
-        <a href="/service?service=trusses">
-            Trusses
-        </a>
+        <?php else: ?>
+
+
+            <?php foreach (
+                $services as $service
+            ): ?>
+
+
+                <a
+                    href="/service?service=<?= e(
+                        $service['slug']
+                    ) ?>"
+                >
+
+                    <?= e(
+                        $service['name']
+                    ) ?>
+
+                </a>
+
+
+            <?php endforeach; ?>
+
+
+        <?php endif; ?>
+
 
     </div>
 
+
+    <!-- CONTACT -->
+
     <div class="footer-section">
+
 
         <h3>
             Contact Us
         </h3>
+
 
         <a
             href="https://www.google.com/maps/place/ABAA+Entertainment/@14.4652755,121.1915078,19z"
@@ -816,7 +1224,9 @@ $firstMimeType =
             class="contact-item"
         >
 
+
             <i class="fa-solid fa-location-dot"></i>
+
 
             <span>
 
@@ -825,35 +1235,46 @@ $firstMimeType =
 
             </span>
 
+
         </a>
+
 
         <a
             href="tel:+639231476552"
             class="contact-item"
         >
 
+
             <i class="fa-solid fa-phone"></i>
+
 
             <span>
                 +63 923 147 6552
             </span>
 
+
         </a>
+
 
         <a
             href="mailto:abaaentertainment@gmail.com"
             class="contact-item"
         >
 
+
             <i class="fa-solid fa-envelope"></i>
+
 
             <span>
                 abaaentertainment@gmail.com
             </span>
 
+
         </a>
 
+
         <div class="social-links">
+
 
             <a
                 href="https://www.facebook.com/ABAAEntertainment"
@@ -866,6 +1287,7 @@ $firstMimeType =
 
             </a>
 
+
             <a
                 href="#"
                 aria-label="Instagram"
@@ -874,6 +1296,7 @@ $firstMimeType =
                 <i class="fa-brands fa-instagram"></i>
 
             </a>
+
 
             <a
                 href="https://www.tiktok.com/@markebpmbta?_r=1&_t=ZS-99DpdJXY5sD"
@@ -886,13 +1309,18 @@ $firstMimeType =
 
             </a>
 
+
         </div>
+
 
     </div>
 
+
 </div>
 
+
 <div class="footer-bottom">
+
 
     <p>
 
@@ -902,15 +1330,23 @@ $firstMimeType =
 
     </p>
 
+
     <p>
 
         Entertainment • Events • Experiences
 
     </p>
 
+
 </div>
 
+
 </footer>
+
+
+<!-- =====================================================
+     BOOKING MODAL
+===================================================== -->
 
 <div
     class="booking-overlay"
@@ -918,7 +1354,9 @@ $firstMimeType =
     aria-hidden="true"
 >
 
+
 <div class="booking-modal">
+
 
     <button
         type="button"
@@ -931,15 +1369,21 @@ $firstMimeType =
 
     </button>
 
+
     <div class="booking-header">
 
+
         <span class="booking-label">
+
             ABAA ENTERTAINMENT
+
         </span>
+
 
         <h2>
             Book An Event
         </h2>
+
 
         <p>
 
@@ -948,7 +1392,9 @@ $firstMimeType =
 
         </p>
 
+
     </div>
+
 
     <form
         action="/booking"
@@ -956,13 +1402,19 @@ $firstMimeType =
         class="booking-form"
     >
 
+
+        <!-- NAME + PHONE -->
+
         <div class="form-row">
 
+
             <div class="form-group">
+
 
                 <label for="booking_name">
                     Full Name
                 </label>
+
 
                 <input
                     type="text"
@@ -972,13 +1424,17 @@ $firstMimeType =
                     required
                 >
 
+
             </div>
 
+
             <div class="form-group">
+
 
                 <label for="booking_phone">
                     Contact Number
                 </label>
+
 
                 <input
                     type="tel"
@@ -988,17 +1444,25 @@ $firstMimeType =
                     required
                 >
 
+
             </div>
+
 
         </div>
 
+
+        <!-- EMAIL + CONTACT PERSON -->
+
         <div class="form-row">
 
+
             <div class="form-group">
+
 
                 <label for="booking_email">
                     Email Address
                 </label>
+
 
                 <input
                     type="email"
@@ -1008,13 +1472,17 @@ $firstMimeType =
                     required
                 >
 
+
             </div>
 
+
             <div class="form-group">
+
 
                 <label for="booking_contact_person">
                     Contact Person
                 </label>
+
 
                 <input
                     type="text"
@@ -1024,17 +1492,25 @@ $firstMimeType =
                     required
                 >
 
+
             </div>
+
 
         </div>
 
+
+        <!-- EVENT TYPE + DATE -->
+
         <div class="form-row">
 
+
             <div class="form-group">
+
 
                 <label for="booking_event">
                     Event Type
                 </label>
+
 
                 <select
                     id="booking_event"
@@ -1042,51 +1518,66 @@ $firstMimeType =
                     required
                 >
 
+
                     <option
                         value=""
                         disabled
                         selected
                     >
+
                         Select event type
+
                     </option>
+
 
                     <option value="Birthday">
                         Birthday
                     </option>
 
+
                     <option value="Wedding">
                         Wedding
                     </option>
+
 
                     <option value="Concert">
                         Concert
                     </option>
 
+
                     <option value="Corporate Event">
                         Corporate Event
                     </option>
+
 
                     <option value="Festival">
                         Festival
                     </option>
 
+
                     <option value="Product Launch">
                         Product Launch
                     </option>
+
 
                     <option value="Other">
                         Other
                     </option>
 
+
                 </select>
+
 
             </div>
 
+
             <div class="form-group">
+
 
                 <label for="booking_date">
                     Event Date
                 </label>
+
 
                 <input
                     type="date"
@@ -1095,15 +1586,22 @@ $firstMimeType =
                     required
                 >
 
+
             </div>
+
 
         </div>
 
+
+        <!-- COMPANY -->
+
         <div class="form-group">
+
 
             <label for="booking_company">
                 Company Name
             </label>
+
 
             <input
                 type="text"
@@ -1113,101 +1611,67 @@ $firstMimeType =
                 required
             >
 
+
         </div>
 
+
+        <!-- SERVICES -->
+
         <div class="form-group">
+
 
             <label>
                 Services Needed
             </label>
 
+
             <div class="service-checkboxes">
 
-                <label class="service-checkbox">
 
-                    <input
-                        type="checkbox"
-                        name="service[]"
-                        value="LED Wall"
-                    >
+                <?php if (
+                    !empty($services)
+                ): ?>
 
-                    <span>
-                        LED Wall
-                    </span>
 
-                </label>
+                    <?php foreach (
+                        $services as $service
+                    ): ?>
 
-                <label class="service-checkbox">
 
-                    <input
-                        type="checkbox"
-                        name="service[]"
-                        value="Lights & Sound"
-                    >
+                        <label class="service-checkbox">
 
-                    <span>
-                        Lights & Sound
-                    </span>
 
-                </label>
+                            <input
+                                type="checkbox"
+                                name="service[]"
+                                value="<?= e(
+                                    $service['name']
+                                ) ?>"
+                            >
 
-                <label class="service-checkbox">
 
-                    <input
-                        type="checkbox"
-                        name="service[]"
-                        value="Live Feed"
-                    >
+                            <span>
 
-                    <span>
-                        Live Feed
-                    </span>
+                                <?= e(
+                                    $service['name']
+                                ) ?>
 
-                </label>
+                            </span>
 
-                <label class="service-checkbox">
 
-                    <input
-                        type="checkbox"
-                        name="service[]"
-                        value="Stage Production"
-                    >
+                        </label>
 
-                    <span>
-                        Stage Production
-                    </span>
 
-                </label>
+                    <?php endforeach; ?>
+
+
+                <?php endif; ?>
+
+
+                <!-- FULL EVENT PRODUCTION -->
 
                 <label class="service-checkbox">
 
-                    <input
-                        type="checkbox"
-                        name="service[]"
-                        value="Music Studio"
-                    >
-
-                    <span>
-                        Music Studio
-                    </span>
-
-                </label>
-
-                <label class="service-checkbox">
-
-                    <input
-                        type="checkbox"
-                        name="service[]"
-                        value="Trusses"
-                    >
-
-                    <span>
-                        Trusses
-                    </span>
-
-                </label>
-
-                <label class="service-checkbox">
 
                     <input
                         type="checkbox"
@@ -1215,21 +1679,30 @@ $firstMimeType =
                         value="Full Event Production"
                     >
 
+
                     <span>
                         Full Event Production
                     </span>
 
+
                 </label>
+
 
             </div>
 
+
         </div>
 
+
+        <!-- MESSAGE -->
+
         <div class="form-group">
+
 
             <label for="booking_message">
                 Event Details
             </label>
+
 
             <textarea
                 id="booking_message"
@@ -1238,28 +1711,50 @@ $firstMimeType =
                 placeholder="Tell us about your event, location, preferred setup, budget, or other requirements..."
             ></textarea>
 
+
         </div>
+
+
+        <!-- SUBMIT -->
 
         <button
             type="submit"
             class="booking-submit"
         >
 
+
             <span>
                 Submit Booking Request
             </span>
 
+
             <i class="fa-solid fa-arrow-right"></i>
+
 
         </button>
 
+
     </form>
 
-</div>
 
 </div>
+
+
+</div>
+
+
+<!-- =====================================================
+     JAVASCRIPT
+===================================================== -->
 
 <script>
+
+
+/*
+|--------------------------------------------------------------------------
+| SHOW EVENT
+|--------------------------------------------------------------------------
+*/
 
 function showEvent(
     type,
@@ -1270,30 +1765,36 @@ function showEvent(
     mimeType
 ) {
 
+
     const image =
         document.getElementById(
             "featuredImage"
         );
+
 
     const video =
         document.getElementById(
             "featuredVideo"
         );
 
+
     const featuredTitle =
         document.getElementById(
             "featuredTitle"
         );
+
 
     const playButton =
         document.getElementById(
             "featuredPlayButton"
         );
 
+
     const loading =
         document.getElementById(
             "featuredVideoLoading"
         );
+
 
     if (
         !image ||
@@ -1301,12 +1802,16 @@ function showEvent(
         !featuredTitle
     ) {
 
+
         console.error(
             "Featured event elements are missing."
         );
 
+
         return;
+
     }
+
 
     document
         .querySelectorAll(
@@ -1315,457 +1820,645 @@ function showEvent(
         .forEach(
             function(item) {
 
+
                 item.classList.remove(
                     "active"
                 );
 
+
             }
         );
 
+
     if (button) {
+
 
         button.classList.add(
             "active"
         );
 
+
     }
+
 
     featuredTitle.textContent =
         title;
 
+
     try {
+
 
         video.pause();
 
+
     } catch (error) {
+
 
         console.log(
             "Could not pause video:",
             error
         );
 
+
     }
+
 
     video.removeAttribute(
         "src"
     );
 
+
     video.load();
 
+
     if (loading) {
+
 
         loading.style.display =
             "none";
 
+
     }
 
+
     if (type === "image") {
+
 
         image.src =
             source;
 
+
         image.alt =
             title;
+
 
         image.style.display =
             "block";
 
+
         video.style.display =
             "none";
 
+
         if (playButton) {
+
 
             playButton.style.display =
                 "none";
 
+
         }
 
+
         return;
+
     }
+
 
     if (type === "video") {
 
+
         if (thumbnail) {
+
 
             image.src =
                 thumbnail;
 
+
             image.alt =
                 title;
+
 
             image.style.display =
                 "block";
 
+
         } else {
+
 
             image.style.display =
                 "none";
 
+
         }
+
 
         video.src =
             source;
 
+
         if (mimeType) {
+
 
             video.setAttribute(
                 "type",
                 mimeType
             );
 
+
         }
+
 
         video.load();
 
+
         if (thumbnail) {
+
 
             video.style.display =
                 "none";
 
+
             if (playButton) {
+
 
                 playButton.style.display =
                     "flex";
 
+
             }
 
+
         } else {
+
 
             image.style.display =
                 "none";
 
+
             video.style.display =
                 "block";
 
+
             if (playButton) {
+
 
                 playButton.style.display =
                     "none";
 
+
             }
+
 
         }
 
+
     }
+
 
 }
 
+
+/*
+|--------------------------------------------------------------------------
+| PLAY FEATURED VIDEO
+|--------------------------------------------------------------------------
+*/
+
 function playFeaturedVideo()
 {
+
 
     const image =
         document.getElementById(
             "featuredImage"
         );
 
+
     const video =
         document.getElementById(
             "featuredVideo"
         );
+
 
     const playButton =
         document.getElementById(
             "featuredPlayButton"
         );
 
+
     const loading =
         document.getElementById(
             "featuredVideoLoading"
         );
 
+
     if (!video) {
+
 
         return;
 
+
     }
 
+
     if (image) {
+
 
         image.style.display =
             "none";
 
+
     }
+
 
     video.style.display =
         "block";
 
+
     if (playButton) {
+
 
         playButton.style.display =
             "none";
 
+
     }
 
+
     if (loading) {
+
 
         loading.style.display =
             "block";
 
+
     }
+
 
     video.muted =
         false;
 
+
     const playPromise =
         video.play();
+
 
     if (
         playPromise !== undefined
     ) {
 
+
         playPromise
             .then(
                 function() {
 
+
                     if (loading) {
+
 
                         loading.style.display =
                             "none";
 
+
                     }
+
 
                 }
             )
             .catch(
                 function(error) {
 
+
                     if (loading) {
+
 
                         loading.style.display =
                             "none";
 
+
                     }
+
 
                     console.error(
                         "Video play failed:",
                         error
                     );
 
+
                 }
             );
 
+
     }
 
+
 }
+
+
+/*
+|--------------------------------------------------------------------------
+| FEATURED VIDEO EVENTS
+|--------------------------------------------------------------------------
+*/
 
 document.addEventListener(
     "DOMContentLoaded",
     function() {
+
 
         const video =
             document.getElementById(
                 "featuredVideo"
             );
 
+
         const loading =
             document.getElementById(
                 "featuredVideoLoading"
             );
+
 
         const playButton =
             document.getElementById(
                 "featuredPlayButton"
             );
 
+
         if (!video) {
+
 
             return;
 
+
         }
+
 
         video.addEventListener(
             "canplay",
             function() {
 
+
                 if (loading) {
+
 
                     loading.style.display =
                         "none";
 
+
                 }
+
 
             }
         );
 
+
         video.addEventListener(
             "waiting",
             function() {
+
 
                 if (
                     video.style.display !==
                     "none"
                 ) {
 
+
                     if (loading) {
+
 
                         loading.style.display =
                             "block";
 
+
                     }
+
 
                 }
 
+
             }
         );
+
 
         video.addEventListener(
             "playing",
             function() {
 
+
                 if (loading) {
+
 
                     loading.style.display =
                         "none";
 
+
                 }
+
 
             }
         );
+
 
         video.addEventListener(
             "ended",
             function() {
 
+
                 if (playButton) {
+
 
                     playButton.style.display =
                         "none";
 
+
                 }
+
 
             }
         );
+
 
         video.addEventListener(
             "error",
             function() {
 
+
                 if (loading) {
+
 
                     loading.style.display =
                         "none";
 
+
                 }
+
 
                 console.error(
                     "VIDEO LOAD ERROR"
                 );
+
 
                 console.error(
                     "Video URL:",
                     video.currentSrc
                 );
 
+
                 console.error(
                     "Video error:",
                     video.error
                 );
 
+
             }
         );
+
 
     }
 );
 
+
+/*
+|--------------------------------------------------------------------------
+| BOOKING MODAL
+|--------------------------------------------------------------------------
+*/
+
 function openBookingModal(event)
 {
 
+
     if (event) {
+
 
         event.preventDefault();
 
+
     }
+
 
     const modal =
         document.getElementById(
             "bookingModal"
         );
 
+
     if (!modal) {
+
 
         return;
 
+
     }
+
 
     modal.classList.add(
         "active"
     );
+
 
     modal.setAttribute(
         "aria-hidden",
         "false"
     );
 
+
     document.body.style.overflow =
         "hidden";
 
+
 }
+
 
 function closeBookingModal()
 {
+
 
     const modal =
         document.getElementById(
             "bookingModal"
         );
 
+
     if (!modal) {
+
 
         return;
 
+
     }
+
 
     modal.classList.remove(
         "active"
     );
+
 
     modal.setAttribute(
         "aria-hidden",
         "true"
     );
 
+
     document.body.style.overflow =
         "";
 
+
 }
+
+
+/*
+|--------------------------------------------------------------------------
+| CLICK OUTSIDE BOOKING MODAL
+|--------------------------------------------------------------------------
+*/
 
 document.addEventListener(
     "click",
     function(event) {
+
 
         const modal =
             document.getElementById(
                 "bookingModal"
             );
 
+
         if (
             modal &&
             event.target === modal
         ) {
 
+
             closeBookingModal();
+
 
         }
 
+
     }
 );
+
+
+/*
+|--------------------------------------------------------------------------
+| ESC KEY
+|--------------------------------------------------------------------------
+*/
 
 document.addEventListener(
     "keydown",
     function(event) {
 
+
         if (
             event.key === "Escape"
         ) {
 
+
             closeBookingModal();
 
+
         }
+
 
     }
 );
 
+
 </script>
+
 
 </body>
 
