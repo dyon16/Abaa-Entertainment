@@ -706,7 +706,7 @@ if (
         */
 
         $maxFileSize =
-            4 * 1024 * 1024;
+            500 * 1024 * 1024;
 
         if (
             $fileSize >
@@ -714,7 +714,7 @@ if (
         ) {
 
             $statusError =
-                'File is too large for this PHP upload endpoint. Maximum is 4MB. For large videos, use direct Vercel Blob client uploads.';
+                'File is too large for this PHP upload endpoint. Maximum is 500MB. For large videos, use direct Vercel Blob client uploads.';
 
         } else {
 
@@ -1871,7 +1871,7 @@ foreach ($events as $event) {
                     type="text"
                     id="title"
                     name="title"
-                    placeholder="Example: Android18 x UYRE"
+                    placeholder=""
                     required
                 >
 
