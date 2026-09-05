@@ -1,265 +1,361 @@
-<?php
-
-include(__DIR__ . '/conn.php');
-
-
-/*
-|--------------------------------------------------------------------------
-| LOAD VISIBLE EVENTS
-|--------------------------------------------------------------------------
-*/
-
-$events = [];
-
-try {
-
-    $stmt = $pdo->query(
-        "SELECT
-            id,
-            title,
-            type,
-            file_url,
-            thumbnail_url,
-            is_visible,
-            created_at
-         FROM events
-         WHERE is_visible = 1
-         ORDER BY id DESC"
-    );
-
-    $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-} catch (PDOException $e) {
-
-    error_log(
-        'Event query error: ' .
-        $e->getMessage()
-    );
-
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| HELPER
-|--------------------------------------------------------------------------
-*/
-
-function e($value)
-{
-    return htmlspecialchars(
-        (string)($value ?? ''),
-        ENT_QUOTES,
-        'UTF-8'
-    );
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| GET VIDEO MIME TYPE
-|--------------------------------------------------------------------------
-*/
-
+<?php include(__DIR__ . '/conn.php'); 
+/* |-------------------------------------------------------------------------- 
+| LOAD VISIBLE EVENTS |
+-------------------------------------------------------------------------- */ 
+$events = []; 
+try 
+    {
+        $stmt = $pdo->query( "SELECT id, title, type, file_url, thumbnail_url, is_visible, created_at FROM events WHERE is_visible = 1 ORDER BY id DESC" );
+        $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } 
+catch (PDOException $e) 
+{ 
+    error_log( 'Event query error: ' . $e->getMessage() ); 
+} 
+/* |-------------------------------------------------------------------------- | HELPER |-------------------------------------------------------------------------- */
+function e($value) 
+    { 
+        return htmlspecialchars( (string)($value ?? ''), ENT_QUOTES, 'UTF-8' ); 
+    } 
+/* |-------------------------------------------------------------------------- | GET VIDEO MIME TYPE |-------------------------------------------------------------------------- */
 function getVideoMimeType($url)
-{
-    $path = parse_url(
-        $url,
-        PHP_URL_PATH
-    );
-
-    $extension = strtolower(
-        pathinfo(
-            $path,
-            PATHINFO_EXTENSION
-        )
-    );
-
-    switch ($extension) {
-
-        case 'webm':
-            return 'video/webm';
-
-        case 'ogg':
-            return 'video/ogg';
-
-        case 'mov':
-            return 'video/quicktime';
-
-        case 'm4v':
-            return 'video/mp4';
-
-        case 'mp4':
-        default:
-            return 'video/mp4';
-    }
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| FIRST EVENT
-|--------------------------------------------------------------------------
-*/
-
-$firstEvent = !empty($events)
-    ? $events[0]
-    : null;
-
-$firstType = $firstEvent
-    ? $firstEvent['type']
-    : '';
-
-$firstFile = $firstEvent
-    ? $firstEvent['file_url']
-    : '';
-
-$firstTitle = $firstEvent
-    ? $firstEvent['title']
-    : '';
-
-$firstThumbnail = $firstEvent
-    ? $firstEvent['thumbnail_url']
-    : '';
-
-$firstMimeType =
-    $firstType === 'video'
-        ? getVideoMimeType($firstFile)
-        : '';
-
-?>
-
-<!DOCTYPE html>
-
+    {
+        $path = parse_url( $url, PHP_URL_PATH ); $extension = strtolower( pathinfo( $path, PATHINFO_EXTENSION ) );
+     switch ($extension) 
+     { 
+        case 'webm': return 'video/webm'; 
+        case 'ogg': return 'video/ogg';
+        case 'mov': return 'video/quicktime';
+        case 'm4v': return 'video/mp4'; 
+        case 'mp4': default: return 'video/mp4'; 
+     }
+    } 
+/* |-------------------------------------------------------------------------- 
+| FIRST EVENT |
+-------------------------------------------------------------------------- */ 
+$firstEvent = !empty($events) ? $events[0] : null;
+$firstType = $firstEvent ? $firstEvent['type'] : '';
+$firstFile = $firstEvent ? $firstEvent['file_url'] : ''; 
+$firstTitle = $firstEvent ? $firstEvent['title'] : ''; 
+$firstThumbnail = $firstEvent ? $firstEvent['thumbnail_url'] : ''; 
+$firstMimeType = $firstType === 'video' ? getVideoMimeType($firstFile) : ''; 
+?> 
+<!DOCTYPE html> 
 <html lang="en">
+    <head>
+<meta charset="UTF-8">
 
-<head>
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
-    <meta charset="UTF-8">
+<title>
+    ABAA Entertainment
+</title>
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
+
+<link
+    rel="stylesheet"
+    href="/style.css"
+>
+
+
+<link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+>
+
+
+<style>
+
+    /*
+    |--------------------------------------------------------------------------
+    | FEATURED VIDEO
+    |--------------------------------------------------------------------------
+    */
+
+    .featured-event {
+        position: relative;
+    }
+
+
+    .featured-event video,
+    .featured-event > img {
+        width: 100%;
+        display: block;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | PLAY BUTTON
+    |--------------------------------------------------------------------------
+    */
+
+    .featured-play-button {
+        position: absolute;
+
+        left: 50%;
+        top: 50%;
+
+        transform: translate(
+            -50%,
+            -50%
+        );
+
+        width: 70px;
+        height: 70px;
+
+        border: none;
+        border-radius: 50%;
+
+        background: rgba(
+            255,
+            90,
+            31,
+            .95
+        );
+
+        color: white;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        cursor: pointer;
+
+        z-index: 20;
+
+        box-shadow:
+            0 8px 30px
+            rgba(0,0,0,.30);
+
+        transition:
+            transform .2s ease,
+            background .2s ease;
+    }
+
+
+    .featured-play-button:hover {
+
+        transform:
+            translate(
+                -50%,
+                -50%
+            )
+            scale(1.08);
+
+        background:
+            #ff4510;
+    }
+
+
+    .featured-play-button i {
+
+        font-size: 25px;
+
+        margin-left: 4px;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | VIDEO THUMBNAIL
+    |--------------------------------------------------------------------------
+    */
+
+    .video-thumbnail {
+        position: relative;
+    }
+
+
+    .video-thumbnail img {
+
+        width: 100%;
+        height: 100%;
+
+        object-fit: cover;
+
+        display: block;
+    }
+
+
+    .video-thumbnail-play {
+
+        position: absolute;
+
+        left: 50%;
+        top: 50%;
+
+        transform:
+            translate(
+                -50%,
+                -50%
+            );
+
+        width: 42px;
+        height: 42px;
+
+        border-radius: 50%;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        background:
+            rgba(
+                255,
+                90,
+                31,
+                .92
+            );
+
+        color: white;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | VIDEO LOADING
+    |--------------------------------------------------------------------------
+    */
+
+    .featured-video-loading {
+
+        position: absolute;
+
+        left: 50%;
+        top: 50%;
+
+        transform:
+            translate(
+                -50%,
+                -50%
+            );
+
+        width: 48px;
+        height: 48px;
+
+        border-radius: 50%;
+
+        border:
+            4px solid
+            rgba(
+                255,
+                255,
+                255,
+                .35
+            );
+
+        border-top-color:
+            #ff5a1f;
+
+        animation:
+            featuredVideoSpin
+            .8s linear infinite;
+
+        z-index: 30;
+
+        display: none;
+    }
+
+
+    @keyframes featuredVideoSpin {
+
+        to {
+
+            transform:
+                translate(
+                    -50%,
+                    -50%
+                )
+                rotate(360deg);
+
+        }
+
+    }
+
+</style>
+
+</head> <body> <!-- ================================================== HEADER ================================================== --> <header class="header">
+<a
+    href="/"
+    class="logo"
+>
+
+    <img
+        src="/logo.png"
+        alt="ABAA Entertainment Logo"
     >
 
-    <title>
-        ABAA Entertainment
-    </title>
+</a>
 
 
-    <link
-        rel="stylesheet"
-        href="/style.css"
-    >
+<nav>
 
-
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-    >
-
-</head>
-
-
-<body>
-
-
-<!-- ==================================================
-     HEADER
-================================================== -->
-
-<header class="header">
-
-    <a
-        href="/"
-        class="logo"
-    >
-
-        <img
-            src="/logo.png"
-            alt="ABAA Entertainment Logo"
-        >
-
+    <a href="/">
+        Home
     </a>
 
+    <a href="/#events">
+        Events
+    </a>
 
-    <nav>
+    <a href="/#services">
+        Services
+    </a>
 
-        <a href="/">
-            Home
-        </a>
+    <a href="/about">
+        About
+    </a>
 
-        <a href="/#events">
-            Events
-        </a>
+    <a
+        href="#"
+        class="book-button"
+        onclick="openBookingModal(event)"
+    >
+        Book
+    </a>
 
-        <a href="/#services">
-            Services
-        </a>
+</nav>
 
-        <a href="/about">
-            About
-        </a>
+</header> <!-- ================================================== ABOUT HERO ================================================== --> <section class="about-hero">
+<div class="about-hero-content">
 
-        <a
-            href="#"
-            class="book-button"
-            onclick="openBookingModal(event)"
-        >
-            Book
-        </a>
-
-    </nav>
-
-</header>
+    <p class="small-title">
+        ABAA ENTERTAINMENT
+    </p>
 
 
+    <h1>
 
-<!-- ==================================================
-     HERO
-================================================== -->
+        <span>
+            Powered by Passion.
+        </span>
 
-<section class="about-hero">
+        <br>
 
-    <div class="about-hero-content">
+        <span>
+            Driven by Excellence.
+        </span>
 
-        <p class="small-title">
-            ABAA ENTERTAINMENT
-        </p>
-
-
-        <h1>
-
-            <span>
-                Powered by Passion.
-            </span>
-
-            <br>
-
-            <span>
-                Driven by Excellence.
-            </span>
-
-        </h1>
+    </h1>
 
 
-        <p class="hero-description">
+    <p class="hero-description">
 
-            We create unforgettable experiences through
-            creativity, technology, passion, and professional
-            event production.
+        We create unforgettable experiences through
+        creativity, technology, passion, and professional
+        event production.
 
-        </p>
+    </p>
 
-    </div>
+</div>
 
-</section>
-
-
-
-<main class="main-container">
-
-
+</section> <main class="main-container">
 <!-- ==================================================
      ABOUT / LOGO
 ================================================== -->
@@ -429,6 +525,7 @@ $firstMimeType =
     </p>
 
 
+
     <?php if (empty($events)): ?>
 
 
@@ -451,7 +548,26 @@ $firstMimeType =
                 playsinline
                 preload="metadata"
                 style="display:none;"
-            ></video>
+            >
+
+                Your browser does not support
+                the video tag.
+
+            </video>
+
+
+            <button
+                type="button"
+                id="featuredPlayButton"
+                class="featured-play-button"
+                style="display:none;"
+                onclick="playFeaturedVideo()"
+                aria-label="Play video"
+            >
+
+                <i class="fa-solid fa-play"></i>
+
+            </button>
 
 
             <div
@@ -464,6 +580,7 @@ $firstMimeType =
             </div>
 
         </div>
+
 
 
     <?php else: ?>
@@ -479,91 +596,98 @@ $firstMimeType =
         >
 
 
-            <?php if ($firstType === 'video'): ?>
+            <!-- ==========================================
+                 FEATURED IMAGE
+            =========================================== -->
+
+            <img
+                id="featuredImage"
+                src="<?= e(
+                    $firstType === 'video'
+                        ? (
+                            $firstThumbnail
+                            ?: '/logo.png'
+                        )
+                        : $firstFile
+                ) ?>"
+                alt="<?= e($firstTitle) ?>"
+                <?= (
+                    $firstType === 'video'
+                    && !$firstThumbnail
+                )
+                    ? 'style="display:none;"'
+                    : ''
+                ?>
+            >
 
 
-                <!-- ==========================================
-                     VIDEO THUMBNAIL
-                =========================================== -->
+            <!-- ==========================================
+                 FEATURED VIDEO
+            =========================================== -->
 
-                <img
-                    id="featuredImage"
-                    src="<?= e(
-                        $firstThumbnail ?: '/logo.png'
-                    ) ?>"
-                    alt="<?= e($firstTitle) ?>"
-                    <?= $firstThumbnail
-                        ? ''
-                        : 'style="display:none;"'
-                    ?>
-                >
+            <video
+                id="featuredVideo"
+                controls
+                playsinline
+                preload="metadata"
+                <?= (
+                    $firstType === 'video'
+                    && !$firstThumbnail
+                )
+                    ? ''
+                    : 'style="display:none;"'
+                ?>
+            >
 
+                <?php if ($firstType === 'video'): ?>
 
-                <!-- ==========================================
-                     FEATURED VIDEO
-                =========================================== -->
-
-                <video
-                    id="featuredVideo"
-                    controls
-                    playsinline
-                    preload="metadata"
-                    <?= $firstThumbnail
-                        ? 'style="display:none;"'
-                        : ''
-                    ?>
-                ></video>
-
-
-                <!-- ==========================================
-                     PLAY BUTTON
-                =========================================== -->
-
-                <?php if ($firstThumbnail): ?>
-
-                    <button
-                        type="button"
-                        id="featuredPlayButton"
-                        class="featured-play-button"
-                        onclick="playFeaturedVideo()"
-                        aria-label="Play video"
+                    <source
+                        id="featuredVideoSource"
+                        src="<?= e($firstFile) ?>"
+                        type="<?= e($firstMimeType) ?>"
                     >
-
-                        <i class="fa-solid fa-play"></i>
-
-                    </button>
 
                 <?php endif; ?>
 
 
-            <?php else: ?>
+                Your browser does not support
+                the video tag.
+
+            </video>
 
 
-                <!-- ==========================================
-                     IMAGE EVENT
-                =========================================== -->
+            <!-- ==========================================
+                 LOADING SPINNER
+            =========================================== -->
 
-                <img
-                    id="featuredImage"
-                    src="<?= e($firstFile) ?>"
-                    alt="<?= e($firstTitle) ?>"
-                >
-
-
-                <!-- ==========================================
-                     VIDEO
-                =========================================== -->
-
-                <video
-                    id="featuredVideo"
-                    controls
-                    playsinline
-                    preload="metadata"
-                    style="display:none;"
-                ></video>
+            <div
+                id="featuredVideoLoading"
+                class="featured-video-loading"
+            ></div>
 
 
-            <?php endif; ?>
+            <!-- ==========================================
+                 PLAY BUTTON
+            =========================================== -->
+
+            <button
+                type="button"
+                id="featuredPlayButton"
+                class="featured-play-button"
+                <?= (
+                    $firstType === 'video'
+                    && $firstThumbnail
+                )
+                    ? ''
+                    : 'style="display:none;"'
+                ?>
+                onclick="playFeaturedVideo()"
+                aria-label="Play video"
+            >
+
+                <i class="fa-solid fa-play"></i>
+
+            </button>
 
 
             <!-- ==========================================
@@ -611,7 +735,9 @@ $firstMimeType =
 
                 $eventMimeType =
                     $eventType === 'video'
-                        ? getVideoMimeType($eventFile)
+                        ? getVideoMimeType(
+                            $eventFile
+                        )
                         : '';
 
                 ?>
@@ -625,28 +751,38 @@ $firstMimeType =
                     ?>"
                     onclick="showEvent(
                         <?= htmlspecialchars(
-                            json_encode($eventType),
+                            json_encode(
+                                $eventType
+                            ),
                             ENT_QUOTES,
                             'UTF-8'
                         ) ?>,
                         <?= htmlspecialchars(
-                            json_encode($eventFile),
+                            json_encode(
+                                $eventFile
+                            ),
                             ENT_QUOTES,
                             'UTF-8'
                         ) ?>,
                         <?= htmlspecialchars(
-                            json_encode($eventTitle),
+                            json_encode(
+                                $eventTitle
+                            ),
                             ENT_QUOTES,
                             'UTF-8'
                         ) ?>,
                         this,
                         <?= htmlspecialchars(
-                            json_encode($eventThumbnail),
+                            json_encode(
+                                $eventThumbnail
+                            ),
                             ENT_QUOTES,
                             'UTF-8'
                         ) ?>,
                         <?= htmlspecialchars(
-                            json_encode($eventMimeType),
+                            json_encode(
+                                $eventMimeType
+                            ),
                             ENT_QUOTES,
                             'UTF-8'
                         ) ?>
@@ -659,7 +795,13 @@ $firstMimeType =
                     ): ?>
 
 
-                        <div class="video-thumbnail">
+                        <!-- ==================================
+                             VIDEO THUMBNAIL
+                        =================================== -->
+
+                        <div
+                            class="video-thumbnail"
+                        >
 
                             <img
                                 src="<?= e(
@@ -688,6 +830,10 @@ $firstMimeType =
                     <?php else: ?>
 
 
+                        <!-- ==================================
+                             IMAGE THUMBNAIL
+                        =================================== -->
+
                         <img
                             src="<?= e(
                                 $eventFile
@@ -700,6 +846,10 @@ $firstMimeType =
 
                     <?php endif; ?>
 
+
+                    <!-- ======================================
+                         THUMBNAIL TITLE
+                    ======================================= -->
 
                     <span class="event-thumbnail-title">
 
@@ -724,1196 +874,630 @@ $firstMimeType =
 
 </section>
 
+</main> <!-- ================================================== FOOTER ================================================== --> <footer class="footer">
+<div class="footer-container">
 
-</main>
 
+    <div class="footer-section footer-brand">
 
-
-<!-- ==================================================
-     FOOTER
-================================================== -->
-
-<footer class="footer">
-
-    <div class="footer-container">
-
-
-        <div class="footer-section footer-brand">
-
-            <img
-                src="/logo.png"
-                alt="ABAA Entertainment Logo"
-            >
-
-            <p>
-
-                Creating unforgettable events,
-                entertainment, and experiences
-                through creativity, technology,
-                and professional event services.
-
-            </p>
-
-        </div>
-
-
-
-        <div class="footer-section">
-
-            <h3>
-                Quick Links
-            </h3>
-
-            <a href="/">
-                Home
-            </a>
-
-            <a href="/#events">
-                Events
-            </a>
-
-            <a href="/#services">
-                Services
-            </a>
-
-            <a href="/about">
-                About Us
-            </a>
-
-            <a
-                href="/booking-status"
-                class="booking-status-link"
-            >
-                Check Booking Status
-            </a>
-
-        </div>
-
-
-
-        <div class="footer-section">
-
-            <h3>
-                Our Services
-            </h3>
-
-            <a href="/service?service=led-wall">
-                LED Wall
-            </a>
-
-            <a href="/service?service=lights-sound">
-                Lights & Sound
-            </a>
-
-            <a href="/service?service=live-feed">
-                Live Feed
-            </a>
-
-            <a href="/service?service=stage">
-                Stage Production
-            </a>
-
-            <a href="/service?service=music-studio">
-                Music Studio
-            </a>
-
-            <a href="/service?service=trusses">
-                Trusses
-            </a>
-
-        </div>
-
-
-
-        <div class="footer-section">
-
-            <h3>
-                Contact Us
-            </h3>
-
-
-            <a
-                href="https://www.google.com/maps/place/ABAA+Entertainment/@14.4652755,121.1915078,19z"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="contact-item"
-            >
-
-                <i class="fa-solid fa-location-dot"></i>
-
-                <span>
-
-                    2F, Casa Ynares, P. Gomez,
-                    Libis, Binangonan, Rizal
-
-                </span>
-
-            </a>
-
-
-            <a
-                href="tel:+639231476552"
-                class="contact-item"
-            >
-
-                <i class="fa-solid fa-phone"></i>
-
-                <span>
-                    +63 923 147 6552
-                </span>
-
-            </a>
-
-
-            <a
-                href="mailto:abaaentertainment@gmail.com"
-                class="contact-item"
-            >
-
-                <i class="fa-solid fa-envelope"></i>
-
-                <span>
-                    abaaentertainment@gmail.com
-                </span>
-
-            </a>
-
-
-            <div class="social-links">
-
-                <a
-                    href="https://www.facebook.com/ABAAEntertainment"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="Facebook"
-                >
-
-                    <i class="fa-brands fa-facebook-f"></i>
-
-                </a>
-
-
-                <a
-                    href="#"
-                    aria-label="Instagram"
-                >
-
-                    <i class="fa-brands fa-instagram"></i>
-
-                </a>
-
-
-                <a
-                    href="https://www.tiktok.com/@markebpmbta?_r=1&_t=ZS-99DpdJXY5sD"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="TikTok"
-                >
-
-                    <i class="fa-brands fa-tiktok"></i>
-
-                </a>
-
-            </div>
-
-        </div>
-
-
-    </div>
-
-
-
-    <div class="footer-bottom">
-
-        <p>
-
-            © <?= date('Y') ?>
-            ABAA Entertainment.
-            All Rights Reserved.
-
-        </p>
-
-
-        <p>
-
-            Entertainment • Events • Experiences
-
-        </p>
-
-    </div>
-
-</footer>
-
-
-
-<!-- ==================================================
-     BOOKING MODAL
-================================================== -->
-
-<div
-    class="booking-overlay"
-    id="bookingModal"
-    aria-hidden="true"
->
-
-    <div class="booking-modal">
-
-
-        <button
-            type="button"
-            class="booking-close"
-            onclick="closeBookingModal()"
-            aria-label="Close booking form"
+        <img
+            src="/logo.png"
+            alt="ABAA Entertainment Logo"
         >
 
-            <i class="fa-solid fa-xmark"></i>
+        <p>
 
-        </button>
+            Creating unforgettable events,
+            entertainment, and experiences
+            through creativity, technology,
+            and professional event services.
+
+        </p>
+
+    </div>
 
 
-        <div class="booking-header">
 
-            <span class="booking-label">
-                ABAA ENTERTAINMENT
+    <div class="footer-section">
+
+        <h3>
+            Quick Links
+        </h3>
+
+        <a href="/">
+            Home
+        </a>
+
+        <a href="/#events">
+            Events
+        </a>
+
+        <a href="/#services">
+            Services
+        </a>
+
+        <a href="/about">
+            About Us
+        </a>
+
+        <a
+            href="/booking-status"
+            class="booking-status-link"
+        >
+            Check Booking Status
+        </a>
+
+    </div>
+
+
+
+    <div class="footer-section">
+
+        <h3>
+            Our Services
+        </h3>
+
+        <a href="/service?service=led-wall">
+            LED Wall
+        </a>
+
+        <a href="/service?service=lights-sound">
+            Lights & Sound
+        </a>
+
+        <a href="/service?service=live-feed">
+            Live Feed
+        </a>
+
+        <a href="/service?service=stage">
+            Stage Production
+        </a>
+
+        <a href="/service?service=music-studio">
+            Music Studio
+        </a>
+
+        <a href="/service?service=trusses">
+            Trusses
+        </a>
+
+    </div>
+
+
+
+    <div class="footer-section">
+
+        <h3>
+            Contact Us
+        </h3>
+
+
+        <a
+            href="https://www.google.com/maps/place/ABAA+Entertainment/@14.4652755,121.1915078,19z"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="contact-item"
+        >
+
+            <i class="fa-solid fa-location-dot"></i>
+
+            <span>
+
+                2F, Casa Ynares, P. Gomez,
+                Libis, Binangonan, Rizal
+
             </span>
 
-            <h2>
-                Book An Event
-            </h2>
+        </a>
 
-            <p>
 
-                Tell us about your event and our team
-                will get back to you.
+        <a
+            href="tel:+639231476552"
+            class="contact-item"
+        >
 
-            </p>
+            <i class="fa-solid fa-phone"></i>
+
+            <span>
+                +63 923 147 6552
+            </span>
+
+        </a>
+
+
+        <a
+            href="mailto:abaaentertainment@gmail.com"
+            class="contact-item"
+        >
+
+            <i class="fa-solid fa-envelope"></i>
+
+            <span>
+                abaaentertainment@gmail.com
+            </span>
+
+        </a>
+
+
+        <div class="social-links">
+
+
+            <a
+                href="https://www.facebook.com/ABAAEntertainment"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Facebook"
+            >
+
+                <i class="fa-brands fa-facebook-f"></i>
+
+            </a>
+
+
+            <a
+                href="#"
+                aria-label="Instagram"
+            >
+
+                <i class="fa-brands fa-instagram"></i>
+
+            </a>
+
+
+            <a
+                href="https://www.tiktok.com/@markebpmbta?_r=1&_t=ZS-99DpdJXY5sD"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="TikTok"
+            >
+
+                <i class="fa-brands fa-tiktok"></i>
+
+            </a>
+
 
         </div>
 
+    </div>
 
 
-        <form
-            action="/booking"
-            method="POST"
-            class="booking-form"
-        >
-
-
-            <div class="form-row">
-
-                <div class="form-group">
-
-                    <label for="booking_name">
-                        Full Name
-                    </label>
-
-                    <input
-                        type="text"
-                        id="booking_name"
-                        name="name"
-                        placeholder="Enter your full name"
-                        required
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label for="booking_phone">
-                        Contact Number
-                    </label>
-
-                    <input
-                        type="tel"
-                        id="booking_phone"
-                        name="phone"
-                        placeholder="09XX XXX XXXX"
-                        required
-                    >
-
-                </div>
-
-            </div>
+</div>
 
 
 
-            <div class="form-row">
+<div class="footer-bottom">
 
-                <div class="form-group">
+    <p>
 
-                    <label for="booking_email">
-                        Email Address
-                    </label>
+        © <?= date('Y') ?>
+        ABAA Entertainment.
+        All Rights Reserved.
 
-                    <input
-                        type="email"
-                        id="booking_email"
-                        name="email"
-                        placeholder="your@email.com"
-                        required
-                    >
-
-                </div>
+    </p>
 
 
-                <div class="form-group">
+    <p>
 
-                    <label for="booking_contact_person">
-                        Contact Person
-                    </label>
+        Entertainment • Events • Experiences
 
-                    <input
-                        type="text"
-                        id="booking_contact_person"
-                        name="contact_person"
-                        placeholder="Contact person's name"
-                        required
-                    >
+    </p>
 
-                </div>
+</div>
 
-            </div>
+</footer> <!-- ================================================== BOOKING MODAL ================================================== --> <div class="booking-overlay" id="bookingModal" aria-hidden="true" >
+<div class="booking-modal">
 
 
+    <button
+        type="button"
+        class="booking-close"
+        onclick="closeBookingModal()"
+        aria-label="Close booking form"
+    >
 
-            <div class="form-row">
+        <i class="fa-solid fa-xmark"></i>
 
-                <div class="form-group">
-
-                    <label for="booking_event">
-                        Event Type
-                    </label>
-
-                    <select
-                        id="booking_event"
-                        name="event_type"
-                        required
-                    >
-
-                        <option
-                            value=""
-                            disabled
-                            selected
-                        >
-                            Select event type
-                        </option>
-
-                        <option value="Birthday">
-                            Birthday
-                        </option>
-
-                        <option value="Wedding">
-                            Wedding
-                        </option>
-
-                        <option value="Concert">
-                            Concert
-                        </option>
-
-                        <option value="Corporate Event">
-                            Corporate Event
-                        </option>
-
-                        <option value="Festival">
-                            Festival
-                        </option>
-
-                        <option value="Product Launch">
-                            Product Launch
-                        </option>
-
-                        <option value="Other">
-                            Other
-                        </option>
-
-                    </select>
-
-                </div>
+    </button>
 
 
-                <div class="form-group">
+    <div class="booking-header">
 
-                    <label for="booking_date">
-                        Event Date
-                    </label>
+        <span class="booking-label">
+            ABAA ENTERTAINMENT
+        </span>
 
-                    <input
-                        type="date"
-                        id="booking_date"
-                        name="event_date"
-                        required
-                    >
+        <h2>
+            Book An Event
+        </h2>
 
-                </div>
+        <p>
 
-            </div>
+            Tell us about your event and our team
+            will get back to you.
 
+        </p>
+
+    </div>
+
+
+
+    <form
+        action="/booking"
+        method="POST"
+        class="booking-form"
+    >
+
+
+        <div class="form-row">
 
 
             <div class="form-group">
 
-                <label for="booking_company">
-                    Company Name
+                <label for="booking_name">
+                    Full Name
                 </label>
 
                 <input
                     type="text"
-                    id="booking_company"
-                    name="cname"
-                    placeholder="Enter company name"
+                    id="booking_name"
+                    name="name"
+                    placeholder="Enter your full name"
                     required
                 >
 
             </div>
 
 
-
             <div class="form-group">
 
-                <label>
-                    Services Needed
+                <label for="booking_phone">
+                    Contact Number
                 </label>
 
-
-                <div class="service-checkboxes">
-
-
-                    <label class="service-checkbox">
-
-                        <input
-                            type="checkbox"
-                            name="service[]"
-                            value="LED Wall"
-                        >
-
-                        <span>
-                            LED Wall
-                        </span>
-
-                    </label>
-
-
-                    <label class="service-checkbox">
-
-                        <input
-                            type="checkbox"
-                            name="service[]"
-                            value="Lights & Sound"
-                        >
-
-                        <span>
-                            Lights & Sound
-                        </span>
-
-                    </label>
-
-
-                    <label class="service-checkbox">
-
-                        <input
-                            type="checkbox"
-                            name="service[]"
-                            value="Live Feed"
-                        >
-
-                        <span>
-                            Live Feed
-                        </span>
-
-                    </label>
-
-
-                    <label class="service-checkbox">
-
-                        <input
-                            type="checkbox"
-                            name="service[]"
-                            value="Stage Production"
-                        >
-
-                        <span>
-                            Stage Production
-                        </span>
-
-                    </label>
-
-
-                    <label class="service-checkbox">
-
-                        <input
-                            type="checkbox"
-                            name="service[]"
-                            value="Music Studio"
-                        >
-
-                        <span>
-                            Music Studio
-                        </span>
-
-                    </label>
-
-
-                    <label class="service-checkbox">
-
-                        <input
-                            type="checkbox"
-                            name="service[]"
-                            value="Trusses"
-                        >
-
-                        <span>
-                            Trusses
-                        </span>
-
-                    </label>
-
-
-                    <label class="service-checkbox">
-
-                        <input
-                            type="checkbox"
-                            name="service[]"
-                            value="Full Event Production"
-                        >
-
-                        <span>
-                            Full Event Production
-                        </span>
-
-                    </label>
-
-
-                </div>
+                <input
+                    type="tel"
+                    id="booking_phone"
+                    name="phone"
+                    placeholder="09XX XXX XXXX"
+                    required
+                >
 
             </div>
 
+        </div>
+
+
+
+        <div class="form-row">
 
 
             <div class="form-group">
 
-                <label for="booking_message">
-                    Event Details
+                <label for="booking_email">
+                    Email Address
                 </label>
 
-                <textarea
-                    id="booking_message"
-                    name="message"
-                    rows="4"
-                    placeholder="Tell us about your event, location, preferred setup, budget, or other requirements..."
-                ></textarea>
+                <input
+                    type="email"
+                    id="booking_email"
+                    name="email"
+                    placeholder="your@email.com"
+                    required
+                >
 
             </div>
 
 
+            <div class="form-group">
 
-            <button
-                type="submit"
-                class="booking-submit"
+                <label for="booking_contact_person">
+                    Contact Person
+                </label>
+
+                <input
+                    type="text"
+                    id="booking_contact_person"
+                    name="contact_person"
+                    placeholder="Contact person's name"
+                    required
+                >
+
+            </div>
+
+        </div>
+
+
+
+        <div class="form-row">
+
+
+            <div class="form-group">
+
+                <label for="booking_event">
+                    Event Type
+                </label>
+
+                <select
+                    id="booking_event"
+                    name="event_type"
+                    required
+                >
+
+                    <option
+                        value=""
+                        disabled
+                        selected
+                    >
+                        Select event type
+                    </option>
+
+                    <option value="Birthday">
+                        Birthday
+                    </option>
+
+                    <option value="Wedding">
+                        Wedding
+                    </option>
+
+                    <option value="Concert">
+                        Concert
+                    </option>
+
+                    <option value="Corporate Event">
+                        Corporate Event
+                    </option>
+
+                    <option value="Festival">
+                        Festival
+                    </option>
+
+                    <option value="Product Launch">
+                        Product Launch
+                    </option>
+
+                    <option value="Other">
+                        Other
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="booking_date">
+                    Event Date
+                </label>
+
+                <input
+                    type="date"
+                    id="booking_date"
+                    name="event_date"
+                    required
+                >
+
+            </div>
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+            <label for="booking_company">
+                Company Name
+            </label>
+
+            <input
+                type="text"
+                id="booking_company"
+                name="cname"
+                placeholder="Enter company name"
+                required
             >
 
-                <span>
-                    Submit Booking Request
-                </span>
+        </div>
 
-                <i class="fa-solid fa-arrow-right"></i>
 
-            </button>
 
-        </form>
+        <div class="form-group">
 
-    </div>
+            <label>
+                Services Needed
+            </label>
+
+
+            <div class="service-checkboxes">
+
+
+                <label class="service-checkbox">
+
+                    <input
+                        type="checkbox"
+                        name="service[]"
+                        value="LED Wall"
+                    >
+
+                    <span>
+                        LED Wall
+                    </span>
+
+                </label>
+
+
+                <label class="service-checkbox">
+
+                    <input
+                        type="checkbox"
+                        name="service[]"
+                        value="Lights & Sound"
+                    >
+
+                    <span>
+                        Lights & Sound
+                    </span>
+
+                </label>
+
+
+                <label class="service-checkbox">
+
+                    <input
+                        type="checkbox"
+                        name="service[]"
+                        value="Live Feed"
+                    >
+
+                    <span>
+                        Live Feed
+                    </span>
+
+                </label>
+
+
+                <label class="service-checkbox">
+
+                    <input
+                        type="checkbox"
+                        name="service[]"
+                        value="Stage Production"
+                    >
+
+                    <span>
+                        Stage Production
+                    </span>
+
+                </label>
+
+
+                <label class="service-checkbox">
+
+                    <input
+                        type="checkbox"
+                        name="service[]"
+                        value="Music Studio"
+                    >
+
+                    <span>
+                        Music Studio
+                    </span>
+
+                </label>
+
+
+                <label class="service-checkbox">
+
+                    <input
+                        type="checkbox"
+                        name="service[]"
+                        value="Trusses"
+                    >
+
+                    <span>
+                        Trusses
+                    </span>
+
+                </label>
+
+
+                <label class="service-checkbox">
+
+                    <input
+                        type="checkbox"
+                        name="service[]"
+                        value="Full Event Production"
+                    >
+
+                    <span>
+                        Full Event Production
+                    </span>
+
+                </label>
+
+
+            </div>
+
+        </div>
+
+
+
+        <div class="form-group">
+
+            <label for="booking_message">
+                Event Details
+            </label>
+
+            <textarea
+                id="booking_message"
+                name="message"
+                rows="4"
+                placeholder="Tell us about your event, location, preferred setup, budget, or other requirements..."
+            ></textarea>
+
+        </div>
+
+
+
+        <button
+            type="submit"
+            class="booking-submit"
+        >
+
+            <span>
+                Submit Booking Request
+            </span>
+
+            <i class="fa-solid fa-arrow-right"></i>
+
+        </button>
+
+    </form>
 
 </div>
 
-
-
-<!-- ==================================================
-     JAVASCRIPT
-================================================== -->
-
-<script>
-
-/*
-|--------------------------------------------------------------------------
-| EVENT SWITCHER
-|--------------------------------------------------------------------------
-*/
-
-function showEvent(
-    type,
-    source,
-    title,
-    button,
-    thumbnail,
-    mimeType
-) {
-
-    const image =
-        document.getElementById(
-            "featuredImage"
-        );
-
-    const video =
-        document.getElementById(
-            "featuredVideo"
-        );
-
-    const featuredTitle =
-        document.getElementById(
-            "featuredTitle"
-        );
-
-    const playButton =
-        document.getElementById(
-            "featuredPlayButton"
-        );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | CHECK ELEMENTS
-    |--------------------------------------------------------------------------
-    */
-
-    if (
-        !image ||
-        !video ||
-        !featuredTitle
-    ) {
-
-        console.error(
-            "Featured event elements are missing."
-        );
-
-        return;
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | REMOVE ACTIVE STATE
-    |--------------------------------------------------------------------------
-    */
-
-    document
-        .querySelectorAll(
-            ".event-thumbnail"
-        )
-        .forEach(function(item) {
-
-            item.classList.remove(
-                "active"
-            );
-
-        });
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | ADD ACTIVE STATE
-    |--------------------------------------------------------------------------
-    */
-
-    if (button) {
-
-        button.classList.add(
-            "active"
-        );
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | UPDATE TITLE
-    |--------------------------------------------------------------------------
-    */
-
-    featuredTitle.textContent =
-        title;
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | COMPLETELY STOP CURRENT VIDEO
-    |--------------------------------------------------------------------------
-    */
-
-    video.pause();
-
-    video.removeAttribute(
-        "src"
-    );
-
-    video.load();
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | IMAGE EVENT
-    |--------------------------------------------------------------------------
-    */
-
-    if (type === "image") {
-
-        image.src =
-            source;
-
-        image.alt =
-            title;
-
-        image.style.display =
-            "block";
-
-
-        video.style.display =
-            "none";
-
-
-        if (playButton) {
-
-            playButton.style.display =
-                "none";
-
-        }
-
-
-        return;
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | VIDEO EVENT
-    |--------------------------------------------------------------------------
-    */
-
-    if (type === "video") {
-
-        /*
-        |--------------------------------------------------------------------------
-        | SET THUMBNAIL
-        |--------------------------------------------------------------------------
-        */
-
-        if (thumbnail) {
-
-            image.src =
-                thumbnail;
-
-            image.alt =
-                title;
-
-            image.style.display =
-                "block";
-
-        } else {
-
-            image.style.display =
-                "none";
-
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | SET VIDEO DIRECTLY ON VIDEO ELEMENT
-        |--------------------------------------------------------------------------
-        */
-
-        video.src =
-            source;
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | SET MIME TYPE
-        |--------------------------------------------------------------------------
-        |
-        | Some browsers do not need this when src is directly
-        | assigned, but keeping the property makes the intent clear.
-        |--------------------------------------------------------------------------
-        */
-
-        video.dataset.mimeType =
-            mimeType || "video/mp4";
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | LOAD NEW VIDEO
-        |--------------------------------------------------------------------------
-        */
-
-        video.load();
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | THUMBNAIL MODE
-        |--------------------------------------------------------------------------
-        */
-
-        if (thumbnail) {
-
-            video.style.display =
-                "none";
-
-
-            if (playButton) {
-
-                playButton.style.display =
-                    "flex";
-
-            }
-
-        } else {
-
-            video.style.display =
-                "block";
-
-
-            if (playButton) {
-
-                playButton.style.display =
-                    "none";
-
-            }
-
-        }
-
-    }
-
-}
-
-
-
-/*
-|--------------------------------------------------------------------------
-| PLAY FEATURED VIDEO
-|--------------------------------------------------------------------------
-*/
-
-function playFeaturedVideo()
-{
-
-    const image =
-        document.getElementById(
-            "featuredImage"
-        );
-
-    const video =
-        document.getElementById(
-            "featuredVideo"
-        );
-
-    const playButton =
-        document.getElementById(
-            "featuredPlayButton"
-        );
-
-
-    if (!video) {
-
-        return;
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | HIDE THUMBNAIL
-    |--------------------------------------------------------------------------
-    */
-
-    if (image) {
-
-        image.style.display =
-            "none";
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | SHOW VIDEO
-    |--------------------------------------------------------------------------
-    */
-
-    video.style.display =
-        "block";
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | HIDE PLAY BUTTON
-    |--------------------------------------------------------------------------
-    */
-
-    if (playButton) {
-
-        playButton.style.display =
-            "none";
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | DO NOT FORCE MUTE
-    |--------------------------------------------------------------------------
-    */
-
-    video.muted =
-        false;
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | PLAY
-    |--------------------------------------------------------------------------
-    */
-
-    const playPromise =
-        video.play();
-
-
-    if (
-        playPromise !== undefined
-    ) {
-
-        playPromise.catch(
-            function(error) {
-
-                console.error(
-                    "Video play failed:",
-                    error
-                );
-
-            }
-        );
-
-    }
-
-}
-
-
-
-/*
-|--------------------------------------------------------------------------
-| INITIALIZE FIRST VIDEO
-|--------------------------------------------------------------------------
-|
-| The first video needs its source assigned after the page loads.
-|--------------------------------------------------------------------------
-*/
-
-document.addEventListener(
-    "DOMContentLoaded",
-    function() {
-
-        const video =
-            document.getElementById(
-                "featuredVideo"
-            );
-
-
-        if (!video) {
-
-            return;
-
-        }
-
-
-        <?php if ($firstType === 'video' && $firstFile): ?>
-
-        video.src =
-            <?= json_encode(
-                $firstFile,
-                JSON_UNESCAPED_SLASHES
-            ) ?>;
-
-        video.load();
-
-        <?php endif; ?>
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | VIDEO ERROR
-        |--------------------------------------------------------------------------
-        */
-
-        video.addEventListener(
-            "error",
-            function() {
-
-                console.error(
-                    "Unable to load event video."
-                );
-
-                console.error(
-                    "Current video URL:",
-                    video.currentSrc
-                );
-
-                console.error(
-                    "Video error:",
-                    video.error
-                );
-
-            }
-        );
-
-    }
-);
-
-
-
-/*
-|--------------------------------------------------------------------------
-| OPEN BOOKING MODAL
-|--------------------------------------------------------------------------
-*/
-
-function openBookingModal(event)
-{
-
-    if (event) {
-
-        event.preventDefault();
-
-    }
-
-
-    const modal =
-        document.getElementById(
-            "bookingModal"
-        );
-
-
-    if (!modal) {
-
-        return;
-
-    }
-
-
-    modal.classList.add(
-        "active"
-    );
-
-
-    modal.setAttribute(
-        "aria-hidden",
-        "false"
-    );
-
-
-    document.body.style.overflow =
-        "hidden";
-
-}
-
-
-
-/*
-|--------------------------------------------------------------------------
-| CLOSE BOOKING MODAL
-|--------------------------------------------------------------------------
-*/
-
-function closeBookingModal()
-{
-
-    const modal =
-        document.getElementById(
-            "bookingModal"
-        );
-
-
-    if (!modal) {
-
-        return;
-
-    }
-
-
-    modal.classList.remove(
-        "active"
-    );
-
-
-    modal.setAttribute(
-        "aria-hidden",
-        "true"
-    );
-
-
-    document.body.style.overflow =
-        "";
-
-}
-
-
-
-/*
-|--------------------------------------------------------------------------
-| CLICK OUTSIDE MODAL
-|--------------------------------------------------------------------------
-*/
-
-document.addEventListener(
-    "click",
-    function(event) {
-
-        const modal =
-            document.getElementById(
-                "bookingModal"
-            );
-
-
-        if (
-            modal &&
-            event.target === modal
-        ) {
-
-            closeBookingModal();
-
-        }
-
-    }
-);
-
-
-
-/*
-|--------------------------------------------------------------------------
-| ESC KEY
-|--------------------------------------------------------------------------
-*/
-
-document.addEventListener(
-    "keydown",
-    function(event) {
-
-        if (
-            event.key === "Escape"
-        ) {
-
-            closeBookingModal();
-
-        }
-
-    }
-);
-
-</script>
-
-
-</body>
-
-</html>
+</div> 
+    <!-- ================================================== JAVASCRIPT ================================================== --> 
+    <script> 
+        /* |-------------------------------------------------------------------------- | EVENT SWITCHER |-------------------------------------------------------------------------- | 
+        | This version completely resets the video element before | loading another event. | */ 
+        function showEvent( type, source, title, button, thumbnail, mimeType ) 
+        { 
+            const image = document.getElementById( "featuredImage" ); 
+            const video = document.getElementById( "featuredVideo" ); 
+            const videoSource = document.getElementById( "featuredVideoSource" ); 
+            const featuredTitle = document.getElementById( "featuredTitle" ); 
+            const playButton = document.getElementById( "featuredPlayButton" ); 
+            const loading = document.getElementById( "featuredVideoLoading" ); 
+            /* |-------------------------------------------------------------------------- | CHECK ELEMENTS |-------------------------------------------------------------------------- */ 
+            if ( !image || !video || !featuredTitle ) 
+            { 
+                console.error( "Featured event elements are missing." ); 
+                return; 
+            } 
+            /* |-------------------------------------------------------------------------- | REMOVE ACTIVE FROM ALL THUMBNAILS |-------------------------------------------------------------------------- */
+            document .querySelectorAll( ".event-thumbnail" ) .forEach( function(item) 
+            { 
+                item.classList.remove( "active" ); 
+            } ); 
+            /* |-------------------------------------------------------------------------- | ACTIVE THUMBNAIL |-------------------------------------------------------------------------- */ 
+            if (button) 
+            { button.classList.add( "active" ); } 
+                /* |-------------------------------------------------------------------------- | UPDATE TITLE |-------------------------------------------------------------------------- */ 
+            featuredTitle.textContent = title;
+            /* |-------------------------------------------------------------------------- | STOP CURRENT VIDEO |-------------------------------------------------------------------------- */ 
+            try 
+            { 
+                video.pause(); 
+            } 
+            catch (error) 
+            { 
+                console.log( "Could not pause video:", error ); 
+            } 
+            /* |-------------------------------------------------------------------------- | RESET VIDEO |-------------------------------------------------------------------------- */ 
+            video.removeAttribute( "src" ); if (videoSource) { videoSource.removeAttribute( "src" ); videoSource.removeAttribute( "type" ); } video.load(); 
+            /* |-------------------------------------------------------------------------- | HIDE LOADING |-------------------------------------------------------------------------- */ 
+            if (loading) { loading.style.display = "none"; } 
+                /* |-------------------------------------------------------------------------- | IMAGE EVENT |-------------------------------------------------------------------------- */ 
+            if (type === "image") { /* | Show image */ image.src = source; image.alt = title; image.style.display = "block"; /* | Hide video */ video.style.display = "none"; /* | Hide play button */ if (playButton) { playButton.style.display = "none"; } return; } /* |-------------------------------------------------------------------------- | VIDEO EVENT |-------------------------------------------------------------------------- */ if (type === "video") { /* |-------------------------------------------------------------------------- | SET VIDEO THUMBNAIL |-------------------------------------------------------------------------- */ if (thumbnail) { image.src = thumbnail; image.alt = title; image.style.display = "block"; } else { image.style.display = "none"; } /* |-------------------------------------------------------------------------- | SET VIDEO SOURCE |-------------------------------------------------------------------------- | | We set the source directly on the video element. | This is more reliable when switching between videos. | */ video.src = source; /* |-------------------------------------------------------------------------- | MIME TYPE |-------------------------------------------------------------------------- */ if (mimeType) { video.type = mimeType; } /* |-------------------------------------------------------------------------- | LOAD VIDEO |-------------------------------------------------------------------------- */ video.load(); /* |-------------------------------------------------------------------------- | VIDEO HAS THUMBNAIL |-------------------------------------------------------------------------- */ if (thumbnail) { /* | Keep video hidden until user presses play. */ video.style.display = "none"; /* | Show play button. */ if (playButton) { playButton.style.display = "flex"; } } else { /* | No thumbnail. | | Show video directly. */ image.style.display = "none"; video.style.display = "block"; if (playButton) { playButton.style.display = "none"; } } } } /* |-------------------------------------------------------------------------- | PLAY FEATURED VIDEO |-------------------------------------------------------------------------- */ function playFeaturedVideo() { const image = document.getElementById( "featuredImage" ); const video = document.getElementById( "featuredVideo" ); const playButton = document.getElementById( "featuredPlayButton" ); const loading = document.getElementById( "featuredVideoLoading" ); /* |-------------------------------------------------------------------------- | CHECK VIDEO |-------------------------------------------------------------------------- */ if (!video) { console.error( "Featured video element not found." ); return; } /* |-------------------------------------------------------------------------- | HIDE THUMBNAIL |-------------------------------------------------------------------------- */ if (image) { image.style.display = "none"; } /* |-------------------------------------------------------------------------- | SHOW VIDEO |-------------------------------------------------------------------------- */ video.style.display = "block"; /* |-------------------------------------------------------------------------- | HIDE PLAY BUTTON |-------------------------------------------------------------------------- */ if (playButton) { playButton.style.display = "none"; } /* |-------------------------------------------------------------------------- | SHOW LOADING |-------------------------------------------------------------------------- */ if (loading) { loading.style.display = "block"; } /* |-------------------------------------------------------------------------- | AUDIO |-------------------------------------------------------------------------- */ video.muted = false; /* |-------------------------------------------------------------------------- | PLAY |-------------------------------------------------------------------------- */ const playPromise = video.play(); if ( playPromise !== undefined ) { playPromise .then( function() { if (loading) { loading.style.display = "none"; } } ) .catch( function(error) { if (loading) { loading.style.display = "none"; } console.error( "Video play failed:", error ); /* |-------------------------------------------------------------------------- | SHOW VIDEO AGAIN |-------------------------------------------------------------------------- */ video.style.display = "block"; } ); } } /* |-------------------------------------------------------------------------- | VIDEO EVENTS |-------------------------------------------------------------------------- */ document.addEventListener( "DOMContentLoaded", function() { const video = document.getElementById( "featuredVideo" ); const loading = document.getElementById( "featuredVideoLoading" ); const playButton = document.getElementById( "featuredPlayButton" ); if (!video) { return; } /* |-------------------------------------------------------------------------- | CAN PLAY |-------------------------------------------------------------------------- */ video.addEventListener( "canplay", function() { if (loading) { loading.style.display = "none"; } } ); /* |-------------------------------------------------------------------------- | WAITING |-------------------------------------------------------------------------- */ video.addEventListener( "waiting", function() { if ( video.style.display !== "none" ) { if (loading) { loading.style.display = "block"; } } } ); /* |-------------------------------------------------------------------------- | PLAYING |-------------------------------------------------------------------------- */ video.addEventListener( "playing", function() { if (loading) { loading.style.display = "none"; } } ); /* |-------------------------------------------------------------------------- | ENDED |-------------------------------------------------------------------------- */ video.addEventListener( "ended", function() { if (playButton) { /* | Do not automatically show | the thumbnail again. */ playButton.style.display = "none"; } } ); /* |-------------------------------------------------------------------------- | VIDEO ERROR |-------------------------------------------------------------------------- */ video.addEventListener( "error", function() { if (loading) { loading.style.display = "none"; } console.error( "================================" ); console.error( "VIDEO LOAD ERROR" ); console.error( "Video URL:", video.currentSrc ); console.error( "Video error:", video.error ); console.error( "================================" ); } ); } ); /* |-------------------------------------------------------------------------- | OPEN BOOKING MODAL |-------------------------------------------------------------------------- */ function openBookingModal(event) { if (event) { event.preventDefault(); } const modal = document.getElementById( "bookingModal" ); if (!modal) { return; } modal.classList.add( "active" ); modal.setAttribute( "aria-hidden", "false" ); document.body.style.overflow = "hidden"; } /* |-------------------------------------------------------------------------- | CLOSE BOOKING MODAL |-------------------------------------------------------------------------- */ function closeBookingModal() { const modal = document.getElementById( "bookingModal" ); if (!modal) { return; } modal.classList.remove( "active" ); modal.setAttribute( "aria-hidden", "true" ); document.body.style.overflow = ""; } /* |-------------------------------------------------------------------------- | CLICK OUTSIDE MODAL |-------------------------------------------------------------------------- */ document.addEventListener( "click", function(event) { const modal = document.getElementById( "bookingModal" ); if ( modal && event.target === modal ) { closeBookingModal(); } } ); /* |-------------------------------------------------------------------------- | ESC KEY |-------------------------------------------------------------------------- */ document.addEventListener( "keydown", function(event) { if ( event.key === "Escape" ) { closeBookingModal(); } } ); </script> </body> </html>
