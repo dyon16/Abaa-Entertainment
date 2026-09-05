@@ -145,25 +145,94 @@ function e($value)
     );
 }
 
-function slugify($value)
-{
-    $value = trim((string) $value);
 
-    if ($value === '') {
-        return 'service';
+function parseServiceDetails($details)
+{
+    if (empty($details)) {
+        return [];
     }
 
-    $value = iconv(
-        'UTF-8',
-        'ASCII//TRANSLIT//IGNORE',
-        $value
+    $decoded = json_decode(
+        $details,
+        true
     );
 
-    $value = strtolower($value);
-    $value = preg_replace('/[^a-z0-9]+/', '-', $value);
+    if (is_array($decoded)) {
+        return array_values(
+            array_filter(
+                array_map(
+                    'trim',
+                    $decoded
+                ),
+                static function ($item) {
+                    return $item !== '';
+                }
+            )
+        );
+    }
+
+    return array_values(
+        array_filter(
+            array_map(
+                'trim',
+                preg_split('/\r\n|\r|\n/', $details)
+            ),
+            static function ($item) {
+                return $item !== '';
+            }
+        )
+    );
+}
+
+function slugify($value)
+{
+    $value = strtolower(trim((string) $value));
+
+    $value = preg_replace('/[^a-z0-9]+/i', '-', $value);
     $value = trim($value, '-');
 
     return $value !== '' ? $value : 'service';
+}
+
+/*
+|--------------------------------------------------------------------------
+| GENERATE UNIQUE SERVICE SLUG
+|--------------------------------------------------------------------------
+*/
+
+function generateUniqueServiceSlug($pdo, $name, $excludeId = 0)
+{
+    $baseSlug = slugify($name);
+    $slug = $baseSlug;
+    $counter = 2;
+
+    while (true) {
+        $sql =
+            "SELECT id
+             FROM services
+             WHERE slug = :slug";
+
+        $params = [
+            ':slug' => $slug
+        ];
+
+        if ((int) $excludeId > 0) {
+            $sql .= " AND id != :id";
+            $params[':id'] = (int) $excludeId;
+        }
+
+        $sql .= " LIMIT 1";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+
+        if (!$stmt->fetch(PDO::FETCH_ASSOC)) {
+            return $slug;
+        }
+
+        $slug = $baseSlug . '-' . $counter;
+        $counter++;
+    }
 }
 
 /*
@@ -355,6 +424,57 @@ unset(
 
 /*
 |--------------------------------------------------------------------------
+| LOAD SERVICE FOR EDITING
+|--------------------------------------------------------------------------
+*/
+
+$editService = null;
+
+if (
+    $_SERVER['REQUEST_METHOD'] === 'GET' &&
+    isset($_GET['edit'])
+) {
+    $editId = (int) $_GET['edit'];
+
+    if ($editId > 0) {
+        try {
+            $stmt = $pdo->prepare(
+                "SELECT
+                    id,
+                    name,
+                    slug,
+                    image_url,
+                    description,
+                    details,
+                    is_available,
+                    created_at
+                 FROM services
+                 WHERE id = :id
+                 LIMIT 1"
+            );
+
+            $stmt->execute([
+                ':id' => $editId
+            ]);
+
+            $editService = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$editService) {
+                $statusError = 'Service not found.';
+            }
+        } catch (PDOException $e) {
+            error_log(
+                'Service edit load error: ' .
+                $e->getMessage()
+            );
+
+            $statusError = 'Unable to load service for editing.';
+        }
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
 | DELETE SERVICE
 |--------------------------------------------------------------------------
 */
@@ -474,56 +594,51 @@ if (
     $serviceId = (int) ($_POST['service_id'] ?? 0);
 
     $name = trim($_POST['name'] ?? '');
-    $slug = trim($_POST['slug'] ?? '');
     $description = trim($_POST['description'] ?? '');
-    $details = trim($_POST['details'] ?? '');
+
+    $detailInputs = $_POST['details'] ?? [];
+
+    if (!is_array($detailInputs)) {
+        $detailInputs = [$detailInputs];
+    }
+
+    $detailInputs = array_values(
+        array_filter(
+            array_map(
+                'trim',
+                $detailInputs
+            ),
+            static function ($item) {
+                return $item !== '';
+            }
+        )
+    );
+
+    $details = json_encode(
+        $detailInputs,
+        JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+    );
+
+    if ($details === false) {
+        $details = '[]';
+    }
 
     $isAvailable = isset($_POST['is_available']) ? 1 : 0;
-    $sortOrder = (int) ($_POST['sort_order'] ?? 0);
 
-    if (!$blobToken) {
-        $statusError =
-            'Vercel Blob is not configured. Please add BLOB_READ_WRITE_TOKEN.';
-    } elseif ($name === '') {
+    if ($name === '') {
         $statusError = 'Please enter a service name.';
     } else {
-        if ($slug === '') {
-            $slug = slugify($name);
-        } else {
-            $slug = slugify($slug);
-        }
-
         try {
             /*
-             * Check slug uniqueness.
+             * Slug is generated automatically from the service name.
+             * Duplicate names receive -2, -3, etc.
              */
-            $slugSql =
-                "SELECT id
-                 FROM services
-                 WHERE slug = :slug";
+            $slug = generateUniqueServiceSlug(
+                $pdo,
+                $name,
+                $isUpdate ? $serviceId : 0
+            );
 
-            if ($isUpdate) {
-                $slugSql .= " AND id != :id";
-            }
-
-            $slugSql .= " LIMIT 1";
-
-            $slugStmt = $pdo->prepare($slugSql);
-
-            $slugParams = [
-                ':slug' => $slug
-            ];
-
-            if ($isUpdate) {
-                $slugParams[':id'] = $serviceId;
-            }
-
-            $slugStmt->execute($slugParams);
-
-            if ($slugStmt->fetch()) {
-                $statusError =
-                    'That service slug is already in use. Please choose another.';
-            } else {
                 $existingImageUrl = null;
 
                 if ($isUpdate && $serviceId > 0) {
@@ -657,8 +772,7 @@ if (
                                     image_url = :image_url,
                                     description = :description,
                                     details = :details,
-                                    is_available = :is_available,
-                                    sort_order = :sort_order
+                                    is_available = :is_available
                                  WHERE id = :id"
                             );
 
@@ -680,9 +794,6 @@ if (
 
                                 ':is_available' =>
                                     $isAvailable,
-
-                                ':sort_order' =>
-                                    $sortOrder,
 
                                 ':id' =>
                                     $serviceId
@@ -725,7 +836,10 @@ if (
                                     :description,
                                     :details,
                                     :is_available,
-                                    :sort_order,
+                                    (
+                                        SELECT COALESCE(MAX(s.sort_order), 0) + 1
+                                        FROM services s
+                                    ),
                                     NOW()
                                 )"
                             );
@@ -747,10 +861,7 @@ if (
                                     $details,
 
                                 ':is_available' =>
-                                    $isAvailable,
-
-                                ':sort_order' =>
-                                    $sortOrder
+                                    $isAvailable
                             ]);
 
                             $statusMessage =
@@ -758,7 +869,6 @@ if (
                         }
                     }
                 }
-            }
         } catch (PDOException $e) {
             /*
              * If a new image was uploaded but the database operation
@@ -809,6 +919,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 /*
 |--------------------------------------------------------------------------
+| LOAD EDIT SERVICE
+|--------------------------------------------------------------------------
+*/
+
+$editService = null;
+
+if (
+    $_SERVER['REQUEST_METHOD'] === 'GET' &&
+    isset($_GET['edit'])
+) {
+    $editId = (int) $_GET['edit'];
+
+    if ($editId > 0) {
+        try {
+            $editStmt = $pdo->prepare(
+                "SELECT
+                    id,
+                    name,
+                    slug,
+                    image_url,
+                    description,
+                    details,
+                    is_available,
+                    sort_order,
+                    created_at
+                 FROM services
+                 WHERE id = :id
+                 LIMIT 1"
+            );
+
+            $editStmt->execute([
+                ':id' => $editId
+            ]);
+
+            $editService =
+                $editStmt->fetch(PDO::FETCH_ASSOC) ?: null;
+
+            if (!$editService) {
+                $statusError = 'Service not found.';
+            }
+        } catch (PDOException $e) {
+            error_log(
+                'Service edit query error: ' .
+                $e->getMessage()
+            );
+
+            $statusError = 'Unable to load service for editing.';
+        }
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
 | LOAD SERVICES
 |--------------------------------------------------------------------------
 */
@@ -828,7 +991,7 @@ try {
             sort_order,
             created_at
          FROM services
-         ORDER BY sort_order ASC, id DESC"
+         ORDER BY sort_order ASC, id ASC"
     );
 
     $services =
@@ -989,8 +1152,15 @@ foreach ($services as $service) {
 }
 
 .service-form-group input[type="file"] {
+    width: 100%;
     padding: 9px;
     height: auto;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fafafa;
+    color: var(--text);
+    box-sizing: border-box;
+    cursor: pointer;
 }
 
 .service-help {
@@ -1012,6 +1182,127 @@ foreach ($services as $service) {
 
 .service-checkbox label {
     margin: 0;
+}
+
+.service-details-editor-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.service-details-editor-header > div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.add-detail-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 40px;
+    padding: 9px 14px;
+    border: 1px solid var(--orange);
+    border-radius: 8px;
+    background: var(--orange);
+    color: white;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.add-detail-button:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+}
+
+.service-details-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.service-detail-row {
+    display: grid;
+    grid-template-columns: 1fr 40px;
+    align-items: center;
+    gap: 8px;
+}
+
+.service-detail-drag {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+}
+
+.service-detail-row input {
+    min-width: 0;
+}
+
+.remove-detail-button {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    background: #fff5f5;
+    color: #dc2626;
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.remove-detail-button:hover {
+    background: #fee2e2;
+}
+
+.service-details-list {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.service-details-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13px;
+    line-height: 1.45;
+    color: #374151;
+}
+
+.service-details-list i {
+    color: var(--orange);
+    margin-top: 3px;
+    flex: 0 0 auto;
+}
+
+.service-cancel-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 10px;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fff;
+    color: #374151;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.service-cancel-button:hover {
+    background: #f8fafc;
 }
 
 .service-form-actions {
@@ -1191,6 +1482,15 @@ foreach ($services as $service) {
 }
 
 @media (max-width: 600px) {
+    .service-details-editor-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .add-detail-button {
+        width: 100%;
+    }
+
     .service-form-grid {
         grid-template-columns: 1fr;
     }
@@ -1437,14 +1737,26 @@ foreach ($services as $service) {
         </div>
 
         <div class="stat-content">
-            <span>Order</span>
+            <span>Services</span>
             <strong><?= $totalServices ?></strong>
-            <small>Services in library</small>
+            <small>In service library</small>
         </div>
 
     </div>
 
 </section>
+
+<?php
+
+$detailItems = parseServiceDetails(
+    $editService['details'] ?? ''
+);
+
+if (empty($detailItems)) {
+    $detailItems = [''];
+}
+
+?>
 
 <!-- =====================================================
      SERVICE FORM
@@ -1463,7 +1775,7 @@ foreach ($services as $service) {
 
         <div>
             <span>SERVICE CONTENT</span>
-            <h2>Add New Service</h2>
+            <h2><?= $editService ? 'Edit Service' : 'Add New Service' ?></h2>
         </div>
 
     </div>
@@ -1473,6 +1785,16 @@ foreach ($services as $service) {
         enctype="multipart/form-data"
         action="/admin/services"
     >
+
+        <?php if ($editService): ?>
+
+            <input
+                type="hidden"
+                name="service_id"
+                value="<?= (int) $editService['id'] ?>"
+            >
+
+        <?php endif; ?>
 
         <div class="service-form-grid">
 
@@ -1486,49 +1808,18 @@ foreach ($services as $service) {
                     type="text"
                     id="name"
                     name="name"
+                    value="<?= e($editService['name'] ?? '') ?>"
                     placeholder="e.g. Event Coordination"
                     required
                 >
 
-            </div>
-
-            <div class="service-form-group">
-
-                <label for="slug">
-                    Slug
-                </label>
-
-                <input
-                    type="text"
-                    id="slug"
-                    name="slug"
-                    placeholder="event-coordination"
-                >
-
                 <span class="service-help">
-                    Leave blank to generate automatically from the service name.
+                    URL slug is generated automatically from the service name.
                 </span>
 
             </div>
 
             <div class="service-form-group">
-
-                <label for="sort_order">
-                    Sort Order
-                </label>
-
-                <input
-                    type="number"
-                    id="sort_order"
-                    name="sort_order"
-                    value="0"
-                    min="0"
-                >
-
-            </div>
-
-            <div class="service-form-group">
-
                 <label>
                     Availability
                 </label>
@@ -1539,7 +1830,7 @@ foreach ($services as $service) {
                         id="is_available"
                         name="is_available"
                         value="1"
-                        checked
+                        <?= (!$editService || (int) $editService['is_available'] === 1) ? 'checked' : '' ?>
                     >
 
                     <label for="is_available">
@@ -1563,7 +1854,10 @@ foreach ($services as $service) {
                 >
 
                 <span class="service-help">
-                    Optional. JPG, PNG, or WEBP · Maximum 10MB.
+                    JPG, PNG, WEBP · Maximum 10MB
+                    <?php if (!empty($editService['image_url'])): ?>
+                        Current image will be kept if you do not upload a new one.
+                    <?php endif; ?>
                 </span>
 
             </div>
@@ -1578,21 +1872,63 @@ foreach ($services as $service) {
                     id="description"
                     name="description"
                     placeholder="A short description displayed with the service."
-                ></textarea>
+                ><?= e($editService['description'] ?? '') ?></textarea>
 
             </div>
 
             <div class="service-form-group full">
 
-                <label for="details">
-                    Service Details
-                </label>
+                <div class="service-details-editor-header">
+                    <div>
+                        <label>
+                            Service Details
+                        </label>
 
-                <textarea
-                    id="details"
-                    name="details"
-                    placeholder="Detailed information about this service."
-                ></textarea>
+                        <span class="service-help">
+                            Add as many service details as you need. Click + to add another detail.
+                        </span>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="add-detail-button"
+                        onclick="addServiceDetail()"
+                    >
+                        <i class="fa-solid fa-plus"></i>
+                        Add Detail
+                    </button>
+                </div>
+
+                <div
+                    id="serviceDetailsList"
+                    class="service-details-editor"
+                >
+
+                    <?php foreach ($detailItems as $detail): ?>
+
+                        <div class="service-detail-row">
+
+                            <input
+                                type="text"
+                                name="details[]"
+                                value="<?= e($detail) ?>"
+                                placeholder="e.g. Professional setup and technical support"
+                            >
+
+                            <button
+                                type="button"
+                                class="remove-detail-button"
+                                onclick="removeServiceDetail(this)"
+                                title="Remove detail"
+                            >
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+
+                        </div>
+
+                    <?php endforeach; ?>
+
+                </div>
 
             </div>
 
@@ -1602,14 +1938,26 @@ foreach ($services as $service) {
 
             <button
                 type="submit"
-                name="create_service"
+                name="<?= $editService ? 'update_service' : 'create_service' ?>"
                 class="service-submit-button"
             >
-                <i class="fa-solid fa-plus"></i>
-                Add Service
+                <i class="fa-solid <?= $editService ? 'fa-save' : 'fa-plus' ?>"></i>
+                <?= $editService ? 'Save Changes' : 'Add Service' ?>
             </button>
 
         </div>
+
+        <?php if ($editService): ?>
+
+            <a
+                href="/admin/services"
+                class="service-cancel-button"
+            >
+                <i class="fa-solid fa-xmark"></i>
+                Cancel Editing
+            </a>
+
+        <?php endif; ?>
 
     </form>
 
@@ -1732,12 +2080,38 @@ foreach ($services as $service) {
 
                         <?php endif; ?>
 
-                        <div class="service-admin-meta">
+                        <?php
+                        $serviceDetails = preg_split(
+                            '/\\r\\n|\\r|\\n/',
+                            (string) ($service['details'] ?? '')
+                        );
 
-                            <span>
-                                <i class="fa-solid fa-sort"></i>
-                                Order: <?= (int) $service['sort_order'] ?>
-                            </span>
+                        $serviceDetails = array_values(
+                            array_filter(
+                                array_map('trim', $serviceDetails),
+                                static function ($item) {
+                                    return $item !== '';
+                                }
+                            )
+                        );
+                        ?>
+
+                        <?php if (!empty($serviceDetails)): ?>
+
+                            <ul class="service-details-list">
+                                <?php foreach ($serviceDetails as $detail): ?>
+
+                                    <li>
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        <span><?= e($detail) ?></span>
+                                    </li>
+
+                                <?php endforeach; ?>
+                            </ul>
+
+                        <?php endif; ?>
+
+                        <div class="service-admin-meta">
 
                             <span>
                                 <i class="fa-regular fa-clock"></i>
@@ -1850,6 +2224,51 @@ foreach ($services as $service) {
 </main>
 
 </div>
+
+<script>
+function addServiceDetail(value = '') {
+    const list = document.getElementById('serviceDetailsList');
+    if (!list) return;
+
+    const row = document.createElement('div');
+    row.className = 'service-detail-row';
+    row.innerHTML = `
+        <input
+            type="text"
+            name="details[]"
+            value=""
+            placeholder="e.g. Professional setup and technical support"
+        >
+        <button
+            type="button"
+            class="remove-detail-button"
+            onclick="removeServiceDetail(this)"
+            title="Remove detail"
+        >
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    `;
+
+    list.appendChild(row);
+    const input = row.querySelector('input');
+    input.value = value || '';
+    input.focus();
+}
+
+function removeServiceDetail(button) {
+    const list = document.getElementById('serviceDetailsList');
+    if (!list) return;
+
+    const rows = list.querySelectorAll('.service-detail-row');
+
+    if (rows.length === 1) {
+        rows[0].querySelector('input').value = '';
+        return;
+    }
+
+    button.closest('.service-detail-row').remove();
+}
+</script>
 
 </body>
 
