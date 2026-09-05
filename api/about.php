@@ -75,6 +75,25 @@ try {
 
 
 <style>
+    .service-unavailable-checkbox {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+.service-unavailable-checkbox input {
+    cursor: not-allowed;
+}
+
+.service-unavailable-text {
+    color: #dc2626;
+    font-size: 0.8em;
+    margin-left: 4px;
+}
+
+.booking-no-services {
+    margin: 0;
+    color: #777;
+}
 .service-unavailable-link {
     color: #dc2626 !important;
     cursor: not-allowed;
@@ -118,8 +137,8 @@ try {
             Events
         </a>
 
-        <a href="/#services">
-            Services
+        <a href="/#">
+            
         </a>
 
         <a
@@ -268,7 +287,7 @@ try {
 
             <p>
                 To deliver professional, creative, and
-                high-quality entertainment services while
+                high-quality entertainment  while
                 providing opportunities for artists and
                 creative professionals to grow and succeed.
             </p>
@@ -463,7 +482,7 @@ try {
                 Creating unforgettable events,
                 entertainment, and experiences
                 through creativity, technology,
-                and professional event services.
+                and professional event .
             </p>
 
         </div>
@@ -877,124 +896,68 @@ try {
                  MULTIPLE SERVICES
             ================================================== -->
 
-            <div class="form-group">
+          <!-- SERVICES -->
 
-                <label>
-                    Services Needed
+<div class="form-group">
+
+    <label>
+        Services Needed
+    </label>
+
+    <div class="service-checkboxes">
+
+        <?php if (!empty($services)): ?>
+
+            <?php foreach ($services as $service): ?>
+
+                <?php
+                $serviceAvailable =
+                    (int)($service['is_available'] ?? 0) === 1;
+                ?>
+
+                <label
+                    class="service-checkbox<?= !$serviceAvailable
+                        ? ' service-unavailable-checkbox'
+                        : ''
+                    ?>"
+                >
+
+                    <input
+                        type="checkbox"
+                        name="service[]"
+                        value="<?= e($service['name']) ?>"
+                        <?= !$serviceAvailable ? 'disabled' : '' ?>
+                    >
+
+                    <span>
+
+                        <?= e($service['name']) ?>
+
+                        <?php if (!$serviceAvailable): ?>
+
+                            <small class="service-unavailable-text">
+                                (Unavailable)
+                            </small>
+
+                        <?php endif; ?>
+
+                    </span>
+
                 </label>
 
+            <?php endforeach; ?>
 
-                <div class="service-checkboxes">
+        <?php else: ?>
 
+            <p class="booking-no-services">
+                No services are currently available.
+            </p>
 
-                    <label class="service-checkbox">
+        <?php endif; ?>
 
-                        <input
-                            type="checkbox"
-                            name="service[]"
-                            value="LED Wall"
-                        >
+    </div>
 
-                        <span>
-                            LED Wall
-                        </span>
-
-                    </label>
-
-
-                    <label class="service-checkbox">
-
-                        <input
-                            type="checkbox"
-                            name="service[]"
-                            value="Lights & Sound"
-                        >
-
-                        <span>
-                            Lights & Sound
-                        </span>
-
-                    </label>
-
-
-                    <label class="service-checkbox">
-
-                        <input
-                            type="checkbox"
-                            name="service[]"
-                            value="Live Feed"
-                        >
-
-                        <span>
-                            Live Feed
-                        </span>
-
-                    </label>
-
-
-                    <label class="service-checkbox">
-
-                        <input
-                            type="checkbox"
-                            name="service[]"
-                            value="Stage Production"
-                        >
-
-                        <span>
-                            Stage Production
-                        </span>
-
-                    </label>
-
-
-                    <label class="service-checkbox">
-
-                        <input
-                            type="checkbox"
-                            name="service[]"
-                            value="Music Studio"
-                        >
-
-                        <span>
-                            Music Studio
-                        </span>
-
-                    </label>
-
-
-                    <label class="service-checkbox">
-
-                        <input
-                            type="checkbox"
-                            name="service[]"
-                            value="Trusses"
-                        >
-
-                        <span>
-                            Trusses
-                        </span>
-
-                    </label>
-
-
-                    <label class="service-checkbox">
-
-                        <input
-                            type="checkbox"
-                            name="service[]"
-                            value="Full Event Production"
-                        >
-
-                        <span>
-                            Full Event Production
-                        </span>
-
-                    </label>
-
-
-                </div>
-
-            </div>
+</div>
 
 
 
