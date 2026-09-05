@@ -147,7 +147,6 @@ try {
             sort_order,
             created_at
          FROM services
-         WHERE is_available = 1
          ORDER BY sort_order ASC, id ASC"
     );
 
@@ -468,6 +467,68 @@ $firstMimeType =
 |--------------------------------------------------------------------------
 */
 
+.service-unavailable {
+    cursor: not-allowed;
+    border-color: #7f1d1d;
+    filter: grayscale(.15);
+}
+
+.service-unavailable:hover {
+    transform: none;
+    border-color: #dc2626;
+    box-shadow: 0 15px 35px rgba(220, 38, 38, .22);
+}
+
+.service-unavailable::before {
+    width: 100%;
+    background: #dc2626;
+}
+
+.service-unavailable img {
+    filter: grayscale(.75) brightness(.42);
+}
+
+.service-unavailable:hover img {
+    transform: none;
+    filter: grayscale(.75) brightness(.42);
+}
+
+.service-unavailable .image-title {
+    color: #fca5a5;
+    background: #180707;
+}
+
+.service-unavailable-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(80, 0, 0, .30);
+    pointer-events: none;
+}
+
+.service-unavailable-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: 1px solid rgba(248, 113, 113, .65);
+    border-radius: 999px;
+    background: rgba(127, 29, 29, .90);
+    color: #fee2e2;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: .8px;
+    text-transform: uppercase;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, .35);
+}
+
+.service-unavailable-badge i {
+    color: #f87171;
+}
+
 .service-empty {
 
     width:
@@ -684,53 +745,79 @@ $firstMimeType =
 
             <?php foreach ($services as $service): ?>
 
+                <?php
+                $serviceAvailable =
+                    (int) ($service['is_available'] ?? 0) === 1;
+                ?>
 
-                <a
-                    href="/service?service=<?= e($service['slug']) ?>"
-                    class="image-button"
-                >
+                <?php if ($serviceAvailable): ?>
 
+                    <a
+                        href="/service?service=<?= e($service['slug']) ?>"
+                        class="image-button"
+                    >
 
-                    <?php if (
-                        !empty($service['image_url'])
-                    ): ?>
+                        <?php if (!empty($service['image_url'])): ?>
 
+                            <img
+                                src="<?= e($service['image_url']) ?>"
+                                alt="<?= e($service['name']) ?>"
+                            >
 
-                        <img
-                            src="<?= e(
-                                $service['image_url']
-                            ) ?>"
-                            alt="<?= e(
-                                $service['name']
-                            ) ?>"
-                        >
+                        <?php else: ?>
 
+                            <img
+                                src="/logo.png"
+                                alt="<?= e($service['name']) ?>"
+                            >
 
-                    <?php else: ?>
+                        <?php endif; ?>
 
+                        <div class="image-title">
+                            <?= e($service['name']) ?>
+                        </div>
 
-                        <img
-                            src="/logo.png"
-                            alt="<?= e(
-                                $service['name']
-                            ) ?>"
-                        >
+                    </a>
 
+                <?php else: ?>
 
-                    <?php endif; ?>
+                    <div
+                        class="image-button service-unavailable"
+                        aria-disabled="true"
+                    >
 
+                        <?php if (!empty($service['image_url'])): ?>
 
-                    <div class="image-title">
+                            <img
+                                src="<?= e($service['image_url']) ?>"
+                                alt="<?= e($service['name']) ?>"
+                            >
 
-                        <?= e(
-                            $service['name']
-                        ) ?>
+                        <?php else: ?>
+
+                            <img
+                                src="/logo.png"
+                                alt="<?= e($service['name']) ?>"
+                            >
+
+                        <?php endif; ?>
+
+                        <div class="service-unavailable-overlay">
+
+                            <span class="service-unavailable-badge">
+                                <i class="fa-solid fa-circle-xmark"></i>
+                                Not Available
+                            </span>
+
+                        </div>
+
+                        <div class="image-title">
+                            <?= e($service['name']) ?>
+                        </div>
 
                     </div>
 
-
-                </a>
-
+                <?php endif; ?>
 
             <?php endforeach; ?>
 
