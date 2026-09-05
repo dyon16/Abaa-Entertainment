@@ -466,7 +466,25 @@ $firstMimeType =
 | SERVICE FALLBACK
 |--------------------------------------------------------------------------
 */
+.service-unavailable-checkbox {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
 
+.service-unavailable-checkbox input {
+    cursor: not-allowed;
+}
+
+.service-unavailable-text {
+    color: #dc2626;
+    font-size: 0.8em;
+    margin-left: 4px;
+}
+
+.booking-no-services {
+    margin: 0;
+    color: #777;
+}
 .service-unavailable {
     cursor: not-allowed;
     border-color: #7f1d1d;
@@ -1702,83 +1720,68 @@ $firstMimeType =
         </div>
 
 
-        <!-- SERVICES -->
+       <!-- SERVICES -->
 
-        <div class="form-group">
+<div class="form-group">
 
+    <label>
+        Services Needed
+    </label>
 
-            <label>
-                Services Needed
-            </label>
+    <div class="service-checkboxes">
 
+        <?php if (!empty($services)): ?>
 
-            <div class="service-checkboxes">
+            <?php foreach ($services as $service): ?>
 
+                <?php
+                $serviceAvailable =
+                    (int)($service['is_available'] ?? 0) === 1;
+                ?>
 
-                <?php if (
-                    !empty($services)
-                ): ?>
-
-
-                    <?php foreach (
-                        $services as $service
-                    ): ?>
-
-
-                        <label class="service-checkbox">
-
-
-                            <input
-                                type="checkbox"
-                                name="service[]"
-                                value="<?= e(
-                                    $service['name']
-                                ) ?>"
-                            >
-
-
-                            <span>
-
-                                <?= e(
-                                    $service['name']
-                                ) ?>
-
-                            </span>
-
-
-                        </label>
-
-
-                    <?php endforeach; ?>
-
-
-                <?php endif; ?>
-
-
-                <!-- FULL EVENT PRODUCTION -->
-
-                <label class="service-checkbox">
-
+                <label
+                    class="service-checkbox<?= !$serviceAvailable
+                        ? ' service-unavailable-checkbox'
+                        : ''
+                    ?>"
+                >
 
                     <input
                         type="checkbox"
                         name="service[]"
-                        value="Full Event Production"
+                        value="<?= e($service['name']) ?>"
+                        <?= !$serviceAvailable ? 'disabled' : '' ?>
                     >
 
-
                     <span>
-                        Full Event Production
-                    </span>
 
+                        <?= e($service['name']) ?>
+
+                        <?php if (!$serviceAvailable): ?>
+
+                            <small class="service-unavailable-text">
+                                (Unavailable)
+                            </small>
+
+                        <?php endif; ?>
+
+                    </span>
 
                 </label>
 
+            <?php endforeach; ?>
 
-            </div>
+        <?php else: ?>
 
+            <p class="booking-no-services">
+                No services are currently available.
+            </p>
 
-        </div>
+        <?php endif; ?>
+
+    </div>
+
+</div>
 
 
         <!-- MESSAGE -->
