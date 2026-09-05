@@ -596,6 +596,69 @@ body::-webkit-scrollbar {
     transition: 0.3s;
 }
 
+.service-unavailable {
+    cursor: not-allowed;
+    border-color: #7f1d1d;
+    filter: grayscale(.15);
+}
+
+.service-unavailable:hover {
+    transform: none;
+    border-color: #dc2626;
+    box-shadow: 0 15px 35px rgba(220, 38, 38, .22);
+}
+
+.service-unavailable::before {
+    width: 100%;
+    background: #dc2626;
+}
+
+.service-unavailable img {
+    filter: grayscale(.75) brightness(.42);
+}
+
+.service-unavailable:hover img {
+    transform: none;
+    filter: grayscale(.75) brightness(.42);
+}
+
+.service-unavailable .image-title {
+    color: #fca5a5;
+    background: #180707;
+}
+
+.service-unavailable-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(80, 0, 0, .30);
+    pointer-events: none;
+}
+
+.service-unavailable-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: 1px solid rgba(248, 113, 113, .65);
+    border-radius: 999px;
+    background: rgba(127, 29, 29, .90);
+    color: #fee2e2;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: .8px;
+    text-transform: uppercase;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, .35);
+}
+
+.service-unavailable-badge i {
+    color: #f87171;
+}
+
+
 .image-button img {
     width: 100%;
 
