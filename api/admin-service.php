@@ -1840,7 +1840,7 @@ if (empty($detailItems)) {
 
             </div>
 
-            <div class="service-form-group full">
+            <div class="service-form-group.full">
 
                 <label for="image">
                     Service Image
@@ -1862,7 +1862,7 @@ if (empty($detailItems)) {
 
             </div>
 
-            <div class="service-form-group full">
+            <div class="service-form-group.full">
 
                 <label for="description">
                     Short Description
@@ -1876,7 +1876,7 @@ if (empty($detailItems)) {
 
             </div>
 
-            <div class="service-form-group full">
+            <div class="service-form-group.full">
 
                 <div class="service-details-editor-header">
                     <div>
