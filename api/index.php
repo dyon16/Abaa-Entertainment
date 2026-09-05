@@ -216,7 +216,7 @@ $firstMimeType =
 
 
 <!-- ==================================================
-     ABOUT HERO
+     HERO
 ================================================== -->
 
 <section class="about-hero">
@@ -260,191 +260,299 @@ $firstMimeType =
 <main class="main-container">
 
 
-    <!-- ==================================================
-         ABOUT / LOGO
-    ================================================== -->
+<!-- ==================================================
+     ABOUT / LOGO
+================================================== -->
 
-    <section class="big-box">
+<section class="big-box">
 
-        <img
-            src="/logo.png"
-            alt="ABAA Entertainment"
-        >
-
-    </section>
-
-
-
-    <!-- ==================================================
-         SERVICES
-    ================================================== -->
-
-    <section
-        class="services"
-        id="services"
+    <img
+        src="/logo.png"
+        alt="ABAA Entertainment"
     >
 
-        <h2>
-            Services
-        </h2>
+</section>
 
 
-        <p class="services-description">
 
-            Professional entertainment and event services
-            designed to create memorable experiences.
+<!-- ==================================================
+     SERVICES
+================================================== -->
 
-        </p>
+<section
+    class="services"
+    id="services"
+>
+
+    <h2>
+        Services
+    </h2>
 
 
-        <div class="boxes">
+    <p class="services-description">
+
+        Professional entertainment and event services
+        designed to create memorable experiences.
+
+    </p>
 
 
-            <a
-                href="/service?service=led-wall"
-                class="image-button"
+    <div class="boxes">
+
+
+        <a
+            href="/service?service=led-wall"
+            class="image-button"
+        >
+
+            <img
+                src="/service1.png"
+                alt="LED Wall"
             >
 
-                <img
-                    src="/service1.png"
-                    alt="LED Wall"
-                >
+            <div class="image-title">
+                LED Wall
+            </div>
 
-                <div class="image-title">
-                    LED Wall
-                </div>
-
-            </a>
+        </a>
 
 
-            <a
-                href="/service?service=lights-sound"
-                class="image-button"
+        <a
+            href="/service?service=lights-sound"
+            class="image-button"
+        >
+
+            <img
+                src="/service2.png"
+                alt="Lights and Sound"
             >
 
-                <img
-                    src="/service2.png"
-                    alt="Lights and Sound"
-                >
+            <div class="image-title">
+                Lights and Sound
+            </div>
 
-                <div class="image-title">
-                    Lights and Sound
-                </div>
-
-            </a>
+        </a>
 
 
-            <a
-                href="/service?service=live-feed"
-                class="image-button"
+        <a
+            href="/service?service=live-feed"
+            class="image-button"
+        >
+
+            <img
+                src="/service3.png"
+                alt="Live Feed"
             >
 
-                <img
-                    src="/service3.png"
-                    alt="Live Feed"
-                >
+            <div class="image-title">
+                Live Feed
+            </div>
 
-                <div class="image-title">
-                    Live Feed
-                </div>
-
-            </a>
+        </a>
 
 
-            <a
-                href="/service?service=stage"
-                class="image-button"
+        <a
+            href="/service?service=stage"
+            class="image-button"
+        >
+
+            <img
+                src="/service4.png"
+                alt="Stage Production"
             >
 
-                <img
-                    src="/service4.png"
-                    alt="Stage Production"
-                >
+            <div class="image-title">
+                Stage
+            </div>
 
-                <div class="image-title">
-                    Stage
-                </div>
-
-            </a>
+        </a>
 
 
-            <a
-                href="/service?service=music-studio"
-                class="image-button"
+        <a
+            href="/service?service=music-studio"
+            class="image-button"
+        >
+
+            <img
+                src="/service5.png"
+                alt="Music Studio"
             >
 
-                <img
-                    src="/service5.png"
-                    alt="Music Studio"
-                >
+            <div class="image-title">
+                Music Studio
+            </div>
 
-                <div class="image-title">
-                    Music Studio
-                </div>
-
-            </a>
+        </a>
 
 
-            <a
-                href="/service?service=trusses"
-                class="image-button"
+        <a
+            href="/service?service=trusses"
+            class="image-button"
+        >
+
+            <img
+                src="/service6.png"
+                alt="Trusses"
             >
 
-                <img
-                    src="/service6.png"
-                    alt="Trusses"
-                >
+            <div class="image-title">
+                Trusses
+            </div>
 
-                <div class="image-title">
-                    Trusses
-                </div>
+        </a>
 
-            </a>
+    </div>
+
+</section>
+
+
+
+<!-- ==================================================
+     EVENTS
+================================================== -->
+
+<section
+    class="events"
+    id="events"
+>
+
+    <h2>
+        Events
+    </h2>
+
+
+    <p class="events-description">
+
+        Explore our latest events, performances,
+        and memorable experiences.
+
+    </p>
+
+
+    <?php if (empty($events)): ?>
+
+
+        <!-- ==================================================
+             NO EVENTS
+        ================================================== -->
+
+        <div class="featured-event">
+
+            <img
+                id="featuredImage"
+                src="/logo.png"
+                alt="ABAA Entertainment"
+            >
+
+
+            <video
+                id="featuredVideo"
+                controls
+                playsinline
+                preload="metadata"
+                style="display:none;"
+            ></video>
+
+
+            <div
+                class="featured-title"
+                id="featuredTitle"
+            >
+
+                No events available
+
+            </div>
 
         </div>
 
-    </section>
+
+    <?php else: ?>
 
 
+        <!-- ==================================================
+             FEATURED EVENT
+        ================================================== -->
 
-    <!-- ==================================================
-         EVENTS
-    ================================================== -->
-
-    <section
-        class="events"
-        id="events"
-    >
-
-        <h2>
-            Events
-        </h2>
+        <div
+            class="featured-event"
+            id="featuredEvent"
+        >
 
 
-        <p class="events-description">
-
-            Explore our latest events, performances,
-            and memorable experiences.
-
-        </p>
+            <?php if ($firstType === 'video'): ?>
 
 
-
-        <?php if (empty($events)): ?>
-
-
-            <!-- ==================================================
-                 NO EVENTS
-            ================================================== -->
-
-            <div class="featured-event">
+                <!-- ==========================================
+                     VIDEO THUMBNAIL
+                =========================================== -->
 
                 <img
                     id="featuredImage"
-                    src="/logo.png"
-                    alt="ABAA Entertainment"
+                    src="<?= e(
+                        $firstThumbnail ?: '/logo.png'
+                    ) ?>"
+                    alt="<?= e($firstTitle) ?>"
+                    <?= $firstThumbnail
+                        ? ''
+                        : 'style="display:none;"'
+                    ?>
                 >
 
+
+                <!-- ==========================================
+                     FEATURED VIDEO
+                =========================================== -->
+
+                <video
+                    id="featuredVideo"
+                    controls
+                    playsinline
+                    preload="metadata"
+                    <?= $firstThumbnail
+                        ? 'style="display:none;"'
+                        : ''
+                    ?>
+                ></video>
+
+
+                <!-- ==========================================
+                     PLAY BUTTON
+                =========================================== -->
+
+                <?php if ($firstThumbnail): ?>
+
+                    <button
+                        type="button"
+                        id="featuredPlayButton"
+                        class="featured-play-button"
+                        onclick="playFeaturedVideo()"
+                        aria-label="Play video"
+                    >
+
+                        <i class="fa-solid fa-play"></i>
+
+                    </button>
+
+                <?php endif; ?>
+
+
+            <?php else: ?>
+
+
+                <!-- ==========================================
+                     IMAGE EVENT
+                =========================================== -->
+
+                <img
+                    id="featuredImage"
+                    src="<?= e($firstFile) ?>"
+                    alt="<?= e($firstTitle) ?>"
+                >
+
+
+                <!-- ==========================================
+                     VIDEO
+                =========================================== -->
 
                 <video
                     id="featuredVideo"
@@ -452,289 +560,111 @@ $firstMimeType =
                     playsinline
                     preload="metadata"
                     style="display:none;"
-                >
-
-                    <source
-                        id="featuredVideoSource"
-                        src=""
-                        type="video/mp4"
-                    >
-
-                    Your browser does not support
-                    the video tag.
-
-                </video>
+                ></video>
 
 
-                <div
-                    class="featured-title"
-                    id="featuredTitle"
-                >
-
-                    No events available
-
-                </div>
-
-            </div>
+            <?php endif; ?>
 
 
-
-        <?php else: ?>
-
-
-            <!-- ==================================================
-                 FEATURED EVENT
-            ================================================== -->
+            <!-- ==========================================
+                 FEATURED TITLE
+            =========================================== -->
 
             <div
-                class="featured-event"
-                id="featuredEvent"
+                class="featured-title"
+                id="featuredTitle"
             >
 
-
-                <?php if ($firstType === 'video'): ?>
-
-
-                    <!-- ==========================================
-                         VIDEO THUMBNAIL
-                    =========================================== -->
-
-                    <img
-                        id="featuredImage"
-                        src="<?= e(
-                            $firstThumbnail ?: '/logo.png'
-                        ) ?>"
-                        alt="<?= e($firstTitle) ?>"
-                        <?= $firstThumbnail
-                            ? ''
-                            : 'style="display:none;"'
-                        ?>
-                    >
-
-
-                    <!-- ==========================================
-                         FEATURED VIDEO
-                    =========================================== -->
-
-                    <video
-                        id="featuredVideo"
-                        controls
-                        playsinline
-                        preload="metadata"
-                        <?= $firstThumbnail
-                            ? 'style="display:none;"'
-                            : ''
-                        ?>
-                    >
-
-                        <source
-                            id="featuredVideoSource"
-                            src="<?= e($firstFile) ?>"
-                            type="<?= e($firstMimeType) ?>"
-                        >
-
-                        Your browser does not support
-                        the video tag.
-
-                    </video>
-
-
-                    <!-- ==========================================
-                         PLAY BUTTON
-                    =========================================== -->
-
-                    <?php if ($firstThumbnail): ?>
-
-                        <button
-                            type="button"
-                            id="featuredPlayButton"
-                            class="featured-play-button"
-                            onclick="playFeaturedVideo()"
-                            aria-label="Play video"
-                        >
-
-                            <i class="fa-solid fa-play"></i>
-
-                        </button>
-
-                    <?php endif; ?>
-
-
-                <?php else: ?>
-
-
-                    <!-- ==========================================
-                         IMAGE EVENT
-                    =========================================== -->
-
-                    <img
-                        id="featuredImage"
-                        src="<?= e($firstFile) ?>"
-                        alt="<?= e($firstTitle) ?>"
-                    >
-
-
-                    <!-- ==========================================
-                         HIDDEN VIDEO
-                    =========================================== -->
-
-                    <video
-                        id="featuredVideo"
-                        controls
-                        playsinline
-                        preload="metadata"
-                        style="display:none;"
-                    >
-
-                        <source
-                            id="featuredVideoSource"
-                            src=""
-                            type="video/mp4"
-                        >
-
-                        Your browser does not support
-                        the video tag.
-
-                    </video>
-
-
-                <?php endif; ?>
-
-
-
-                <!-- ==========================================
-                     FEATURED TITLE
-                =========================================== -->
-
-                <div
-                    class="featured-title"
-                    id="featuredTitle"
-                >
-
-                    <?= e($firstTitle) ?>
-
-                </div>
+                <?= e($firstTitle) ?>
 
             </div>
 
+        </div>
 
 
-            <!-- ==================================================
-                 EVENT THUMBNAILS
-            ================================================== -->
 
-            <div class="event-thumbnails">
+        <!-- ==================================================
+             EVENT THUMBNAILS
+        ================================================== -->
 
-
-                <?php foreach (
-                    $events as $index => $event
-                ): ?>
+        <div class="event-thumbnails">
 
 
-                    <?php
+            <?php foreach (
+                $events as $index => $event
+            ): ?>
 
-                    $eventType =
-                        $event['type'];
 
-                    $eventFile =
-                        $event['file_url'];
+                <?php
 
-                    $eventTitle =
-                        $event['title'];
+                $eventType =
+                    $event['type'];
 
-                    $eventThumbnail =
-                        $event['thumbnail_url'];
+                $eventFile =
+                    $event['file_url'];
 
-                    $eventMimeType =
+                $eventTitle =
+                    $event['title'];
+
+                $eventThumbnail =
+                    $event['thumbnail_url'];
+
+                $eventMimeType =
+                    $eventType === 'video'
+                        ? getVideoMimeType($eventFile)
+                        : '';
+
+                ?>
+
+
+                <button
+                    type="button"
+                    class="event-thumbnail <?= $index === 0
+                        ? 'active'
+                        : ''
+                    ?>"
+                    onclick="showEvent(
+                        <?= htmlspecialchars(
+                            json_encode($eventType),
+                            ENT_QUOTES,
+                            'UTF-8'
+                        ) ?>,
+                        <?= htmlspecialchars(
+                            json_encode($eventFile),
+                            ENT_QUOTES,
+                            'UTF-8'
+                        ) ?>,
+                        <?= htmlspecialchars(
+                            json_encode($eventTitle),
+                            ENT_QUOTES,
+                            'UTF-8'
+                        ) ?>,
+                        this,
+                        <?= htmlspecialchars(
+                            json_encode($eventThumbnail),
+                            ENT_QUOTES,
+                            'UTF-8'
+                        ) ?>,
+                        <?= htmlspecialchars(
+                            json_encode($eventMimeType),
+                            ENT_QUOTES,
+                            'UTF-8'
+                        ) ?>
+                    )"
+                >
+
+
+                    <?php if (
                         $eventType === 'video'
-                            ? getVideoMimeType($eventFile)
-                            : '';
-
-                    ?>
+                    ): ?>
 
 
-                    <button
-                        type="button"
-                        class="event-thumbnail <?= $index === 0
-                            ? 'active'
-                            : ''
-                        ?>"
-                        onclick="showEvent(
-                            <?= htmlspecialchars(
-                                json_encode($eventType),
-                                ENT_QUOTES,
-                                'UTF-8'
-                            ) ?>,
-                            <?= htmlspecialchars(
-                                json_encode($eventFile),
-                                ENT_QUOTES,
-                                'UTF-8'
-                            ) ?>,
-                            <?= htmlspecialchars(
-                                json_encode($eventTitle),
-                                ENT_QUOTES,
-                                'UTF-8'
-                            ) ?>,
-                            this,
-                            <?= htmlspecialchars(
-                                json_encode($eventThumbnail),
-                                ENT_QUOTES,
-                                'UTF-8'
-                            ) ?>,
-                            <?= htmlspecialchars(
-                                json_encode($eventMimeType),
-                                ENT_QUOTES,
-                                'UTF-8'
-                            ) ?>
-                        )"
-                    >
-
-
-                        <?php if (
-                            $eventType === 'video'
-                        ): ?>
-
-
-                            <!-- ==================================
-                                 VIDEO THUMBNAIL
-                            =================================== -->
-
-                            <div class="video-thumbnail">
-
-                                <img
-                                    src="<?= e(
-                                        $eventThumbnail
-                                        ?: '/logo.png'
-                                    ) ?>"
-                                    alt="<?= e(
-                                        $eventTitle
-                                    ) ?>"
-                                >
-
-
-                                <span
-                                    class="video-thumbnail-play"
-                                >
-
-                                    <i
-                                        class="fa-solid fa-play"
-                                    ></i>
-
-                                </span>
-
-                            </div>
-
-
-                        <?php else: ?>
-
-
-                            <!-- ==================================
-                                 IMAGE THUMBNAIL
-                            =================================== -->
+                        <div class="video-thumbnail">
 
                             <img
                                 src="<?= e(
-                                    $eventFile
+                                    $eventThumbnail
+                                    ?: '/logo.png'
                                 ) ?>"
                                 alt="<?= e(
                                     $eventTitle
@@ -742,35 +672,57 @@ $firstMimeType =
                             >
 
 
-                        <?php endif; ?>
+                            <span
+                                class="video-thumbnail-play"
+                            >
+
+                                <i
+                                    class="fa-solid fa-play"
+                                ></i>
+
+                            </span>
+
+                        </div>
 
 
-                        <!-- ======================================
-                             THUMBNAIL TITLE
-                        ======================================= -->
+                    <?php else: ?>
 
-                        <span class="event-thumbnail-title">
 
-                            <?= e(
+                        <img
+                            src="<?= e(
+                                $eventFile
+                            ) ?>"
+                            alt="<?= e(
                                 $eventTitle
-                            ) ?>
-
-                        </span>
-
-
-                    </button>
+                            ) ?>"
+                        >
 
 
-                <?php endforeach; ?>
+                    <?php endif; ?>
 
 
-            </div>
+                    <span class="event-thumbnail-title">
+
+                        <?= e(
+                            $eventTitle
+                        ) ?>
+
+                    </span>
 
 
-        <?php endif; ?>
+                </button>
 
 
-    </section>
+            <?php endforeach; ?>
+
+
+        </div>
+
+
+    <?php endif; ?>
+
+
+</section>
 
 
 </main>
@@ -929,7 +881,6 @@ $firstMimeType =
 
             <div class="social-links">
 
-
                 <a
                     href="https://www.facebook.com/ABAAEntertainment"
                     target="_blank"
@@ -962,7 +913,6 @@ $firstMimeType =
                     <i class="fa-brands fa-tiktok"></i>
 
                 </a>
-
 
             </div>
 
@@ -1051,7 +1001,6 @@ $firstMimeType =
 
             <div class="form-row">
 
-
                 <div class="form-group">
 
                     <label for="booking_name">
@@ -1091,7 +1040,6 @@ $firstMimeType =
 
             <div class="form-row">
 
-
                 <div class="form-group">
 
                     <label for="booking_email">
@@ -1130,7 +1078,6 @@ $firstMimeType =
 
 
             <div class="form-row">
-
 
                 <div class="form-group">
 
@@ -1199,7 +1146,6 @@ $firstMimeType =
                     >
 
                 </div>
-
 
             </div>
 
@@ -1388,7 +1334,6 @@ $firstMimeType =
 
 <script>
 
-
 /*
 |--------------------------------------------------------------------------
 | EVENT SWITCHER
@@ -1414,11 +1359,6 @@ function showEvent(
             "featuredVideo"
         );
 
-    const videoSource =
-        document.getElementById(
-            "featuredVideoSource"
-        );
-
     const featuredTitle =
         document.getElementById(
             "featuredTitle"
@@ -1439,7 +1379,6 @@ function showEvent(
     if (
         !image ||
         !video ||
-        !videoSource ||
         !featuredTitle
     ) {
 
@@ -1454,7 +1393,7 @@ function showEvent(
 
     /*
     |--------------------------------------------------------------------------
-    | REMOVE ACTIVE
+    | REMOVE ACTIVE STATE
     |--------------------------------------------------------------------------
     */
 
@@ -1473,7 +1412,7 @@ function showEvent(
 
     /*
     |--------------------------------------------------------------------------
-    | ADD ACTIVE
+    | ADD ACTIVE STATE
     |--------------------------------------------------------------------------
     */
 
@@ -1498,26 +1437,11 @@ function showEvent(
 
     /*
     |--------------------------------------------------------------------------
-    | STOP VIDEO
+    | COMPLETELY STOP CURRENT VIDEO
     |--------------------------------------------------------------------------
     */
 
     video.pause();
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | RESET VIDEO
-    |--------------------------------------------------------------------------
-    */
-
-    videoSource.removeAttribute(
-        "src"
-    );
-
-    videoSource.removeAttribute(
-        "type"
-    );
 
     video.removeAttribute(
         "src"
@@ -1557,6 +1481,7 @@ function showEvent(
 
 
         return;
+
     }
 
 
@@ -1569,7 +1494,9 @@ function showEvent(
     if (type === "video") {
 
         /*
-        | Set thumbnail
+        |--------------------------------------------------------------------------
+        | SET THUMBNAIL
+        |--------------------------------------------------------------------------
         */
 
         if (thumbnail) {
@@ -1592,28 +1519,42 @@ function showEvent(
 
 
         /*
-        | Set video source
+        |--------------------------------------------------------------------------
+        | SET VIDEO DIRECTLY ON VIDEO ELEMENT
+        |--------------------------------------------------------------------------
         */
 
-        videoSource.src =
+        video.src =
             source;
 
 
-        videoSource.type =
-            mimeType ||
-            "video/mp4";
+        /*
+        |--------------------------------------------------------------------------
+        | SET MIME TYPE
+        |--------------------------------------------------------------------------
+        |
+        | Some browsers do not need this when src is directly
+        | assigned, but keeping the property makes the intent clear.
+        |--------------------------------------------------------------------------
+        */
+
+        video.dataset.mimeType =
+            mimeType || "video/mp4";
 
 
         /*
-        | Reload
+        |--------------------------------------------------------------------------
+        | LOAD NEW VIDEO
+        |--------------------------------------------------------------------------
         */
 
         video.load();
 
 
         /*
-        | If thumbnail exists,
-        | show thumbnail first.
+        |--------------------------------------------------------------------------
+        | THUMBNAIL MODE
+        |--------------------------------------------------------------------------
         */
 
         if (thumbnail) {
@@ -1630,11 +1571,6 @@ function showEvent(
             }
 
         } else {
-
-            /*
-            | No thumbnail:
-            | show video immediately.
-            */
 
             video.style.display =
                 "block";
@@ -1688,7 +1624,9 @@ function playFeaturedVideo()
 
 
     /*
-    | Hide thumbnail
+    |--------------------------------------------------------------------------
+    | HIDE THUMBNAIL
+    |--------------------------------------------------------------------------
     */
 
     if (image) {
@@ -1700,7 +1638,9 @@ function playFeaturedVideo()
 
 
     /*
-    | Show video
+    |--------------------------------------------------------------------------
+    | SHOW VIDEO
+    |--------------------------------------------------------------------------
     */
 
     video.style.display =
@@ -1708,7 +1648,9 @@ function playFeaturedVideo()
 
 
     /*
-    | Hide play button
+    |--------------------------------------------------------------------------
+    | HIDE PLAY BUTTON
+    |--------------------------------------------------------------------------
     */
 
     if (playButton) {
@@ -1720,17 +1662,19 @@ function playFeaturedVideo()
 
 
     /*
-    | Make sure video is NOT forced muted.
-    |
-    | The user can now use the browser
-    | volume/unmute controls.
+    |--------------------------------------------------------------------------
+    | DO NOT FORCE MUTE
+    |--------------------------------------------------------------------------
     */
 
-    video.muted = false;
+    video.muted =
+        false;
 
 
     /*
-    | Play
+    |--------------------------------------------------------------------------
+    | PLAY
+    |--------------------------------------------------------------------------
     */
 
     const playPromise =
@@ -1744,8 +1688,8 @@ function playFeaturedVideo()
         playPromise.catch(
             function(error) {
 
-                console.log(
-                    "Video play prevented:",
+                console.error(
+                    "Video play failed:",
                     error
                 );
 
@@ -1760,7 +1704,10 @@ function playFeaturedVideo()
 
 /*
 |--------------------------------------------------------------------------
-| VIDEO ERROR
+| INITIALIZE FIRST VIDEO
+|--------------------------------------------------------------------------
+|
+| The first video needs its source assigned after the page loads.
 |--------------------------------------------------------------------------
 */
 
@@ -1781,6 +1728,25 @@ document.addEventListener(
         }
 
 
+        <?php if ($firstType === 'video' && $firstFile): ?>
+
+        video.src =
+            <?= json_encode(
+                $firstFile,
+                JSON_UNESCAPED_SLASHES
+            ) ?>;
+
+        video.load();
+
+        <?php endif; ?>
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | VIDEO ERROR
+        |--------------------------------------------------------------------------
+        */
+
         video.addEventListener(
             "error",
             function() {
@@ -1790,8 +1756,13 @@ document.addEventListener(
                 );
 
                 console.error(
-                    "Video source:",
+                    "Current video URL:",
                     video.currentSrc
+                );
+
+                console.error(
+                    "Video error:",
+                    video.error
                 );
 
             }
