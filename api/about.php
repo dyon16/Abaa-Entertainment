@@ -2,6 +2,48 @@
 
 include(__DIR__ . '/conn.php');
 
+function e($value)
+{
+    return htmlspecialchars((string)($value ?? ''), ENT_QUOTES, 'UTF-8');
+}
+
+/*
+|--------------------------------------------------------------------------
+| LOAD SERVICES
+|--------------------------------------------------------------------------
+| Services are managed from /admin/services and shared with the
+| homepage/service pages.
+*/
+$services = [];
+
+try {
+
+    $stmt = $pdo->query(
+        "SELECT
+            id,
+            name,
+            slug,
+            image_url,
+            description,
+            details,
+            is_available,
+            sort_order,
+            created_at
+         FROM services
+         ORDER BY sort_order ASC, id ASC"
+    );
+
+    $services = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+} catch (PDOException $e) {
+
+    error_log(
+        'About page service query error: ' .
+        $e->getMessage()
+    );
+
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -30,6 +72,20 @@ include(__DIR__ . '/conn.php');
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
     >
+
+
+<style>
+.service-unavailable-link {
+    color: #dc2626 !important;
+    cursor: not-allowed;
+    opacity: .85;
+}
+
+.footer-empty {
+    color: #777;
+    font-size: 13px;
+}
+</style>
 
 </head>
 
@@ -258,143 +314,6 @@ include(__DIR__ . '/conn.php');
         </div>
 
     </section>
-
-
-
-    <section
-        class="what-we-do"
-        id="services"
-    >
-
-        <div class="section-heading">
-
-            <span class="section-label">
-                WHAT WE DO
-            </span>
-
-            <h2>
-                Creating Experiences
-            </h2>
-
-            <p>
-                From technical production to live
-                entertainment, we provide the tools
-                and expertise needed to bring events
-                to life.
-            </p>
-
-        </div>
-
-
-        <div class="service-grid">
-
-            <div class="service-card">
-
-                <i class="fa-solid fa-display"></i>
-
-                <h3>
-                    LED Wall
-                </h3>
-
-                <p>
-                    High-quality LED wall solutions
-                    for concerts, corporate events,
-                    celebrations, and productions.
-                </p>
-
-            </div>
-
-
-            <div class="service-card">
-
-                <i class="fa-solid fa-lightbulb"></i>
-
-                <h3>
-                    Lights & Sound
-                </h3>
-
-                <p>
-                    Professional lighting and sound
-                    production designed to enhance
-                    every event.
-                </p>
-
-            </div>
-
-
-            <div class="service-card">
-
-                <i class="fa-solid fa-video"></i>
-
-                <h3>
-                    Live Feed
-                </h3>
-
-                <p>
-                    Reliable live video production
-                    and projection solutions for
-                    large-scale events.
-                </p>
-
-            </div>
-
-
-            <div class="service-card">
-
-                <i class="fa-solid fa-layer-group"></i>
-
-                <h3>
-                    Stage Production
-                </h3>
-
-                <p>
-                    Complete stage production and
-                    technical support for memorable
-                    performances.
-                </p>
-
-            </div>
-
-
-            <div class="service-card">
-
-                <i class="fa-solid fa-music"></i>
-
-                <h3>
-                    Music Studio
-                </h3>
-
-                <p>
-                    Creative spaces and professional
-                    equipment for music and audio
-                    production.
-                </p>
-
-            </div>
-
-
-            <div class="service-card">
-
-                <i class="fa-solid fa-cubes"></i>
-
-                <h3>
-                    Trusses
-                </h3>
-
-                <p>
-                    Safe and professional truss
-                    solutions for lighting, LED walls,
-                    and event equipment.
-                </p>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-
     <section class="why-us">
 
         <div class="why-image">
@@ -587,29 +506,38 @@ include(__DIR__ . '/conn.php');
                 Our Services
             </h3>
 
-            <a href="/service?service=led-wall">
-                LED Wall
-            </a>
+            
+<?php if (!empty($services)): ?>
 
-            <a href="/service?service=lights-sound">
-                Lights & Sound
-            </a>
+<?php foreach ($services as $item): ?>
 
-            <a href="/service?service=live-feed">
-                Live Feed
-            </a>
+<?php
+    $serviceSlug = trim((string)($item['slug'] ?? ''));
+    $serviceName = trim((string)($item['name'] ?? ''));
+    $isAvailable = (int)($item['is_available'] ?? 0) === 1;
+?>
 
-            <a href="/service?service=stage">
-                Stage Production
-            </a>
+<?php if ($serviceSlug !== '' && $serviceName !== ''): ?>
 
-            <a href="/service?service=music-studio">
-                Music Studio
-            </a>
+<a
+    href="<?= $isAvailable ? '/service?service=' . rawurlencode($serviceSlug) : '#' ?>"
+    <?= !$isAvailable ? 'aria-disabled="true" onclick="return false;" class="service-unavailable-link"' : '' ?>
+>
+    <?= e($serviceName) ?>
+</a>
 
-            <a href="/service?service=trusses">
-                Trusses
-            </a>
+<?php endif; ?>
+
+<?php endforeach; ?>
+
+<?php else: ?>
+
+<span class="footer-empty">
+    No services available.
+</span>
+
+<?php endif; ?>
+
 
         </div>
 
