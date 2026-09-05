@@ -1,834 +1,808 @@
 <?php
+
 session_start();
 
 include(__DIR__ . '/conn.php');
 
 /*
 |--------------------------------------------------------------------------
-
-ADMIN AUTHENTICATION
+| ADMIN AUTHENTICATION
+|--------------------------------------------------------------------------
 */
 
 $authSecret = getenv('ADMIN_AUTH_SECRET');
 
 if (!$authSecret) {
-$authSecret = 'ABAA_CHANGE_THIS_SECRET_2026';
+    $authSecret = 'ABAA_CHANGE_THIS_SECRET_2026';
 }
 
 $cookieName = 'abaa_admin_auth';
 
 /*
 |--------------------------------------------------------------------------
-
-VERCEL BLOB
+| VERCEL BLOB
+|--------------------------------------------------------------------------
 */
 
 $blobToken = getenv('BLOB_READ_WRITE_TOKEN');
 
 /*
 |--------------------------------------------------------------------------
-
-BASE64 URL DECODE
+| BASE64 URL DECODE
+|--------------------------------------------------------------------------
 */
 
 function base64UrlDecode($data)
 {
-$remainder = strlen($data) % 4;
+    $remainder = strlen($data) % 4;
 
-if ($remainder > 0) {
-    $data .= str_repeat('=', 4 - $remainder);
-}
+    if ($remainder > 0) {
+        $data .= str_repeat(
+            '=',
+            4 - $remainder
+        );
+    }
 
-return base64_decode(
-    strtr($data, '-_', '+/'),
-    true
-);
-
+    return base64_decode(
+        strtr($data, '-_', '+/'),
+        true
+    );
 }
 
 /*
 |--------------------------------------------------------------------------
-
-VERIFY ADMIN COOKIE
+| VERIFY ADMIN COOKIE
+|--------------------------------------------------------------------------
 */
 
 function verifyAdminCookie($cookie, $secret)
 {
-if (empty($cookie)) {
-return false;
-}
+    if (empty($cookie)) {
+        return false;
+    }
 
-$parts = explode('.', $cookie);
+    $parts = explode('.', $cookie);
 
-if (count($parts) !== 2) {
-    return false;
-}
+    if (count($parts) !== 2) {
+        return false;
+    }
 
-$payloadEncoded = $parts[0];
-$providedSignature = $parts[1];
+    $payloadEncoded = $parts[0];
+    $providedSignature = $parts[1];
 
-$expectedSignature = hash_hmac(
-    'sha256',
-    $payloadEncoded,
-    $secret
-);
+    $expectedSignature = hash_hmac(
+        'sha256',
+        $payloadEncoded,
+        $secret
+    );
 
-if (!hash_equals(
-    $expectedSignature,
-    $providedSignature
-)) {
-    return false;
-}
+    if (!hash_equals(
+        $expectedSignature,
+        $providedSignature
+    )) {
+        return false;
+    }
 
-$payloadJson = base64UrlDecode($payloadEncoded);
+    $payloadJson = base64UrlDecode(
+        $payloadEncoded
+    );
 
-if ($payloadJson === false) {
-    return false;
-}
+    if ($payloadJson === false) {
+        return false;
+    }
 
-$payload = json_decode(
-    $payloadJson,
-    true
-);
+    $payload = json_decode(
+        $payloadJson,
+        true
+    );
 
-if (!is_array($payload)) {
-    return false;
-}
+    if (!is_array($payload)) {
+        return false;
+    }
 
-if (
-    !isset($payload['id']) ||
-    !isset($payload['username']) ||
-    !isset($payload['exp'])
-) {
-    return false;
-}
+    if (
+        !isset($payload['id']) ||
+        !isset($payload['username']) ||
+        !isset($payload['exp'])
+    ) {
+        return false;
+    }
 
-if ((int) $payload['exp'] < time()) {
-    return false;
-}
+    if (
+        (int) $payload['exp'] < time()
+    ) {
+        return false;
+    }
 
-return $payload;
-
+    return $payload;
 }
 
 /*
 |--------------------------------------------------------------------------
-
-CHECK LOGIN
+| CHECK LOGIN
+|--------------------------------------------------------------------------
 */
 
 $admin = false;
 
 if (isset($_COOKIE[$cookieName])) {
-$admin = verifyAdminCookie(
-$_COOKIE[$cookieName],
-$authSecret
-);
+
+    $admin = verifyAdminCookie(
+        $_COOKIE[$cookieName],
+        $authSecret
+    );
 }
 
 /*
 |--------------------------------------------------------------------------
-
-REDIRECT IF NOT LOGGED IN
+| REDIRECT IF NOT LOGGED IN
+|--------------------------------------------------------------------------
 */
 
 if (!$admin) {
-header('Location: /admin');
-exit;
+
+    header(
+        'Location: /admin'
+    );
+
+    exit;
 }
 
 /*
 |--------------------------------------------------------------------------
-
-HELPER
+| HELPER
+|--------------------------------------------------------------------------
 */
 
 function e($value)
 {
-return htmlspecialchars(
-(string) ($value ?? ''),
-ENT_QUOTES,
-'UTF-8'
-);
+    return htmlspecialchars(
+        (string) ($value ?? ''),
+        ENT_QUOTES,
+        'UTF-8'
+    );
 }
 
 /*
 |--------------------------------------------------------------------------
-
-UPLOAD FILE TO VERCEL BLOB
-
-|
-| IMPORTANT:
-|
-| This version does NOT use:
-|
-| file_get_contents($tmpFile)
-|
-| Therefore the entire video is not loaded into PHP memory.
-|
-| The temporary uploaded file is streamed directly to cURL.
-|
+| BLOB UPLOAD FUNCTION
 |--------------------------------------------------------------------------
 */
 
 function uploadToVercelBlob(
-$tmpFile,
-$fileName,
-$mimeType,
-$fileSize,
-$blobToken
+    $tmpFile,
+    $fileName,
+    $mimeType,
+    $blobToken
 ) {
-if (!$blobToken) {
-return [
-'success' => false,
-'error' => 'BLOB_READ_WRITE_TOKEN is not configured.'
-];
-}
 
-if (!is_file($tmpFile)) {
-    return [
-        'success' => false,
-        'error' => 'Temporary upload file was not found.'
-    ];
-}
+    if (!$blobToken) {
 
-$fileHandle = fopen($tmpFile, 'rb');
+        return [
+            'success' => false,
+            'error' =>
+                'BLOB_READ_WRITE_TOKEN is not configured.'
+        ];
+    }
 
-if ($fileHandle === false) {
-    return [
-        'success' => false,
-        'error' => 'Unable to open uploaded file.'
-    ];
-}
+    if (!is_file($tmpFile)) {
 
-/*
-|--------------------------------------------------------------------------
-| VERCEL BLOB URL
-|--------------------------------------------------------------------------
-*/
+        return [
+            'success' => false,
+            'error' =>
+                'Temporary upload file was not found.'
+        ];
+    }
 
-$url =
-    'https://blob.vercel-storage.com/' .
-    str_replace(
-        '%2F',
-        '/',
-        rawurlencode($fileName)
+    $fileContents = file_get_contents(
+        $tmpFile
     );
 
-$ch = curl_init($url);
+    if ($fileContents === false) {
 
-if ($ch === false) {
-    fclose($fileHandle);
+        return [
+            'success' => false,
+            'error' =>
+                'Unable to read uploaded file.'
+        ];
+    }
 
-    return [
-        'success' => false,
-        'error' => 'Unable to initialize Blob upload.'
-    ];
-}
+    /*
+    |--------------------------------------------------------------------------
+    | VERCEL BLOB API
+    |--------------------------------------------------------------------------
+    */
 
-curl_setopt_array(
-    $ch,
-    [
-        CURLOPT_CUSTOMREQUEST => 'PUT',
+    $url =
+        'https://blob.vercel-storage.com/' .
+        rawurlencode($fileName);
 
-        /*
-        |--------------------------------------------------------------------------
-        | STREAM FILE
-        |--------------------------------------------------------------------------
-        */
+    $ch = curl_init($url);
 
-        CURLOPT_UPLOAD => true,
+    if ($ch === false) {
 
-        CURLOPT_INFILE => $fileHandle,
+        return [
+            'success' => false,
+            'error' =>
+                'Unable to initialize Blob upload.'
+        ];
+    }
 
-        CURLOPT_INFILESIZE => $fileSize,
+    curl_setopt_array(
+        $ch,
+        [
+            CURLOPT_CUSTOMREQUEST =>
+                'PUT',
 
-        CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POSTFIELDS =>
+                $fileContents,
 
-        CURLOPT_HTTPHEADER => [
-            'Authorization: Bearer ' . $blobToken,
-            'Content-Type: ' . $mimeType,
-            'x-api-version: 7'
-        ],
+            CURLOPT_RETURNTRANSFER =>
+                true,
 
-        /*
-        |--------------------------------------------------------------------------
-        | LARGE FILE SETTINGS
-        |--------------------------------------------------------------------------
-        */
+            CURLOPT_HTTPHEADER => [
+                'Authorization: Bearer ' .
+                    $blobToken,
 
-        CURLOPT_TIMEOUT => 600,
+                'Content-Type: ' .
+                    $mimeType,
 
-        CURLOPT_CONNECTTIMEOUT => 30,
+                'x-api-version: 7',
+            ],
 
-        CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_TIMEOUT => 300,
 
-        CURLOPT_FAILONERROR => false
-    ]
-);
-
-$response = curl_exec($ch);
-
-$curlError = curl_error($ch);
-
-$httpCode = curl_getinfo(
-    $ch,
-    CURLINFO_HTTP_CODE
-);
-
-fclose($fileHandle);
-
-unset($ch);
-
-/*
-|--------------------------------------------------------------------------
-| CURL ERROR
-|--------------------------------------------------------------------------
-*/
-
-if ($response === false) {
-    return [
-        'success' => false,
-        'error' =>
-            'Blob upload failed: ' .
-            ($curlError ?: 'Unknown cURL error.')
-    ];
-}
-
-/*
-|--------------------------------------------------------------------------
-| HTTP ERROR
-|--------------------------------------------------------------------------
-*/
-
-if (
-    $httpCode < 200 ||
-    $httpCode >= 300
-) {
-    error_log(
-        'Vercel Blob upload error: HTTP ' .
-        $httpCode .
-        ' Response: ' .
-        $response
+            CURLOPT_CONNECTTIMEOUT => 30,
+        ]
     );
 
+    $response = curl_exec($ch);
+
+    $curlError = curl_error($ch);
+
+    $httpCode = curl_getinfo(
+        $ch,
+        CURLINFO_HTTP_CODE
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | PHP 8.5 FIX
+    |--------------------------------------------------------------------------
+    |
+    | curl_close() is deprecated since PHP 8.5 because CurlHandle
+    | objects are automatically cleaned up.
+    |
+    | Do NOT use curl_close($ch).
+    |--------------------------------------------------------------------------
+    */
+
+    unset($ch);
+
+    if ($response === false) {
+
+        return [
+            'success' => false,
+            'error' =>
+                'Blob upload failed: ' .
+                $curlError
+        ];
+    }
+
+    if (
+        $httpCode < 200 ||
+        $httpCode >= 300
+    ) {
+
+        error_log(
+            'Vercel Blob upload error: HTTP ' .
+            $httpCode .
+            ' Response: ' .
+            $response
+        );
+
+        return [
+            'success' => false,
+            'error' =>
+                'Vercel Blob rejected the upload.'
+        ];
+    }
+
+    $data = json_decode(
+        $response,
+        true
+    );
+
+    if (!is_array($data)) {
+
+        return [
+            'success' => false,
+            'error' =>
+                'Invalid response from Vercel Blob.'
+        ];
+    }
+
+    $blobUrl =
+        $data['url'] ??
+        $data['downloadUrl'] ??
+        null;
+
+    if (!$blobUrl) {
+
+        return [
+            'success' => false,
+            'error' =>
+                'Vercel Blob did not return a file URL.'
+        ];
+    }
+
     return [
-        'success' => false,
-        'error' =>
-            'Vercel Blob rejected the upload. HTTP ' .
-            $httpCode
+        'success' => true,
+        'url' => $blobUrl
     ];
 }
 
 /*
 |--------------------------------------------------------------------------
-| DECODE RESPONSE
+| DELETE FROM VERCEL BLOB
 |--------------------------------------------------------------------------
-*/
-
-$data = json_decode(
-    $response,
-    true
-);
-
-if (!is_array($data)) {
-    return [
-        'success' => false,
-        'error' =>
-            'Invalid response from Vercel Blob.'
-    ];
-}
-
-$blobUrl =
-    $data['url'] ??
-    $data['downloadUrl'] ??
-    null;
-
-if (!$blobUrl) {
-    return [
-        'success' => false,
-        'error' =>
-            'Vercel Blob did not return a file URL.'
-    ];
-}
-
-return [
-    'success' => true,
-    'url' => $blobUrl
-];
-
-}
-
-/*
-|--------------------------------------------------------------------------
-
-DELETE FROM VERCEL BLOB
 */
 
 function deleteFromVercelBlob(
-$blobUrl,
-$blobToken
+    $blobUrl,
+    $blobToken
 ) {
-if (
-empty($blobUrl) ||
-empty($blobToken)
-) {
-return false;
-}
 
-$ch = curl_init($blobUrl);
+    if (
+        empty($blobUrl) ||
+        empty($blobToken)
+    ) {
+        return false;
+    }
 
-if ($ch === false) {
-    return false;
-}
+    $ch = curl_init($blobUrl);
 
-curl_setopt_array(
-    $ch,
-    [
-        CURLOPT_CUSTOMREQUEST => 'DELETE',
+    if ($ch === false) {
+        return false;
+    }
 
-        CURLOPT_RETURNTRANSFER => true,
+    curl_setopt_array(
+        $ch,
+        [
+            CURLOPT_CUSTOMREQUEST =>
+                'DELETE',
 
-        CURLOPT_HTTPHEADER => [
-            'Authorization: Bearer ' . $blobToken,
-            'x-api-version: 7'
-        ],
+            CURLOPT_RETURNTRANSFER =>
+                true,
 
-        CURLOPT_TIMEOUT => 60,
+            CURLOPT_HTTPHEADER => [
+                'Authorization: Bearer ' .
+                    $blobToken,
 
-        CURLOPT_CONNECTTIMEOUT => 20
-    ]
-);
+                'x-api-version: 7',
+            ],
 
-$response = curl_exec($ch);
+            CURLOPT_TIMEOUT => 60,
+        ]
+    );
 
-$httpCode = curl_getinfo(
-    $ch,
-    CURLINFO_HTTP_CODE
-);
+    $response = curl_exec($ch);
 
-unset($ch);
+    $httpCode = curl_getinfo(
+        $ch,
+        CURLINFO_HTTP_CODE
+    );
 
-return (
-    $response !== false &&
-    $httpCode >= 200 &&
-    $httpCode < 300
-);
+    /*
+    |--------------------------------------------------------------------------
+    | PHP 8.5 FIX
+    |--------------------------------------------------------------------------
+    |
+    | curl_close() is deprecated since PHP 8.5.
+    |--------------------------------------------------------------------------
+    */
 
+    unset($ch);
+
+    return (
+        $response !== false &&
+        $httpCode >= 200 &&
+        $httpCode < 300
+    );
 }
 
 /*
 |--------------------------------------------------------------------------
-
-FLASH MESSAGES
+| FLASH MESSAGES
+|--------------------------------------------------------------------------
 */
 
 $statusMessage =
-$_SESSION['event_status_message'] ?? '';
+    $_SESSION['event_status_message'] ?? '';
 
 $statusError =
-$_SESSION['event_status_error'] ?? '';
+    $_SESSION['event_status_error'] ?? '';
 
 unset(
-$_SESSION['event_status_message'],
-$_SESSION['event_status_error']
+    $_SESSION['event_status_message'],
+    $_SESSION['event_status_error']
 );
 
 /*
 |--------------------------------------------------------------------------
-
-DELETE EVENT
+| DELETE EVENT
+|--------------------------------------------------------------------------
 */
 
 if (
-$_SERVER['REQUEST_METHOD'] === 'POST' &&
-isset($_POST['delete_event'])
+    $_SERVER['REQUEST_METHOD'] === 'POST' &&
+    isset($_POST['delete_event'])
 ) {
-$eventId =
-(int) (
-$_POST['event_id'] ?? 0
-);
 
-if ($eventId > 0) {
-    try {
-
-        $stmt = $pdo->prepare(
-            "SELECT
-                file_url,
-                thumbnail_url
-             FROM events
-             WHERE id = :id
-             LIMIT 1"
+    $eventId =
+        (int) (
+            $_POST['event_id'] ?? 0
         );
 
-        $stmt->execute([
-            ':id' => $eventId
-        ]);
+    if ($eventId > 0) {
 
-        $event =
-            $stmt->fetch(
-                PDO::FETCH_ASSOC
-            );
+        try {
 
-        if ($event) {
-
-            /*
-            |--------------------------------------------------------------------------
-            | DELETE MAIN FILE
-            |--------------------------------------------------------------------------
-            */
-
-            if (!empty($event['file_url'])) {
-                deleteFromVercelBlob(
-                    $event['file_url'],
-                    $blobToken
+            $stmt =
+                $pdo->prepare(
+                    "SELECT
+                        file_url,
+                        thumbnail_url
+                     FROM events
+                     WHERE id = :id
+                     LIMIT 1"
                 );
+
+            $stmt->execute([
+                ':id' => $eventId
+            ]);
+
+            $event =
+                $stmt->fetch(
+                    PDO::FETCH_ASSOC
+                );
+
+            if ($event) {
+
+                /*
+                |--------------------------------------------------------------------------
+                | DELETE MAIN BLOB
+                |--------------------------------------------------------------------------
+                */
+
+                if (
+                    !empty(
+                        $event['file_url']
+                    )
+                ) {
+
+                    deleteFromVercelBlob(
+                        $event['file_url'],
+                        $blobToken
+                    );
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | DELETE THUMBNAIL BLOB
+                |--------------------------------------------------------------------------
+                */
+
+                if (
+                    !empty(
+                        $event['thumbnail_url']
+                    )
+                ) {
+
+                    deleteFromVercelBlob(
+                        $event['thumbnail_url'],
+                        $blobToken
+                    );
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | DELETE DATABASE RECORD
+                |--------------------------------------------------------------------------
+                */
+
+                $stmt =
+                    $pdo->prepare(
+                        "DELETE FROM events
+                         WHERE id = :id"
+                    );
+
+                $stmt->execute([
+                    ':id' => $eventId
+                ]);
+
+                $statusMessage =
+                    'Event deleted successfully.';
+
+            } else {
+
+                $statusError =
+                    'Event not found.';
             }
 
-            /*
-            |--------------------------------------------------------------------------
-            | DELETE THUMBNAIL
-            |--------------------------------------------------------------------------
-            */
+        } catch (PDOException $e) {
 
-            if (!empty($event['thumbnail_url'])) {
-                deleteFromVercelBlob(
-                    $event['thumbnail_url'],
-                    $blobToken
-                );
-            }
-
-            /*
-            |--------------------------------------------------------------------------
-            | DELETE DATABASE RECORD
-            |--------------------------------------------------------------------------
-            */
-
-            $stmt = $pdo->prepare(
-                "DELETE FROM events
-                 WHERE id = :id"
+            error_log(
+                'Event delete error: ' .
+                $e->getMessage()
             );
+
+            $statusError =
+                'Unable to delete event.';
+        }
+
+    } else {
+
+        $statusError =
+            'Invalid event.';
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| TOGGLE VISIBILITY
+|--------------------------------------------------------------------------
+*/
+
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST' &&
+    isset($_POST['toggle_visibility'])
+) {
+
+    $eventId =
+        (int) (
+            $_POST['event_id'] ?? 0
+        );
+
+    if ($eventId > 0) {
+
+        try {
+
+            $stmt =
+                $pdo->prepare(
+                    "UPDATE events
+                     SET is_visible =
+                        CASE
+                            WHEN is_visible = 1
+                            THEN 0
+                            ELSE 1
+                        END
+                     WHERE id = :id"
+                );
 
             $stmt->execute([
                 ':id' => $eventId
             ]);
 
             $statusMessage =
-                'Event deleted successfully.';
+                'Event visibility updated.';
 
-        } else {
+        } catch (PDOException $e) {
+
+            error_log(
+                'Event visibility error: ' .
+                $e->getMessage()
+            );
 
             $statusError =
-                'Event not found.';
+                'Unable to update visibility.';
         }
-
-    } catch (PDOException $e) {
-
-        error_log(
-            'Event delete error: ' .
-            $e->getMessage()
-        );
-
-        $statusError =
-            'Unable to delete event.';
-    }
-
-} else {
-
-    $statusError =
-        'Invalid event.';
-}
-
-}
-
-/*
-|--------------------------------------------------------------------------
-
-TOGGLE VISIBILITY
-*/
-
-if (
-$_SERVER['REQUEST_METHOD'] === 'POST' &&
-isset($_POST['toggle_visibility'])
-) {
-$eventId =
-(int) (
-$_POST['event_id'] ?? 0
-);
-
-if ($eventId > 0) {
-
-    try {
-
-        $stmt = $pdo->prepare(
-            "UPDATE events
-             SET is_visible =
-                CASE
-                    WHEN is_visible = 1
-                    THEN 0
-                    ELSE 1
-                END
-             WHERE id = :id"
-        );
-
-        $stmt->execute([
-            ':id' => $eventId
-        ]);
-
-        $statusMessage =
-            'Event visibility updated.';
-
-    } catch (PDOException $e) {
-
-        error_log(
-            'Event visibility error: ' .
-            $e->getMessage()
-        );
-
-        $statusError =
-            'Unable to update visibility.';
-    }
-
-} else {
-
-    $statusError =
-        'Invalid event.';
-}
-
-}
-
-/*
-|--------------------------------------------------------------------------
-
-UPLOAD EVENT
-*/
-
-if (
-$_SERVER['REQUEST_METHOD'] === 'POST' &&
-isset($_POST['upload_event'])
-) {
-
-$title =
-    trim(
-        $_POST['title'] ?? ''
-    );
-
-$type =
-    trim(
-        $_POST['type'] ?? ''
-    );
-
-/*
-|--------------------------------------------------------------------------
-| VALIDATE BLOB TOKEN
-|--------------------------------------------------------------------------
-*/
-
-if (!$blobToken) {
-
-    $statusError =
-        'Vercel Blob is not configured. Please add BLOB_READ_WRITE_TOKEN.';
-
-/*
-|--------------------------------------------------------------------------
-| VALIDATE TITLE
-|--------------------------------------------------------------------------
-*/
-
-} elseif ($title === '') {
-
-    $statusError =
-        'Please enter an event title.';
-
-/*
-|--------------------------------------------------------------------------
-| VALIDATE TYPE
-|--------------------------------------------------------------------------
-*/
-
-} elseif (
-    !in_array(
-        $type,
-        ['image', 'video'],
-        true
-    )
-) {
-
-    $statusError =
-        'Invalid event type.';
-
-/*
-|--------------------------------------------------------------------------
-| CHECK MAIN FILE
-|--------------------------------------------------------------------------
-*/
-
-} elseif (
-    !isset($_FILES['event_file']) ||
-    $_FILES['event_file']['error'] !== UPLOAD_ERR_OK
-) {
-
-    $statusError =
-        'Please select an event file.';
-
-} else {
-
-    $file =
-        $_FILES['event_file'];
-
-    $originalName =
-        $file['name'];
-
-    $tmpName =
-        $file['tmp_name'];
-
-    $fileSize =
-        (int) $file['size'];
-
-    /*
-    |--------------------------------------------------------------------------
-    | MAX FILE SIZE
-    |--------------------------------------------------------------------------
-    */
-
-    $maxFileSize =
-        500 * 1024 * 1024;
-
-    if ($fileSize <= 0) {
-
-        $statusError =
-            'The uploaded file is empty.';
-
-    } elseif ($fileSize > $maxFileSize) {
-
-        $statusError =
-            'File is too large. Maximum size is 500MB.';
 
     } else {
 
+        $statusError =
+            'Invalid event.';
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| UPLOAD EVENT
+|--------------------------------------------------------------------------
+*/
+
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST' &&
+    isset($_POST['upload_event'])
+) {
+
+    $title =
+        trim(
+            $_POST['title'] ?? ''
+        );
+
+    $type =
+        trim(
+            $_POST['type'] ?? ''
+        );
+
+    /*
+    |--------------------------------------------------------------------------
+    | VALIDATE BLOB TOKEN
+    |--------------------------------------------------------------------------
+    */
+
+    if (!$blobToken) {
+
+        $statusError =
+            'Vercel Blob is not configured. Please add BLOB_READ_WRITE_TOKEN.';
+
+    /*
+    |--------------------------------------------------------------------------
+    | VALIDATE TITLE
+    |--------------------------------------------------------------------------
+    */
+
+    } elseif ($title === '') {
+
+        $statusError =
+            'Please enter an event title.';
+
+    /*
+    |--------------------------------------------------------------------------
+    | VALIDATE TYPE
+    |--------------------------------------------------------------------------
+    */
+
+    } elseif (
+        !in_array(
+            $type,
+            [
+                'image',
+                'video'
+            ],
+            true
+        )
+    ) {
+
+        $statusError =
+            'Invalid event type.';
+
+    /*
+    |--------------------------------------------------------------------------
+    | CHECK MAIN FILE
+    |--------------------------------------------------------------------------
+    */
+
+    } elseif (
+        !isset(
+            $_FILES['event_file']
+        ) ||
+        $_FILES['event_file']['error'] !==
+            UPLOAD_ERR_OK
+    ) {
+
+        $statusError =
+            'Please select an event file.';
+
+    } else {
+
+        $file =
+            $_FILES['event_file'];
+
+        $originalName =
+            $file['name'];
+
+        $tmpName =
+            $file['tmp_name'];
+
+        $fileSize =
+            (int) $file['size'];
+
         /*
         |--------------------------------------------------------------------------
-        | EXTENSION
+        | MAX FILE SIZE
         |--------------------------------------------------------------------------
         */
 
-        $extension =
-            strtolower(
-                pathinfo(
-                    $originalName,
-                    PATHINFO_EXTENSION
-                )
-            );
-
-        /*
-        |--------------------------------------------------------------------------
-        | ALLOWED EXTENSIONS
-        |--------------------------------------------------------------------------
-        */
-
-        $imageExtensions = [
-            'jpg',
-            'jpeg',
-            'png',
-            'webp'
-        ];
-
-        $videoExtensions = [
-            'mp4',
-            'webm',
-            'mov'
-        ];
-
-        if ($type === 'image') {
-
-            $allowedExtensions =
-                $imageExtensions;
-
-        } else {
-
-            $allowedExtensions =
-                $videoExtensions;
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | VALIDATE EXTENSION
-        |--------------------------------------------------------------------------
-        */
+        $maxFileSize =
+            500 * 1024 * 1024;
 
         if (
-            !in_array(
-                $extension,
-                $allowedExtensions,
-                true
-            )
+            $fileSize >
+            $maxFileSize
         ) {
 
             $statusError =
-                'Invalid file extension for ' .
-                e($type) .
-                '.';
+                'File is too large for this PHP upload endpoint. Maximum is 500MB. For large videos, use direct Vercel Blob client uploads.';
 
         } else {
 
             /*
             |--------------------------------------------------------------------------
-            | VALIDATE MIME
+            | EXTENSION
             |--------------------------------------------------------------------------
             */
 
-            $mimeType =
-                mime_content_type(
-                    $tmpName
+            $extension =
+                strtolower(
+                    pathinfo(
+                        $originalName,
+                        PATHINFO_EXTENSION
+                    )
                 );
 
-            if (!$mimeType) {
+            /*
+            |--------------------------------------------------------------------------
+            | ALLOWED EXTENSIONS
+            |--------------------------------------------------------------------------
+            */
 
-                $mimeType =
-                    'application/octet-stream';
+            $imageExtensions = [
+                'jpg',
+                'jpeg',
+                'png',
+                'webp'
+            ];
+
+            $videoExtensions = [
+                'mp4',
+                'webm',
+                'mov'
+            ];
+
+            if ($type === 'image') {
+
+                $allowedExtensions =
+                    $imageExtensions;
+
+            } else {
+
+                $allowedExtensions =
+                    $videoExtensions;
             }
 
-            $allowedImageMimes = [
-                'image/jpeg',
-                'image/png',
-                'image/webp'
-            ];
-
-            $allowedVideoMimes = [
-                'video/mp4',
-                'video/webm',
-                'video/quicktime'
-            ];
+            /*
+            |--------------------------------------------------------------------------
+            | VALIDATE EXTENSION
+            |--------------------------------------------------------------------------
+            */
 
             if (
-                $type === 'image' &&
                 !in_array(
-                    $mimeType,
-                    $allowedImageMimes,
+                    $extension,
+                    $allowedExtensions,
                     true
                 )
             ) {
 
                 $statusError =
-                    'The uploaded file is not a valid image.';
-
-            } elseif (
-                $type === 'video' &&
-                !in_array(
-                    $mimeType,
-                    $allowedVideoMimes,
-                    true
-                )
-            ) {
-
-                $statusError =
-                    'The uploaded file is not a valid video.';
+                    'Invalid file type for ' .
+                    e($type) .
+                    '.';
 
             } else {
 
                 /*
                 |--------------------------------------------------------------------------
-                | SAFE TITLE
+                | MIME TYPE
+                |--------------------------------------------------------------------------
+                */
+
+                $mimeType =
+                    mime_content_type(
+                        $tmpName
+                    );
+
+                if (!$mimeType) {
+
+                    $mimeType =
+                        'application/octet-stream';
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | SAFE FILE NAME
                 |--------------------------------------------------------------------------
                 */
 
@@ -851,22 +825,10 @@ if (!$blobToken) {
                         'event';
                 }
 
-                /*
-                |--------------------------------------------------------------------------
-                | UNIQUE ID
-                |--------------------------------------------------------------------------
-                */
-
                 $uniqueId =
                     bin2hex(
                         random_bytes(12)
                     );
-
-                /*
-                |--------------------------------------------------------------------------
-                | MAIN BLOB FILE NAME
-                |--------------------------------------------------------------------------
-                */
 
                 $newFileName =
                     'events/' .
@@ -878,7 +840,7 @@ if (!$blobToken) {
 
                 /*
                 |--------------------------------------------------------------------------
-                | UPLOAD MAIN FILE
+                | UPLOAD MAIN FILE TO BLOB
                 |--------------------------------------------------------------------------
                 */
 
@@ -887,11 +849,12 @@ if (!$blobToken) {
                         $tmpName,
                         $newFileName,
                         $mimeType,
-                        $fileSize,
                         $blobToken
                     );
 
-                if (!$blobResult['success']) {
+                if (
+                    !$blobResult['success']
+                ) {
 
                     $statusError =
                         $blobResult['error'];
@@ -901,30 +864,26 @@ if (!$blobToken) {
                     $fileUrl =
                         $blobResult['url'];
 
-                    $thumbnailUrl =
-                        null;
-
                     /*
                     |--------------------------------------------------------------------------
-                    | VIDEO THUMBNAIL
+                    | THUMBNAIL
                     |--------------------------------------------------------------------------
                     */
 
+                    $thumbnailUrl =
+                        null;
+
                     if (
                         $type === 'video' &&
-                        isset($_FILES['thumbnail']) &&
+                        isset(
+                            $_FILES['thumbnail']
+                        ) &&
                         $_FILES['thumbnail']['error'] ===
                             UPLOAD_ERR_OK
                     ) {
 
                         $thumbnail =
                             $_FILES['thumbnail'];
-
-                        $thumbnailTmp =
-                            $thumbnail['tmp_name'];
-
-                        $thumbnailSize =
-                            (int) $thumbnail['size'];
 
                         $thumbnailExtension =
                             strtolower(
@@ -942,9 +901,6 @@ if (!$blobToken) {
                         ];
 
                         if (
-                            $thumbnailSize > 0 &&
-                            $thumbnailSize <=
-                                10 * 1024 * 1024 &&
                             in_array(
                                 $thumbnailExtension,
                                 $allowedThumbnailExtensions,
@@ -954,54 +910,44 @@ if (!$blobToken) {
 
                             $thumbnailMime =
                                 mime_content_type(
-                                    $thumbnailTmp
+                                    $thumbnail['tmp_name']
                                 );
 
-                            $allowedThumbnailMimes = [
-                                'image/jpeg',
-                                'image/png',
-                                'image/webp'
-                            ];
+                            if (!$thumbnailMime) {
+
+                                $thumbnailMime =
+                                    'image/jpeg';
+                            }
+
+                            $thumbnailFileName =
+                                'events/' .
+                                $safeTitle .
+                                '-thumb-' .
+                                $uniqueId .
+                                '.' .
+                                $thumbnailExtension;
+
+                            $thumbnailResult =
+                                uploadToVercelBlob(
+                                    $thumbnail['tmp_name'],
+                                    $thumbnailFileName,
+                                    $thumbnailMime,
+                                    $blobToken
+                                );
 
                             if (
-                                in_array(
-                                    $thumbnailMime,
-                                    $allowedThumbnailMimes,
-                                    true
-                                )
+                                $thumbnailResult['success']
                             ) {
 
-                                $thumbnailFileName =
-                                    'events/' .
-                                    $safeTitle .
-                                    '-thumb-' .
-                                    $uniqueId .
-                                    '.' .
-                                    $thumbnailExtension;
-
-                                $thumbnailResult =
-                                    uploadToVercelBlob(
-                                        $thumbnailTmp,
-                                        $thumbnailFileName,
-                                        $thumbnailMime,
-                                        $thumbnailSize,
-                                        $blobToken
-                                    );
-
-                                if (
-                                    $thumbnailResult['success']
-                                ) {
-
-                                    $thumbnailUrl =
-                                        $thumbnailResult['url'];
-                                }
+                                $thumbnailUrl =
+                                    $thumbnailResult['url'];
                             }
                         }
                     }
 
                     /*
                     |--------------------------------------------------------------------------
-                    | INSERT DATABASE
+                    | INSERT DATABASE RECORD
                     |--------------------------------------------------------------------------
                     */
 
@@ -1052,10 +998,6 @@ if (!$blobToken) {
                         |--------------------------------------------------------------------------
                         | DATABASE FAILED
                         |--------------------------------------------------------------------------
-                        |
-                        | Remove the Blob files so we don't leave
-                        | orphaned files in Vercel Blob.
-                        |--------------------------------------------------------------------------
                         */
 
                         deleteFromVercelBlob(
@@ -1063,7 +1005,11 @@ if (!$blobToken) {
                             $blobToken
                         );
 
-                        if (!empty($thumbnailUrl)) {
+                        if (
+                            !empty(
+                                $thumbnailUrl
+                            )
+                        ) {
 
                             deleteFromVercelBlob(
                                 $thumbnailUrl,
@@ -1085,1158 +1031,1354 @@ if (!$blobToken) {
     }
 }
 
-}
-
 /*
 |--------------------------------------------------------------------------
-
-POST → REDIRECT → GET
+| POST → REDIRECT → GET
+|--------------------------------------------------------------------------
+|
+| This prevents duplicate form submissions and ensures that
+| headers are sent before any HTML output.
+|--------------------------------------------------------------------------
 */
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-if ($statusMessage !== '') {
+    if ($statusMessage !== '') {
 
-    $_SESSION['event_status_message'] =
-        $statusMessage;
-}
+        $_SESSION['event_status_message'] =
+            $statusMessage;
+    }
 
-if ($statusError !== '') {
+    if ($statusError !== '') {
 
-    $_SESSION['event_status_error'] =
-        $statusError;
-}
+        $_SESSION['event_status_error'] =
+            $statusError;
+    }
 
-header(
-    'Location: /admin/events'
-);
+    header(
+        'Location: /admin/events'
+    );
 
-exit;
-
+    exit;
 }
 
 /*
 |--------------------------------------------------------------------------
-
-LOAD EVENTS
+| LOAD EVENTS
+|--------------------------------------------------------------------------
 */
 
 $events = [];
 
 try {
 
-$stmt =
-    $pdo->query(
-        "SELECT
-            id,
-            title,
-            type,
-            file_url,
-            thumbnail_url,
-            is_visible,
-            created_at
-         FROM events
-         ORDER BY id DESC"
-    );
+    $stmt =
+        $pdo->query(
+            "SELECT
+                id,
+                title,
+                type,
+                file_url,
+                thumbnail_url,
+                is_visible,
+                created_at
+             FROM events
+             ORDER BY id DESC"
+        );
 
-$events =
-    $stmt->fetchAll(
-        PDO::FETCH_ASSOC
-    );
+    $events =
+        $stmt->fetchAll(
+            PDO::FETCH_ASSOC
+        );
 
 } catch (PDOException $e) {
 
-error_log(
-    'Event query error: ' .
-    $e->getMessage()
-);
+    error_log(
+        'Event query error: ' .
+        $e->getMessage()
+    );
 
-$statusError =
-    'Unable to load events.';
-
+    $statusError =
+        'Unable to load events.';
 }
 
 /*
 |--------------------------------------------------------------------------
-
-STATISTICS
+| STATISTICS
+|--------------------------------------------------------------------------
 */
 
 $totalEvents =
-count($events);
+    count($events);
 
-$visibleEvents =
-0;
+$visibleEvents = 0;
 
 foreach ($events as $event) {
 
-if (
-    (int) $event['is_visible'] === 1
-) {
-    $visibleEvents++;
-}
+    if (
+        (int) $event['is_visible'] === 1
+    ) {
 
+        $visibleEvents++;
+    }
 }
 
 ?>
 
-<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8">
-<meta
-name="viewport"
-content="width=device-width, initial-scale=1.0"
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
 
 <meta
-name="theme-color"
-content="#ff5a1f"
-
-<title> Events - ABAA Admin </title> <link rel="stylesheet" href="/admin.css" > <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" > <style>
-.event-upload-card {
-background: white;
-border: 1px solid var(--border);
-border-radius: 16px;
-padding: 25px;
-margin-bottom: 30px;
-box-shadow: 0 2px 8px rgba(0,0,0,.03);
-}
-
-.event-upload-header {
-display: flex;
-align-items: center;
-gap: 12px;
-margin-bottom: 22px;
-}
-
-.event-upload-icon {
-width: 42px;
-height: 42px;
-border-radius: 10px;
-display: flex;
-align-items: center;
-justify-content: center;
-color: var(--orange);
-background: var(--orange-light);
-}
-
-.event-upload-header span {
-display: block;
-color: var(--orange);
-font-size: 10px;
-font-weight: 800;
-letter-spacing: 1.5px;
-}
-
-.event-upload-header h2 {
-margin-top: 4px;
-font-size: 20px;
-color: var(--dark);
-}
-
-.event-form-grid {
-display: grid;
-grid-template-columns: 1fr 1fr;
-gap: 18px;
-}
-
-.event-form-group {
-display: flex;
-flex-direction: column;
-gap: 7px;
-}
-
-.event-form-group.full {
-grid-column: 1 / -1;
-}
-
-.event-form-group label {
-font-size: 12px;
-font-weight: 700;
-color: #374151;
-}
-
-.event-form-group input,
-.event-form-group select {
-width: 100%;
-height: 45px;
-border: 1px solid var(--border);
-border-radius: 8px;
-padding: 0 12px;
-background: #fafafa;
-color: var(--text);
-outline: none;
-}
-
-.event-form-group input:focus,
-.event-form-group select:focus {
-background: white;
-border-color: var(--orange);
-box-shadow: 0 0 0 3px rgba(255,90,31,.08);
-}
-
-.event-form-group input[type="file"] {
-padding: 9px;
-height: auto;
-}
-
-.event-help {
-color: #9ca3af;
-font-size: 11px;
-}
-
-.event-upload-button {
-margin-top: 20px;
-border: none;
-border-radius: 9px;
-padding: 12px 18px;
-background: var(--orange);
-color: white;
-font-size: 13px;
-font-weight: 700;
-cursor: pointer;
-display: inline-flex;
-align-items: center;
-gap: 9px;
-transition: .2s;
-}
-
-.event-upload-button:hover {
-background: var(--orange-dark);
-transform: translateY(-1px);
-}
-
-.event-upload-button:disabled {
-opacity: .65;
-cursor: not-allowed;
-transform: none;
-}
-
-.event-admin-grid {
-display: grid;
-grid-template-columns: repeat(3, 1fr);
-gap: 20px;
-padding: 25px;
-}
-
-.event-admin-card {
-border: 1px solid var(--border);
-border-radius: 13px;
-overflow: hidden;
-background: white;
-box-shadow: 0 2px 8px rgba(0,0,0,.04);
-}
-
-.event-preview {
-height: 190px;
-background: #111;
-position: relative;
-overflow: hidden;
-}
-
-.event-preview img,
-.event-preview video {
-width: 100%;
-height: 100%;
-object-fit: cover;
-display: block;
-}
-
-.event-preview video {
-background: #111;
-}
-
-.event-type-badge {
-position: absolute;
-top: 10px;
-left: 10px;
-padding: 6px 9px;
-border-radius: 6px;
-background: rgba(0,0,0,.72);
-color: white;
-font-size: 10px;
-font-weight: 800;
-text-transform: uppercase;
-letter-spacing: .5px;
-z-index: 2;
-}
-
-.event-visibility {
-position: absolute;
-top: 10px;
-right: 10px;
-padding: 6px 9px;
-border-radius: 6px;
-font-size: 10px;
-font-weight: 800;
-color: white;
-z-index: 2;
-}
-
-.event-visibility.visible {
-background: #16a34a;
-}
-
-.event-visibility.hidden {
-background: #6b7280;
-}
-
-.event-admin-content {
-padding: 16px;
-}
-
-.event-admin-content h3 {
-font-size: 16px;
-color: var(--dark);
-margin-bottom: 5px;
-}
-
-.event-admin-date {
-color: #9ca3af;
-font-size: 11px;
-margin-bottom: 15px;
-}
-
-.event-admin-actions {
-display: flex;
-gap: 8px;
-}
-
-.event-action-button {
-flex: 1;
-min-height: 36px;
-border-radius: 7px;
-border: 1px solid var(--border);
-background: white;
-color: #374151;
-font-size: 11px;
-font-weight: 700;
-cursor: pointer;
-display: flex;
-align-items: center;
-justify-content: center;
-gap: 6px;
-}
-
-.event-action-button:hover {
-border-color: var(--orange);
-color: var(--orange);
-}
-
-.event-action-button.delete {
-flex: 0 0 40px;
-color: #dc2626;
-border-color: #fecaca;
-background: #fef2f2;
-}
-
-.event-action-button.delete:hover {
-background: #dc2626;
-color: white;
-}
-
-.upload-progress {
-display: none;
-margin-top: 12px;
-color: #6b7280;
-font-size: 12px;
-}
-
-@media (max-width: 1000px) {
-
-.event-admin-grid {
-    grid-template-columns: repeat(2, 1fr);
-}
-
-}
-
-@media (max-width: 600px) {
-
-.event-form-grid {
-    grid-template-columns: 1fr;
-}
-
-.event-form-group.full {
-    grid-column: auto;
-}
-
-.event-admin-grid {
-    grid-template-columns: 1fr;
-    padding: 18px;
-}
-
-.event-upload-card {
-    padding: 20px;
-}
-
-}
-
-</style> </head> <body> <div class="admin-layout"> <!-- ===================================================== SIDEBAR ===================================================== --> <aside class="sidebar"> <div class="sidebar-brand">
-<div class="sidebar-logo">
-
-    <img
-        src="/logo.png"
-        alt="ABAA Entertainment"
-    >
-
-</div>
-
-<div>
-
-    <strong>
-        ABAA
-    </strong>
-
-    <span>
-        ADMIN PANEL
-    </span>
-
-</div>
-
-</div> <nav class="sidebar-nav">
-<a href="/admin">
-
-    <i class="fa-solid fa-chart-pie"></i>
-
-    <span>
-        Dashboard
-    </span>
-
-</a>
-
-<a href="/admin/bookings">
-
-    <i class="fa-solid fa-calendar-check"></i>
-
-    <span>
-        Bookings
-    </span>
-
-</a>
-
-<a
-    href="/admin/events"
-    class="active"
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
 >
 
-    <i class="fa-solid fa-photo-film"></i>
-
-    <span>
-        Events
-    </span>
-
-</a>
-
-<a href="/admin/services">
-
-    <i class="fa-solid fa-screwdriver-wrench"></i>
-
-    <span>
-        Services
-    </span>
-
-</a>
-
-</nav> <div class="sidebar-info">
-<div class="sidebar-info-icon">
-
-    <i class="fa-solid fa-bolt"></i>
-
-</div>
-
-<div>
-
-    <strong>
-        ABAA Entertainment
-    </strong>
-
-    <span>
-        Event management system
-    </span>
-
-</div>
-
-</div> <div class="sidebar-bottom">
-<div class="admin-user">
-
-    <div class="admin-avatar">
-
-        <i class="fa-solid fa-user"></i>
-
-    </div>
-
-    <div>
-
-        <strong>
-            <?= e($admin['username']) ?>
-        </strong>
-
-        <span>
-            Administrator
-        </span>
-
-    </div>
-
-</div>
-
-<form
-    method="POST"
-    action="/admin"
+<meta
+    name="theme-color"
+    content="#ff5a1f"
 >
 
-    <button
-        type="submit"
-        name="logout"
-        class="logout-button"
-    >
+<title>
+    Events - ABAA Admin
+</title>
 
-        <i class="fa-solid fa-right-from-bracket"></i>
-
-        <span>
-            Logout
-        </span>
-
-    </button>
-
-</form>
-
-</div> </aside> <!-- ===================================================== MAIN ===================================================== --> <main class="admin-main"> <div class="top-panel">
-<div class="top-panel-left">
-
-    <div class="top-panel-icon">
-
-        <i class="fa-solid fa-photo-film"></i>
-
-    </div>
-
-    <div>
-
-        <span>
-            ABAA ENTERTAINMENT
-        </span>
-
-        <strong>
-            Event Management
-        </strong>
-
-    </div>
-
-</div>
-
-<div class="top-panel-right">
-
-    <div class="online-status">
-
-        <span></span>
-
-        System Online
-
-    </div>
-
-    <div class="top-admin">
-
-        <i class="fa-solid fa-circle-user"></i>
-
-        <?= e($admin['username']) ?>
-
-    </div>
-
-</div>
-
-</div> <header class="admin-header">
-<div>
-
-    <span class="dashboard-label">
-        EVENTS
-    </span>
-
-    <h1>
-        Event Management
-    </h1>
-
-    <p>
-        Upload and manage your event images
-        and videos.
-    </p>
-
-</div>
-
-<a
-    href="/"
-    target="_blank"
-    rel="noopener noreferrer"
-    class="view-site-button"
+<link
+    rel="stylesheet"
+    href="/admin.css"
 >
 
-    <i class="fa-solid fa-globe"></i>
-
-    View Website
-
-</a>
-
-</header> <!-- ===================================================== NOTIFICATIONS ===================================================== --> <?php if ($statusMessage): ?> <div class="admin-notification success">
-<i class="fa-solid fa-circle-check"></i>
-
-<?= e($statusMessage) ?>
-
-</div> <?php endif; ?> <?php if ($statusError): ?> <div class="admin-notification error">
-<i class="fa-solid fa-circle-exclamation"></i>
-
-<?= e($statusError) ?>
-
-</div> <?php endif; ?> <!-- ===================================================== STATISTICS ===================================================== --> <section class="stats-grid">
-<div class="stat-card">
-
-    <div class="stat-icon orange">
-
-        <i class="fa-solid fa-photo-film"></i>
-
-    </div>
-
-    <div class="stat-content">
-
-        <span>
-            Total Events
-        </span>
-
-        <strong>
-            <?= $totalEvents ?>
-        </strong>
-
-        <small>
-            Uploaded events
-        </small>
-
-    </div>
-
-</div>
-
-<div class="stat-card">
-
-    <div class="stat-icon dark-orange">
-
-        <i class="fa-solid fa-eye"></i>
-
-    </div>
-
-    <div class="stat-content">
-
-        <span>
-            Visible
-        </span>
-
-        <strong>
-            <?= $visibleEvents ?>
-        </strong>
-
-        <small>
-            Showing on website
-        </small>
-
-    </div>
-
-</div>
-
-<div class="stat-card">
-
-    <div class="stat-icon dark">
-
-        <i class="fa-solid fa-cloud-arrow-up"></i>
-
-    </div>
-
-    <div class="stat-content">
-
-        <span>
-            Uploads
-        </span>
-
-        <strong>
-            <?= $totalEvents ?>
-        </strong>
-
-        <small>
-            Images & videos
-        </small>
-
-    </div>
-
-</div>
-
-</section> <!-- ===================================================== UPLOAD EVENT ===================================================== --> <section class="event-upload-card">
-<div class="event-upload-header">
-
-    <div class="event-upload-icon">
-
-        <i class="fa-solid fa-cloud-arrow-up"></i>
-
-    </div>
-
-    <div>
-
-        <span>
-            EVENT CONTENT
-        </span>
-
-        <h2>
-            Upload New Event
-        </h2>
-
-    </div>
-
-</div>
-
-<form
-    method="POST"
-    enctype="multipart/form-data"
-    action="/admin/events"
-    id="eventUploadForm"
+<link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
 >
 
-    <div class="event-form-grid">
+<style>
 
-        <div class="event-form-group">
+    .event-upload-card {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 8px rgba(0,0,0,.03);
+    }
 
-            <label for="title">
-                Event Title
-            </label>
+    .event-upload-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 22px;
+    }
 
-            <input
-                type="text"
-                id="title"
-                name="title"
-                required
-            >
+    .event-upload-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--orange);
+        background: var(--orange-light);
+    }
 
-        </div>
+    .event-upload-header span {
+        display: block;
+        color: var(--orange);
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+    }
 
-        <div class="event-form-group">
+    .event-upload-header h2 {
+        margin-top: 4px;
+        font-size: 20px;
+        color: var(--dark);
+    }
 
-            <label for="type">
-                Media Type
-            </label>
+    .event-form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+    }
 
-            <select
-                id="type"
-                name="type"
-                onchange="toggleThumbnail()"
-                required
-            >
+    .event-form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+    }
 
-                <option value="image">
-                    Image
-                </option>
+    .event-form-group.full {
+        grid-column: 1 / -1;
+    }
 
-                <option value="video">
-                    Video
-                </option>
+    .event-form-group label {
+        font-size: 12px;
+        font-weight: 700;
+        color: #374151;
+    }
 
-            </select>
+    .event-form-group input,
+    .event-form-group select {
+        width: 100%;
+        height: 45px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 0 12px;
+        background: #fafafa;
+        color: var(--text);
+        outline: none;
+    }
 
-        </div>
+    .event-form-group input:focus,
+    .event-form-group select:focus {
+        background: white;
+        border-color: var(--orange);
+        box-shadow: 0 0 0 3px rgba(255,90,31,.08);
+    }
 
-        <div class="event-form-group">
+    .event-form-group input[type="file"] {
+        padding: 9px;
+        height: auto;
+    }
 
-            <label for="event_file">
-                Event File
-            </label>
+    .event-help {
+        color: #9ca3af;
+        font-size: 11px;
+    }
 
-            <input
-                type="file"
-                id="event_file"
-                name="event_file"
-                accept=".jpg,.jpeg,.png,.webp,.mp4,.webm,.mov"
-                required
-            >
+    .event-upload-button {
+        margin-top: 20px;
+        border: none;
+        border-radius: 9px;
+        padding: 12px 18px;
+        background: var(--orange);
+        color: white;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        transition: .2s;
+    }
 
-            <span class="event-help">
+    .event-upload-button:hover {
+        background: var(--orange-dark);
+        transform: translateY(-1px);
+    }
 
-                Images: JPG, PNG, WEBP ·
-                Videos: MP4, WEBM, MOV
+    .event-admin-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        padding: 25px;
+    }
 
-            </span>
+    .event-admin-card {
+        border: 1px solid var(--border);
+        border-radius: 13px;
+        overflow: hidden;
+        background: white;
+        box-shadow: 0 2px 8px rgba(0,0,0,.04);
+    }
 
-        </div>
+    .event-preview {
+        height: 190px;
+        background: #111;
+        position: relative;
+        overflow: hidden;
+    }
 
-        <div
-            class="event-form-group"
-            id="thumbnailGroup"
-            style="display:none;"
+    .event-preview img,
+    .event-preview video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .event-video-preview {
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+
+    .event-video-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .event-video-icon {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        background: rgba(255,90,31,.92);
+        box-shadow: 0 5px 20px rgba(0,0,0,.25);
+    }
+
+    .event-type-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        padding: 6px 9px;
+        border-radius: 6px;
+        background: rgba(0,0,0,.72);
+        color: white;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+    }
+
+    .event-visibility {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 6px 9px;
+        border-radius: 6px;
+        font-size: 10px;
+        font-weight: 800;
+        color: white;
+    }
+
+    .event-visibility.visible {
+        background: #16a34a;
+    }
+
+    .event-visibility.hidden {
+        background: #6b7280;
+    }
+
+    .event-admin-content {
+        padding: 16px;
+    }
+
+    .event-admin-content h3 {
+        font-size: 16px;
+        color: var(--dark);
+        margin-bottom: 5px;
+    }
+
+    .event-admin-date {
+        color: #9ca3af;
+        font-size: 11px;
+        margin-bottom: 15px;
+    }
+
+    .event-admin-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .event-action-button {
+        flex: 1;
+        min-height: 36px;
+        border-radius: 7px;
+        border: 1px solid var(--border);
+        background: white;
+        color: #374151;
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+
+    .event-action-button:hover {
+        border-color: var(--orange);
+        color: var(--orange);
+    }
+
+    .event-action-button.delete {
+        flex: 0 0 40px;
+        color: #dc2626;
+        border-color: #fecaca;
+        background: #fef2f2;
+    }
+
+    .event-action-button.delete:hover {
+        background: #dc2626;
+        color: white;
+    }
+
+    @media (max-width: 1000px) {
+
+        .event-admin-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+    }
+
+    @media (max-width: 600px) {
+
+        .event-form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .event-form-group.full {
+            grid-column: auto;
+        }
+
+        .event-admin-grid {
+            grid-template-columns: 1fr;
+            padding: 18px;
+        }
+
+        .event-upload-card {
+            padding: 20px;
+        }
+
+    }
+
+</style>
+
+</head>
+
+<body>
+
+<div class="admin-layout">
+
+
+<!-- =====================================================
+     SIDEBAR
+===================================================== -->
+
+<aside class="sidebar">
+
+<div class="sidebar-brand">
+
+    <div class="sidebar-logo">
+
+        <img
+            src="/logo.png"
+            alt="ABAA Entertainment"
         >
 
-            <label for="thumbnail">
-                Video Thumbnail
-            </label>
-
-            <input
-                type="file"
-                id="thumbnail"
-                name="thumbnail"
-                accept=".jpg,.jpeg,.png,.webp"
-            >
-
-            <span class="event-help">
-
-                Optional image displayed
-                before the video plays.
-
-            </span>
-
-        </div>
-
     </div>
-
-    <button
-        type="submit"
-        name="upload_event"
-        class="event-upload-button"
-        id="uploadButton"
-    >
-
-        <i class="fa-solid fa-cloud-arrow-up"></i>
-
-        <span id="uploadButtonText">
-            Upload Event
-        </span>
-
-    </button>
-
-    <div
-        class="upload-progress"
-        id="uploadProgress"
-    >
-        Uploading... Please do not close this page.
-    </div>
-
-</form>
-
-</section> <!-- ===================================================== EVENTS ===================================================== --> <section class="bookings-section">
-<div class="section-header">
 
     <div>
 
-        <div class="section-title-row">
+        <strong>
+            ABAA
+        </strong>
 
-            <span class="section-icon">
-
-                <i class="fa-solid fa-photo-film"></i>
-
-            </span>
-
-            <div>
-
-                <span class="section-label">
-                    EVENT LIBRARY
-                </span>
-
-                <h2>
-                    Uploaded Events
-                </h2>
-
-            </div>
-
-        </div>
+        <span>
+            ADMIN PANEL
+        </span>
 
     </div>
 
-    <div class="booking-count">
+</div>
+
+
+<nav class="sidebar-nav">
+
+    <a href="/admin">
+
+        <i class="fa-solid fa-chart-pie"></i>
+
+        <span>
+            Dashboard
+        </span>
+
+    </a>
+
+
+    <a href="/admin/bookings">
+
+        <i class="fa-solid fa-calendar-check"></i>
+
+        <span>
+            Bookings
+        </span>
+
+    </a>
+
+
+    <a
+        href="/admin/events"
+        class="active"
+    >
 
         <i class="fa-solid fa-photo-film"></i>
 
-        <?= $totalEvents ?>
+        <span>
+            Events
+        </span>
 
-        event<?= $totalEvents === 1 ? '' : 's' ?>
+    </a>
+
+
+    <a href="/admin/services">
+
+        <i class="fa-solid fa-screwdriver-wrench"></i>
+
+        <span>
+            Services
+        </span>
+
+    </a>
+
+</nav>
+
+
+<div class="sidebar-info">
+
+    <div class="sidebar-info-icon">
+
+        <i class="fa-solid fa-bolt"></i>
+
+    </div>
+
+    <div>
+
+        <strong>
+            ABAA Entertainment
+        </strong>
+
+        <span>
+            Event management system
+        </span>
 
     </div>
 
 </div>
 
-<?php if (empty($events)): ?>
 
-<div class="empty-state">
+<div class="sidebar-bottom">
 
-    <div class="empty-icon">
+    <div class="admin-user">
 
-        <i class="fa-regular fa-images"></i>
+        <div class="admin-avatar">
 
-    </div>
-
-    <h3>
-        No events yet
-    </h3>
-
-    <p>
-        Upload your first event image
-        or video above.
-    </p>
-
-</div>
-
-<?php else: ?>
-
-<div class="event-admin-grid">
-
-    <?php foreach ($events as $event): ?>
-
-    <div class="event-admin-card">
-
-        <!-- =================================================
-             PREVIEW
-        ================================================= -->
-
-        <div class="event-preview">
-
-            <?php if ($event['type'] === 'video'): ?>
-
-                <video
-                    src="<?= e($event['file_url']) ?>"
-                    <?php if (!empty($event['thumbnail_url'])): ?>
-                    poster="<?= e($event['thumbnail_url']) ?>"
-                    <?php endif; ?>
-                    controls
-                    preload="metadata"
-                    playsinline
-                ></video>
-
-            <?php else: ?>
-
-                <img
-                    src="<?= e($event['file_url']) ?>"
-                    alt="<?= e($event['title']) ?>"
-                    loading="lazy"
-                >
-
-            <?php endif; ?>
-
-            <span class="event-type-badge">
-
-                <?= e(
-                    strtoupper(
-                        $event['type']
-                    )
-                ) ?>
-
-            </span>
-
-            <?php if (
-                (int) $event['is_visible'] === 1
-            ): ?>
-
-                <span
-                    class="event-visibility visible"
-                >
-
-                    <i class="fa-solid fa-eye"></i>
-
-                    Visible
-
-                </span>
-
-            <?php else: ?>
-
-                <span
-                    class="event-visibility hidden"
-                >
-
-                    <i class="fa-solid fa-eye-slash"></i>
-
-                    Hidden
-
-                </span>
-
-            <?php endif; ?>
+            <i class="fa-solid fa-user"></i>
 
         </div>
 
-        <!-- =================================================
-             CONTENT
-        ================================================= -->
+        <div>
 
-        <div class="event-admin-content">
+            <strong>
+                <?= e($admin['username']) ?>
+            </strong>
 
-            <h3>
+            <span>
+                Administrator
+            </span>
 
-                <?= e(
-                    $event['title']
-                ) ?>
+        </div>
 
-            </h3>
+    </div>
 
-            <div class="event-admin-date">
 
-                <i class="fa-regular fa-clock"></i>
+    <form
+        method="POST"
+        action="/admin"
+    >
 
-                <?= e(
-                    $event['created_at']
-                ) ?>
+        <button
+            type="submit"
+            name="logout"
+            class="logout-button"
+        >
+
+            <i class="fa-solid fa-right-from-bracket"></i>
+
+            <span>
+                Logout
+            </span>
+
+        </button>
+
+    </form>
+
+</div>
+
+</aside>
+
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
+<main class="admin-main">
+
+
+<div class="top-panel">
+
+    <div class="top-panel-left">
+
+        <div class="top-panel-icon">
+
+            <i class="fa-solid fa-photo-film"></i>
+
+        </div>
+
+        <div>
+
+            <span>
+                ABAA ENTERTAINMENT
+            </span>
+
+            <strong>
+                Event Management
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <div class="top-panel-right">
+
+        <div class="online-status">
+
+            <span></span>
+
+            System Online
+
+        </div>
+
+
+        <div class="top-admin">
+
+            <i class="fa-solid fa-circle-user"></i>
+
+            <?= e($admin['username']) ?>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<header class="admin-header">
+
+    <div>
+
+        <span class="dashboard-label">
+            EVENTS
+        </span>
+
+        <h1>
+            Event Management
+        </h1>
+
+        <p>
+            Upload and manage your event images
+            and videos.
+        </p>
+
+    </div>
+
+
+    <a
+        href="/"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="view-site-button"
+    >
+
+        <i class="fa-solid fa-globe"></i>
+
+        View Website
+
+    </a>
+
+</header>
+
+
+<!-- =====================================================
+     NOTIFICATIONS
+===================================================== -->
+
+<?php if ($statusMessage): ?>
+
+    <div class="admin-notification success">
+
+        <i class="fa-solid fa-circle-check"></i>
+
+        <?= e($statusMessage) ?>
+
+    </div>
+
+<?php endif; ?>
+
+
+<?php if ($statusError): ?>
+
+    <div class="admin-notification error">
+
+        <i class="fa-solid fa-circle-exclamation"></i>
+
+        <?= e($statusError) ?>
+
+    </div>
+
+<?php endif; ?>
+
+
+<!-- =====================================================
+     STATISTICS
+===================================================== -->
+
+<section class="stats-grid">
+
+    <div class="stat-card">
+
+        <div class="stat-icon orange">
+
+            <i class="fa-solid fa-photo-film"></i>
+
+        </div>
+
+        <div class="stat-content">
+
+            <span>
+                Total Events
+            </span>
+
+            <strong>
+                <?= $totalEvents ?>
+            </strong>
+
+            <small>
+                Uploaded events
+            </small>
+
+        </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <div class="stat-icon dark-orange">
+
+            <i class="fa-solid fa-eye"></i>
+
+        </div>
+
+        <div class="stat-content">
+
+            <span>
+                Visible
+            </span>
+
+            <strong>
+                <?= $visibleEvents ?>
+            </strong>
+
+            <small>
+                Showing on website
+            </small>
+
+        </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <div class="stat-icon dark">
+
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+
+        </div>
+
+        <div class="stat-content">
+
+            <span>
+                Uploads
+            </span>
+
+            <strong>
+                <?= $totalEvents ?>
+            </strong>
+
+            <small>
+                Images & videos
+            </small>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     UPLOAD EVENT
+===================================================== -->
+
+<section class="event-upload-card">
+
+    <div class="event-upload-header">
+
+        <div class="event-upload-icon">
+
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+
+        </div>
+
+        <div>
+
+            <span>
+                EVENT CONTENT
+            </span>
+
+            <h2>
+                Upload New Event
+            </h2>
+
+        </div>
+
+    </div>
+
+
+    <form
+        method="POST"
+        enctype="multipart/form-data"
+        action="/admin/events"
+    >
+
+        <div class="event-form-grid">
+
+
+            <div class="event-form-group">
+
+                <label for="title">
+                    Event Title
+                </label>
+
+                <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    placeholder=""
+                    required
+                >
 
             </div>
 
-            <div class="event-admin-actions">
 
-                <!-- VISIBILITY -->
+            <div class="event-form-group">
 
-                <form
-                    method="POST"
-                    action="/admin/events"
-                    style="flex:1;"
+                <label for="type">
+                    Media Type
+                </label>
+
+                <select
+                    id="type"
+                    name="type"
+                    onchange="toggleThumbnail()"
+                    required
                 >
 
-                    <input
-                        type="hidden"
-                        name="event_id"
-                        value="<?= (int) $event['id'] ?>"
-                    >
+                    <option value="image">
+                        Image
+                    </option>
 
-                    <button
-                        type="submit"
-                        name="toggle_visibility"
-                        class="event-action-button"
-                    >
+                    <option value="video">
+                        Video
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="event-form-group">
+
+                <label for="event_file">
+                    Event File
+                </label>
+
+                <input
+                    type="file"
+                    id="event_file"
+                    name="event_file"
+                    accept=".jpg,.jpeg,.png,.webp,.mp4,.webm,.mov"
+                    required
+                >
+
+                <span class="event-help">
+
+                    Images: JPG, PNG, WEBP ·
+                    Videos: MP4, WEBM, MOV
+
+                </span>
+
+            </div>
+
+
+            <div
+                class="event-form-group"
+                id="thumbnailGroup"
+                style="display:none;"
+            >
+
+                <label for="thumbnail">
+                    Video Thumbnail
+                </label>
+
+                <input
+                    type="file"
+                    id="thumbnail"
+                    name="thumbnail"
+                    accept=".jpg,.jpeg,.png,.webp"
+                >
+
+                <span class="event-help">
+
+                    Optional image displayed
+                    before the video plays.
+
+                </span>
+
+            </div>
+
+
+        </div>
+
+
+        <button
+            type="submit"
+            name="upload_event"
+            class="event-upload-button"
+        >
+
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+
+            Upload Event
+
+        </button>
+
+    </form>
+
+</section>
+
+
+<!-- =====================================================
+     EVENTS
+===================================================== -->
+
+<section class="bookings-section">
+
+
+    <div class="section-header">
+
+        <div>
+
+            <div class="section-title-row">
+
+                <span class="section-icon">
+
+                    <i class="fa-solid fa-photo-film"></i>
+
+                </span>
+
+                <div>
+
+                    <span class="section-label">
+                        EVENT LIBRARY
+                    </span>
+
+                    <h2>
+                        Uploaded Events
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="booking-count">
+
+            <i class="fa-solid fa-photo-film"></i>
+
+            <?= $totalEvents ?>
+
+            event<?= $totalEvents === 1 ? '' : 's' ?>
+
+        </div>
+
+    </div>
+
+
+    <?php if (empty($events)): ?>
+
+        <div class="empty-state">
+
+            <div class="empty-icon">
+
+                <i class="fa-regular fa-images"></i>
+
+            </div>
+
+            <h3>
+                No events yet
+            </h3>
+
+            <p>
+                Upload your first event image
+                or video above.
+            </p>
+
+        </div>
+
+
+    <?php else: ?>
+
+
+        <div class="event-admin-grid">
+
+
+            <?php foreach ($events as $event): ?>
+
+
+                <div class="event-admin-card">
+
+
+                    <!-- =================================================
+                         PREVIEW
+                    ================================================= -->
+
+                    <div class="event-preview">
+
+
+                        <?php if (
+                            $event['type'] === 'video'
+                        ): ?>
+
+
+                            <?php if (
+                                !empty(
+                                    $event['thumbnail_url']
+                                )
+                            ): ?>
+
+
+                                <div
+                                    class="event-video-preview"
+                                >
+
+                                    <img
+                                        src="<?= e($event['thumbnail_url']) ?>"
+                                        alt="<?= e($event['title']) ?>"
+                                    >
+
+
+                                    <div
+                                        class="event-video-icon"
+                                    >
+
+                                        <i
+                                            class="fa-solid fa-play"
+                                        ></i>
+
+                                    </div>
+
+                                </div>
+
+
+                            <?php else: ?>
+
+
+                                <video
+                                    src="<?= e($event['file_url']) ?>"
+                                    muted
+                                    preload="metadata"
+                                    controls
+                                ></video>
+
+
+                            <?php endif; ?>
+
+
+                        <?php else: ?>
+
+
+                            <img
+                                src="<?= e($event['file_url']) ?>"
+                                alt="<?= e($event['title']) ?>"
+                            >
+
+
+                        <?php endif; ?>
+
+
+                        <span
+                            class="event-type-badge"
+                        >
+
+                            <?= e(
+                                strtoupper(
+                                    $event['type']
+                                )
+                            ) ?>
+
+                        </span>
+
 
                         <?php if (
                             (int) $event['is_visible'] === 1
                         ): ?>
 
-                            <i class="fa-solid fa-eye-slash"></i>
 
-                            Hide
+                            <span
+                                class="event-visibility visible"
+                            >
+
+                                <i
+                                    class="fa-solid fa-eye"
+                                ></i>
+
+                                Visible
+
+                            </span>
+
 
                         <?php else: ?>
 
-                            <i class="fa-solid fa-eye"></i>
 
-                            Show
+                            <span
+                                class="event-visibility hidden"
+                            >
+
+                                <i
+                                    class="fa-solid fa-eye-slash"
+                                ></i>
+
+                                Hidden
+
+                            </span>
+
 
                         <?php endif; ?>
 
-                    </button>
 
-                </form>
+                    </div>
 
-                <!-- DELETE -->
 
-                <form
-                    method="POST"
-                    action="/admin/events"
-                    onsubmit="return confirm('Are you sure you want to delete this event?');"
-                >
+                    <!-- =================================================
+                         CONTENT
+                    ================================================= -->
 
-                    <input
-                        type="hidden"
-                        name="event_id"
-                        value="<?= (int) $event['id'] ?>"
+                    <div
+                        class="event-admin-content"
                     >
 
-                    <button
-                        type="submit"
-                        name="delete_event"
-                        class="event-action-button delete"
-                        title="Delete event"
-                    >
+                        <h3>
 
-                        <i class="fa-solid fa-trash"></i>
+                            <?= e(
+                                $event['title']
+                            ) ?>
 
-                    </button>
+                        </h3>
 
-                </form>
 
-            </div>
+                        <div
+                            class="event-admin-date"
+                        >
+
+                            <i
+                                class="fa-regular fa-clock"
+                            ></i>
+
+                            <?= e(
+                                $event['created_at']
+                            ) ?>
+
+                        </div>
+
+
+                        <div
+                            class="event-admin-actions"
+                        >
+
+
+                            <!-- VISIBILITY -->
+
+                            <form
+                                method="POST"
+                                action="/admin/events"
+                                style="flex:1;"
+                            >
+
+                                <input
+                                    type="hidden"
+                                    name="event_id"
+                                    value="<?= (int) $event['id'] ?>"
+                                >
+
+
+                                <button
+                                    type="submit"
+                                    name="toggle_visibility"
+                                    class="event-action-button"
+                                >
+
+
+                                    <?php if (
+                                        (int) $event['is_visible'] === 1
+                                    ): ?>
+
+
+                                        <i
+                                            class="fa-solid fa-eye-slash"
+                                        ></i>
+
+                                        Hide
+
+
+                                    <?php else: ?>
+
+
+                                        <i
+                                            class="fa-solid fa-eye"
+                                        ></i>
+
+                                        Show
+
+
+                                    <?php endif; ?>
+
+
+                                </button>
+
+                            </form>
+
+
+                            <!-- DELETE -->
+
+                            <form
+                                method="POST"
+                                action="/admin/events"
+                                onsubmit="return confirm('Are you sure you want to delete this event?');"
+                            >
+
+                                <input
+                                    type="hidden"
+                                    name="event_id"
+                                    value="<?= (int) $event['id'] ?>"
+                                >
+
+
+                                <button
+                                    type="submit"
+                                    name="delete_event"
+                                    class="event-action-button delete"
+                                    title="Delete event"
+                                >
+
+                                    <i
+                                        class="fa-solid fa-trash"
+                                    ></i>
+
+                                </button>
+
+                            </form>
+
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+            <?php endforeach; ?>
+
 
         </div>
 
-    </div>
 
-    <?php endforeach; ?>
+    <?php endif; ?>
+
+
+</section>
+
+
+<!-- =====================================================
+     FOOTER
+===================================================== -->
+
+<footer class="admin-footer">
+
+    <span>
+
+        © <?= date('Y') ?>
+
+        ABAA Entertainment
+
+    </span>
+
+    <span>
+        Event Management
+    </span>
+
+</footer>
+
+
+</main>
 
 </div>
 
-<?php endif; ?>
 
-</section> <!-- ===================================================== FOOTER ===================================================== --> <footer class="admin-footer">
-<span>
+<script>
 
-    © <?= date('Y') ?>
-
-    ABAA Entertainment
-
-</span>
-
-<span>
-    Event Management
-</span>
-
-</footer> </main> </div> <script>
 function toggleThumbnail()
 {
-const type =
-document.getElementById('type').value;
+    const type =
+        document.getElementById('type').value;
 
-const thumbnailGroup =
-    document.getElementById(
-        'thumbnailGroup'
-    );
+    const thumbnailGroup =
+        document.getElementById(
+            'thumbnailGroup'
+        );
 
-const thumbnail =
-    document.getElementById(
-        'thumbnail'
-    );
+    const thumbnail =
+        document.getElementById(
+            'thumbnail'
+        );
 
-if (type === 'video') {
+    if (type === 'video') {
 
-    thumbnailGroup.style.display =
-        'flex';
+        thumbnailGroup.style.display =
+            'flex';
 
-} else {
+    } else {
 
-    thumbnailGroup.style.display =
-        'none';
+        thumbnailGroup.style.display =
+            'none';
 
-    thumbnail.value = '';
-}
+        thumbnail.value = '';
 
-}
-
-/*
-|--------------------------------------------------------------------------
-
-PREVENT DOUBLE SUBMISSION
-*/
-
-document
-.getElementById('eventUploadForm')
-.addEventListener(
-'submit',
-function()
-{
-const button =
-document.getElementById(
-'uploadButton'
-);
-
-        const buttonText =
-            document.getElementById(
-                'uploadButtonText'
-            );
-
-        const progress =
-            document.getElementById(
-                'uploadProgress'
-            );
-
-        button.disabled = true;
-
-        buttonText.textContent =
-            'Uploading...';
-
-        progress.style.display =
-            'block';
     }
-);
+}
 
-/*
-|--------------------------------------------------------------------------
+</script>
 
-INITIAL THUMBNAIL STATE
-*/
 
-toggleThumbnail();
+</body>
 
-</script> </body> </html>
+</html>
