@@ -466,25 +466,7 @@ $firstMimeType =
 | SERVICE FALLBACK
 |--------------------------------------------------------------------------
 */
-.service-unavailable-checkbox {
-    opacity: 0.65;
-    cursor: not-allowed;
-}
 
-.service-unavailable-checkbox input {
-    cursor: not-allowed;
-}
-
-.service-unavailable-text {
-    color: #dc2626;
-    font-size: 0.8em;
-    margin-left: 4px;
-}
-
-.booking-no-services {
-    margin: 0;
-    color: #777;
-}
 .service-unavailable {
     cursor: not-allowed;
     border-color: #7f1d1d;
@@ -1508,7 +1490,7 @@ $firstMimeType =
     >
 
 
-        <!-- NAME + PHONE -->
+        <!-- CONTACT PERSON + PHONE -->
 
         <div class="form-row">
 
@@ -1516,16 +1498,16 @@ $firstMimeType =
             <div class="form-group">
 
 
-                <label for="booking_name">
-                    Full Name
+                <label for="booking_contact_person">
+                    Contact Person
                 </label>
 
 
                 <input
                     type="text"
-                    id="booking_name"
-                    name="name"
-                    placeholder="Enter your full name"
+                    id="booking_contact_person"
+                    name="contact_person"
+                    placeholder="Contact person's name"
                     required
                 >
 
@@ -1556,7 +1538,7 @@ $firstMimeType =
         </div>
 
 
-        <!-- EMAIL + CONTACT PERSON -->
+        <!-- EMAIL + COMPANY -->
 
         <div class="form-row">
 
@@ -1584,16 +1566,16 @@ $firstMimeType =
             <div class="form-group">
 
 
-                <label for="booking_contact_person">
-                    Contact Person
+                <label for="booking_company">
+                    Company Name
                 </label>
 
 
                 <input
                     type="text"
-                    id="booking_contact_person"
-                    name="contact_person"
-                    placeholder="Contact person's name"
+                    id="booking_company"
+                    name="cname"
+                    placeholder="Enter company name"
                     required
                 >
 
@@ -1621,6 +1603,7 @@ $firstMimeType =
                     id="booking_event"
                     name="event_type"
                     required
+                    onchange="toggleOtherEventType()"
                 >
 
 
@@ -1698,90 +1681,89 @@ $firstMimeType =
         </div>
 
 
-        <!-- COMPANY -->
+        <!-- OTHER EVENT TYPE -->
 
-        <div class="form-group">
+        <div
+            class="form-group"
+            id="otherEventTypeGroup"
+            style="display: none;"
+        >
 
 
-            <label for="booking_company">
-                Company Name
+            <label for="other_event_type">
+                Please Specify Event Type
             </label>
 
 
             <input
                 type="text"
-                id="booking_company"
-                name="cname"
-                placeholder="Enter company name"
-                required
+                id="other_event_type"
+                name="other_event_type"
+                placeholder="Enter your event type"
             >
 
 
         </div>
 
 
-       <!-- SERVICES -->
+        <!-- SERVICES -->
 
-<div class="form-group">
+        <div class="form-group">
 
-    <label>
-        Services Needed
-    </label>
 
-    <div class="service-checkboxes">
+            <label>
+                Services Needed
+            </label>
 
-        <?php if (!empty($services)): ?>
 
-            <?php foreach ($services as $service): ?>
+            <div class="service-checkboxes">
 
-                <?php
-                $serviceAvailable =
-                    (int)($service['is_available'] ?? 0) === 1;
-                ?>
 
-                <label
-                    class="service-checkbox<?= !$serviceAvailable
-                        ? ' service-unavailable-checkbox'
-                        : ''
-                    ?>"
-                >
+                <?php if (
+                    !empty($services)
+                ): ?>
 
-                    <input
-                        type="checkbox"
-                        name="service[]"
-                        value="<?= e($service['name']) ?>"
-                        <?= !$serviceAvailable ? 'disabled' : '' ?>
-                    >
 
-                    <span>
+                    <?php foreach (
+                        $services as $service
+                    ): ?>
 
-                        <?= e($service['name']) ?>
 
-                        <?php if (!$serviceAvailable): ?>
+                        <label class="service-checkbox">
 
-                            <small class="service-unavailable-text">
-                                (Unavailable)
-                            </small>
 
-                        <?php endif; ?>
+                            <input
+                                type="checkbox"
+                                name="service[]"
+                                value="<?= e(
+                                    $service['name']
+                                ) ?>"
+                            >
 
-                    </span>
 
-                </label>
+                            <span>
 
-            <?php endforeach; ?>
+                                <?= e(
+                                    $service['name']
+                                ) ?>
 
-        <?php else: ?>
+                            </span>
 
-            <p class="booking-no-services">
-                No services are currently available.
-            </p>
 
-        <?php endif; ?>
+                        </label>
 
-    </div>
 
-</div>
+                    <?php endforeach; ?>
+
+
+                <?php endif; ?>
+
+
+
+            </div>
+
+
+        </div>
 
 
         <!-- MESSAGE -->
@@ -2397,6 +2379,76 @@ document.addEventListener(
 
     }
 );
+
+
+/*
+|--------------------------------------------------------------------------
+| OTHER EVENT TYPE
+|--------------------------------------------------------------------------
+*/
+
+function toggleOtherEventType()
+{
+
+
+    const eventType =
+        document.getElementById(
+            "booking_event"
+        );
+
+
+    const otherGroup =
+        document.getElementById(
+            "otherEventTypeGroup"
+        );
+
+
+    const otherInput =
+        document.getElementById(
+            "other_event_type"
+        );
+
+
+    if (
+        !eventType ||
+        !otherGroup ||
+        !otherInput
+    ) {
+
+
+        return;
+
+
+    }
+
+
+    if (eventType.value === "Other") {
+
+
+        otherGroup.style.display =
+            "block";
+
+
+        otherInput.required = true;
+
+
+    } else {
+
+
+        otherGroup.style.display =
+            "none";
+
+
+        otherInput.required = false;
+
+
+        otherInput.value = "";
+
+
+    }
+
+
+}
 
 
 /*
