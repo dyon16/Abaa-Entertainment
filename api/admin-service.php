@@ -1152,15 +1152,8 @@ foreach ($services as $service) {
 }
 
 .service-form-group input[type="file"] {
-    width: 100%;
-    padding: 9px;
-    height: auto;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: #fafafa;
-    color: var(--text);
-    box-sizing: border-box;
-    cursor: pointer;
+        padding: 9px;
+        height: auto;
 }
 
 .service-help {
