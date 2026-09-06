@@ -75,6 +75,9 @@ try {
 
 
 <style>
+    #otherEventTypeGroup {
+    display: none;
+}
     .service-unavailable-checkbox {
     opacity: 0.65;
     cursor: not-allowed;
@@ -724,172 +727,181 @@ try {
         >
 
 
-            <div class="form-row">
+           <!-- CONTACT PERSON + PHONE -->
 
-                <div class="form-group">
+<div class="form-row">
 
-                    <label for="booking_name">
-                        Full Name
-                    </label>
+    <div class="form-group">
 
-                    <input
-                        type="text"
-                        id="booking_name"
-                        name="name"
-                        placeholder="Enter your full name"
-                        required
-                    >
+        <label for="booking_contact_person">
+            Contact Person
+        </label>
 
-                </div>
+        <input
+            type="text"
+            id="booking_contact_person"
+            name="contact_person"
+            placeholder="Contact person's name"
+            required
+        >
 
-
-                <div class="form-group">
-
-                    <label for="booking_phone">
-                        Contact Number
-                    </label>
-
-                    <input
-                        type="tel"
-                        id="booking_phone"
-                        name="phone"
-                        placeholder="09XX XXX XXXX"
-                        required
-                    >
-
-                </div>
-
-            </div>
+    </div>
 
 
+    <div class="form-group">
 
-            <div class="form-row">
+        <label for="booking_phone">
+            Contact Number
+        </label>
 
-                <div class="form-group">
+        <input
+            type="tel"
+            id="booking_phone"
+            name="phone"
+            placeholder="09XX XXX XXXX"
+            required
+        >
 
-                    <label for="booking_email">
-                        Email Address
-                    </label>
-
-                    <input
-                        type="email"
-                        id="booking_email"
-                        name="email"
-                        placeholder="your@email.com"
-                        required
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label for="booking_contact_person">
-                        Contact Person
-                    </label>
-
-                    <input
-                        type="text"
-                        id="booking_contact_person"
-                        name="contact_person"
-                        placeholder="Enter contact person's name"
-                        required
-                    >
-
-                </div>
-
-            </div>
-
-
-
-            <div class="form-row">
-
-                <div class="form-group">
-
-                    <label for="booking_event">
-                        Event Type
-                    </label>
-
-                    <select
-                        id="booking_event"
-                        name="event_type"
-                        required
-                    >
-
-                        <option
-                            value=""
-                            disabled
-                            selected
-                        >
-                            Select event type
-                        </option>
-
-                        <option value="Birthday">
-                            Birthday
-                        </option>
-
-                        <option value="Wedding">
-                            Wedding
-                        </option>
-
-                        <option value="Concert">
-                            Concert
-                        </option>
-
-                        <option value="Corporate Event">
-                            Corporate Event
-                        </option>
-
-                        <option value="Festival">
-                            Festival
-                        </option>
-
-                        <option value="Product Launch">
-                            Product Launch
-                        </option>
-
-                        <option value="Other">
-                            Other
-                        </option>
-
-                    </select>
-
-                </div>
-
-<div class="form-group">
-
-    <label for="booking_date">
-        Event Date
-    </label>
-
-    <input
-        type="date"
-        id="booking_date"
-        name="event_date"
-        required
-    >
+    </div>
 
 </div>
 
-            </div>
+
+<!-- EMAIL + COMPANY -->
+
+<div class="form-row">
+
+    <div class="form-group">
+
+        <label for="booking_email">
+            Email Address
+        </label>
+
+        <input
+            type="email"
+            id="booking_email"
+            name="email"
+            placeholder="your@email.com"
+            required
+        >
+
+    </div>
 
 
+    <div class="form-group">
 
-            <div class="form-group">
+        <label for="booking_company">
+            Company Name
+        </label>
 
-                <label for="booking_company">
-                    Company Name
-                </label>
+        <input
+            type="text"
+            id="booking_company"
+            name="cname"
+            placeholder="Enter company name"
+            required
+        >
 
-                <input
-                    type="text"
-                    id="booking_company"
-                    name="cname"
-                    placeholder="Enter company name"
-                    required
-                >
+    </div>
 
-            </div>
+</div>
+
+
+<!-- EVENT TYPE + DATE -->
+
+<div class="form-row">
+
+    <div class="form-group">
+
+        <label for="booking_event">
+            Event Type
+        </label>
+
+        <select
+            id="booking_event"
+            name="event_type"
+            required
+            onchange="toggleOtherEventType()"
+        >
+
+            <option
+                value=""
+                disabled
+                selected
+            >
+                Select event type
+            </option>
+
+            <option value="Birthday">
+                Birthday
+            </option>
+
+            <option value="Wedding">
+                Wedding
+            </option>
+
+            <option value="Concert">
+                Concert
+            </option>
+
+            <option value="Corporate Event">
+                Corporate Event
+            </option>
+
+            <option value="Festival">
+                Festival
+            </option>
+
+            <option value="Product Launch">
+                Product Launch
+            </option>
+
+            <option value="Other">
+                Other
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label for="booking_date">
+            Event Date
+        </label>
+
+        <input
+            type="date"
+            id="booking_date"
+            name="event_date"
+            required
+        >
+
+    </div>
+
+</div>
+
+
+<!-- OTHER EVENT TYPE -->
+
+<div
+    class="form-group"
+    id="otherEventTypeGroup"
+>
+
+    <label for="other_event_type">
+        Please Specify Event Type
+    </label>
+
+    <input
+        type="text"
+        id="other_event_type"
+        name="other_event_type"
+        placeholder="Enter your event type"
+    >
+
+</div>
 
 
 
@@ -1002,7 +1014,65 @@ try {
 
 <script>
 
+/*
+|--------------------------------------------------------------------------
+| OTHER EVENT TYPE
+|--------------------------------------------------------------------------
+*/
 
+function toggleOtherEventType()
+{
+    const eventType =
+        document.getElementById(
+            "booking_event"
+        );
+
+    const otherGroup =
+        document.getElementById(
+            "otherEventTypeGroup"
+        );
+
+    const otherInput =
+        document.getElementById(
+            "other_event_type"
+        );
+
+
+    if (
+        !eventType ||
+        !otherGroup ||
+        !otherInput
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        eventType.value === "Other"
+    ) {
+
+        otherGroup.style.display =
+            "block";
+
+        otherInput.required =
+            true;
+
+    } else {
+
+        otherGroup.style.display =
+            "none";
+
+        otherInput.required =
+            false;
+
+        otherInput.value =
+            "";
+
+    }
+
+}
 
 
 
