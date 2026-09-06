@@ -93,6 +93,25 @@ $serviceDetails = parseDetails($service['details'] ?? '');
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
     <style>
+        .service-unavailable-checkbox {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+.service-unavailable-checkbox input {
+    cursor: not-allowed;
+}
+
+.service-unavailable-text {
+    color: #dc2626;
+    font-size: 0.8em;
+    margin-left: 4px;
+}
+
+.booking-no-services {
+    margin: 0;
+    color: #777;
+}
         .service-page {
             width: 95%;
             max-width: 1400px;
@@ -764,30 +783,68 @@ $serviceDetails = parseDetails($service['details'] ?? '');
                 <input type="text" id="booking_company" name="cname" placeholder="Enter company name" required>
             </div>
 
-            <div class="form-group">
-                <label>Services Needed</label>
-                <div class="service-checkboxes">
-                    <?php foreach ($services as $item): ?>
-                        <?php if ((int)$item['is_available'] === 1): ?>
-                            <label class="service-checkbox">
-                                <input
-                                    type="checkbox"
-                                    name="service[]"
-                                    value="<?= e($item['name']) ?>"
-                                    <?= (string)$item['slug'] === (string)$service['slug'] ? 'checked' : '' ?>
-                                >
-                                <span><?= e($item['name']) ?></span>
-                            </label>
+           <!-- SERVICES -->
+
+<div class="form-group">
+
+    <label>
+        Services Needed
+    </label>
+
+    <div class="service-checkboxes">
+
+        <?php if (!empty($services)): ?>
+
+            <?php foreach ($services as $service): ?>
+
+                <?php
+                $serviceAvailable =
+                    (int)($service['is_available'] ?? 0) === 1;
+                ?>
+
+                <label
+                    class="service-checkbox<?= !$serviceAvailable
+                        ? ' service-unavailable-checkbox'
+                        : ''
+                    ?>"
+                >
+
+                    <input
+                        type="checkbox"
+                        name="service[]"
+                        value="<?= e($service['name']) ?>"
+                        <?= !$serviceAvailable ? 'disabled' : '' ?>
+                    >
+
+                    <span>
+
+                        <?= e($service['name']) ?>
+
+                        <?php if (!$serviceAvailable): ?>
+
+                            <small class="service-unavailable-text">
+                                (Unavailable)
+                            </small>
+
                         <?php endif; ?>
-                    <?php endforeach; ?>
 
-                    <label class="service-checkbox">
-                        <input type="checkbox" name="service[]" value="Full Event Production">
-                        <span>Full Event Production</span>
-                    </label>
-                </div>
-            </div>
+                    </span>
 
+                </label>
+
+            <?php endforeach; ?>
+
+        <?php else: ?>
+
+            <p class="booking-no-services">
+                No services are currently available.
+            </p>
+
+        <?php endif; ?>
+
+    </div>
+
+</div>
             <div class="form-group">
                 <label for="booking_message">Event Details</label>
                 <textarea id="booking_message" name="message" rows="4" placeholder="Tell us about your event, location, preferred setup, budget, or other requirements..."></textarea>
