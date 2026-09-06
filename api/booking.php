@@ -10,6 +10,7 @@ include(__DIR__ . '/conn.php');
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
 
     header("Location: /");
+
     exit;
 
 }
@@ -19,23 +20,64 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
    GET FORM DATA
 ================================================== */
 
-$name = trim($_POST["name"] ?? "");
+$phone = trim(
+    $_POST["phone"] ?? ""
+);
 
-$phone = trim($_POST["phone"] ?? "");
 
-$email = trim($_POST["email"] ?? "");
+$email = trim(
+    $_POST["email"] ?? ""
+);
 
-$event_type = trim($_POST["event_type"] ?? "");
 
-$event_date = trim($_POST["event_date"] ?? "");
+$event_type = trim(
+    $_POST["event_type"] ?? ""
+);
 
-$cname = trim($_POST["cname"] ?? "");
+
+$other_event_type = trim(
+    $_POST["other_event_type"] ?? ""
+);
+
+
+$event_date = trim(
+    $_POST["event_date"] ?? ""
+);
+
+
+$cname = trim(
+    $_POST["cname"] ?? ""
+);
+
 
 $contact_person = trim(
     $_POST["contact_person"] ?? ""
 );
 
-$message = trim($_POST["message"] ?? "");
+
+$message = trim(
+    $_POST["message"] ?? ""
+);
+
+
+/* ==================================================
+   HANDLE OTHER EVENT TYPE
+================================================== */
+
+if ($event_type === "Other") {
+
+    if ($other_event_type === "") {
+
+        die(
+            "Please specify your event type."
+        );
+
+    }
+
+    $event_type =
+        $other_event_type;
+
+}
 
 
 /*
@@ -57,7 +99,9 @@ $selectedServices =
 if (!is_array($selectedServices)) {
 
     $selectedServices = [
+
         $selectedServices
+
     ];
 
 }
@@ -103,18 +147,6 @@ $selectedServices =
 |--------------------------------------------------------------------------
 | CONVERT SERVICES TO STRING
 |--------------------------------------------------------------------------
-|
-| Example:
-|
-| LED Wall
-| Lights & Sound
-| Live Feed
-|
-| becomes:
-|
-| LED Wall, Lights & Sound, Live Feed
-|
-|--------------------------------------------------------------------------
 */
 
 $service =
@@ -129,14 +161,21 @@ $service =
 ================================================== */
 
 if (
-    $name === "" ||
+
     $phone === "" ||
+
     $email === "" ||
+
     $event_type === "" ||
+
     $event_date === "" ||
+
     $cname === "" ||
+
     $contact_person === "" ||
+
     $service === ""
+
 ) {
 
     die(
@@ -186,14 +225,19 @@ $dateErrors =
 */
 
 if (
+
     !$dateObject ||
+
     (
         $dateErrors !== false &&
+
         (
             $dateErrors["warning_count"] > 0 ||
+
             $dateErrors["error_count"] > 0
         )
     )
+
 ) {
 
     die(
@@ -203,15 +247,16 @@ if (
 }
 
 
-/*
-|--------------------------------------------------------------------------
-| MAKE SURE THE DATE MATCHES EXACTLY
-|--------------------------------------------------------------------------
-*/
+/* ==================================================
+   MAKE SURE DATE MATCHES EXACTLY
+================================================== */
 
 if (
+
     $dateObject->format("Y-m-d")
-    !== $event_date
+    !==
+    $event_date
+
 ) {
 
     die(
@@ -219,24 +264,6 @@ if (
     );
 
 }
-
-
-/*
-|--------------------------------------------------------------------------
-| DATE IS ALREADY MYSQL FORMAT
-|--------------------------------------------------------------------------
-|
-| Date picker sends:
-|
-| 2026-08-27
-|
-| Database receives:
-|
-| 2026-08-27
-|
-|--------------------------------------------------------------------------
-*/
-
 
 
 /* ==================================================
@@ -244,9 +271,10 @@ if (
 ================================================== */
 
 $sql = "
+
     INSERT INTO bookings
+
     (
-        name,
         phone,
         email,
         event_type,
@@ -257,7 +285,21 @@ $sql = "
         message,
         status
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+    VALUES
+
+    (
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?
+    )
+
 ";
 
 
@@ -267,31 +309,31 @@ try {
         $pdo->prepare($sql);
 
 
-  $stmt->execute([
+    $stmt->execute([
 
-    $name,
+        $phone,
 
-    $phone,
+        $email,
 
-    $email,
+        $event_type,
 
-    $event_type,
+        $event_date,
 
-    $event_date,
+        $cname,
 
-    $cname,
+        $contact_person,
 
-    $contact_person,
+        $service,
 
-    $service,
+        $message,
 
-    $message,
+        "Pending"
 
-    "Pending"
+    ]);
 
-]);
 
-$bookingId = (int) $pdo->lastInsertId();
+    $bookingId =
+        (int)$pdo->lastInsertId();
 
 
 } catch (PDOException $e) {
@@ -303,13 +345,17 @@ $bookingId = (int) $pdo->lastInsertId();
 
 
     die(
-        "Something went wrong while submitting your booking. "
+
+        "Something went wrong "
+        . "while submitting your booking. "
         . "Please try again later."
+
     );
 
 }
 
 ?>
+
 
 <!DOCTYPE html>
 
@@ -325,7 +371,8 @@ $bookingId = (int) $pdo->lastInsertId();
     >
 
     <title>
-        Booking Submitted | ABAA Entertainment
+        Booking Submitted |
+        ABAA Entertainment
     </title>
 
 
@@ -362,10 +409,12 @@ $bookingId = (int) $pdo->lastInsertId();
             color: white;
 
             background:
+
                 linear-gradient(
                     rgba(0, 0, 0, 0.92),
                     rgba(0, 0, 0, 0.92)
                 ),
+
                 url("/background.jpg");
 
             background-size: cover;
@@ -386,6 +435,7 @@ $bookingId = (int) $pdo->lastInsertId();
             text-align: center;
 
             background:
+
                 linear-gradient(
                     135deg,
                     #080808,
@@ -402,6 +452,7 @@ $bookingId = (int) $pdo->lastInsertId();
                 8px;
 
             box-shadow:
+
                 0 20px 70px
                 rgba(0, 0, 0, 0.8),
 
@@ -527,6 +578,89 @@ $bookingId = (int) $pdo->lastInsertId();
         }
 
 
+        .booking-id-box {
+
+            margin:
+                25px 0 30px;
+
+            padding:
+                20px;
+
+            background:
+                rgba(255, 61, 2, 0.08);
+
+            border:
+                1px solid #ff3d02;
+
+            border-radius:
+                8px;
+
+            text-align:
+                center;
+
+        }
+
+
+        .booking-id-box span {
+
+            display:
+                block;
+
+            margin-bottom:
+                8px;
+
+            color:
+                #ff8b68;
+
+            font-size:
+                12px;
+
+            font-weight:
+                bold;
+
+            letter-spacing:
+                2px;
+
+        }
+
+
+        .booking-id-box strong {
+
+            display:
+                block;
+
+            margin-bottom:
+                8px;
+
+            color:
+                #ff3d02;
+
+            font-size:
+                32px;
+
+            letter-spacing:
+                2px;
+
+        }
+
+
+        .booking-id-box small {
+
+            display:
+                block;
+
+            color:
+                #999;
+
+            font-size:
+                13px;
+
+            line-height:
+                1.5;
+
+        }
+
+
         @media (max-width: 600px) {
 
             .success-box {
@@ -553,68 +687,6 @@ $bookingId = (int) $pdo->lastInsertId();
             }
 
         }
-       .booking-id-box {
-
-    margin: 25px 0 30px;
-
-    padding: 20px;
-
-    background: rgba(255, 61, 2, 0.08);
-
-    border: 1px solid #ff3d02;
-
-    border-radius: 8px;
-
-    text-align: center;
-
-}
-
-
-.booking-id-box span {
-
-    display: block;
-
-    margin-bottom: 8px;
-
-    color: #ff8b68;
-
-    font-size: 12px;
-
-    font-weight: bold;
-
-    letter-spacing: 2px;
-
-}
-
-
-.booking-id-box strong {
-
-    display: block;
-
-    margin-bottom: 8px;
-
-    color: #ff3d02;
-
-    font-size: 32px;
-
-    letter-spacing: 2px;
-
-}
-
-
-.booking-id-box small {
-
-    display: block;
-
-    color: #999;
-
-    font-size: 13px;
-
-    line-height: 1.5;
-
-}
-
-
 
     </style>
 
@@ -624,66 +696,78 @@ $bookingId = (int) $pdo->lastInsertId();
 <body>
 
 
-    <div class="success-box">
+<div class="success-box">
 
 
-        <div class="success-icon">
-            ✓
-        </div>
+    <div class="success-icon">
 
-
-        <h1>
-            Booking Submitted!
-        </h1>
-
-
-        <p>
-
-    Thank you,
-
-    <strong>
-        <?= htmlspecialchars($name) ?>
-    </strong>.
-
-    Your booking request has been
-    successfully submitted to
-    ABAA Entertainment.
-
-    Our team will review your request
-    and contact you soon.
-
-</p>
-
-
-<div class="booking-id-box">
-
-    <span>
-        YOUR BOOKING ID
-    </span>
-
-    <strong>
-        #<?= $bookingId ?>
-    </strong>
-
-    <small>
-        Please save this number.
-        You will need it to check your booking status.
-    </small>
-
-</div>
-
-
-
-        <a
-            href="/"
-            class="back-button"
-        >
-            Back To Home
-        </a>
-
-
+        ✓
 
     </div>
+
+
+    <h1>
+
+        Booking Submitted!
+
+    </h1>
+
+
+    <p>
+
+        Thank you for choosing
+
+        <strong>
+            ABAA Entertainment
+        </strong>.
+
+        Your booking request has been
+        successfully submitted.
+
+        Our team will review your request
+        and contact you soon.
+
+    </p>
+
+
+    <div class="booking-id-box">
+
+        <span>
+
+            YOUR BOOKING ID
+
+        </span>
+
+
+        <strong>
+
+            #<?= $bookingId ?>
+
+        </strong>
+
+
+        <small>
+
+            Please save this number.
+            You will need it to check
+            your booking status.
+
+        </small>
+
+    </div>
+
+
+    <a
+        href="/"
+        class="back-button"
+    >
+
+        Back To Home
+
+    </a>
+
+
+</div>
 
 
 </body>
