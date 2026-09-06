@@ -191,14 +191,44 @@ if (
 
         try {
 
+            /*
+             * Admin status changes are recorded separately from
+             * customer cancellations.
+             */
             $stmt = $pdo->prepare(
                 "UPDATE bookings
-                 SET status = :status
+                 SET
+                    status = :status,
+                    cancellation_reason = CASE
+                        WHEN :status_cancelled_reason = 'Cancelled'
+                            THEN cancellation_reason
+                        ELSE NULL
+                    END,
+                    cancelled_by = CASE
+                        WHEN :status_cancelled = 'Cancelled' THEN
+                            CASE
+                                WHEN COALESCE(cancelled_by, '') = 'customer'
+                                THEN cancelled_by
+                                ELSE 'admin'
+                            END
+                        ELSE NULL
+                    END,
+                    cancelled_at = CASE
+                        WHEN :status_cancelled_at = 'Cancelled'
+                            AND cancelled_at IS NULL
+                        THEN NOW()
+                        WHEN :status_cancelled_at <> 'Cancelled'
+                        THEN NULL
+                        ELSE cancelled_at
+                    END
                  WHERE id = :id"
             );
 
             $stmt->execute([
                 ':status' => $newStatus,
+                ':status_cancelled_reason' => $newStatus,
+                ':status_cancelled' => $newStatus,
+                ':status_cancelled_at' => $newStatus,
                 ':id' => $bookingId
             ]);
 
@@ -316,7 +346,10 @@ try {
             service,
             message,
             created_at,
-            status
+            status,
+            cancellation_reason,
+            cancelled_by,
+            cancelled_at
          FROM bookings
          ORDER BY id DESC"
     );
@@ -406,6 +439,26 @@ function statusClass($status)
     );
 }
 
+/*
+|--------------------------------------------------------------------------
+| CUSTOMER CANCELLATION NOTIFICATION
+|--------------------------------------------------------------------------
+*/
+
+$customerCancelledBookings = array_values(
+    array_filter(
+        $bookings,
+        static function ($booking) {
+            return (
+                ($booking['status'] ?? '') === 'Cancelled' &&
+                ($booking['cancelled_by'] ?? '') === 'customer'
+            );
+        }
+    )
+);
+
+$customerCancelledCount = count($customerCancelledBookings);
+
 ?>
 
 <!DOCTYPE html>
@@ -439,6 +492,132 @@ function statusClass($status)
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
 >
+
+<style>
+
+        /* Booking status visibility */
+        .customer-cancelled-notification {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 18px;
+            padding: 15px 18px;
+            border-radius: 10px;
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.42);
+            color: #f3f4f6;
+        }
+
+        .customer-cancelled-notification > i {
+            color: #ef4444;
+            font-size: 20px;
+        }
+
+        .customer-cancelled-notification div {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .customer-cancelled-notification strong {
+            color: #fca5a5;
+        }
+
+        .customer-cancelled-notification span {
+            color: #d1d5db;
+            font-size: 13px;
+        }
+
+        .booking-table tbody tr.status-pending {
+            background: rgba(255, 176, 32, 0.055);
+        }
+
+        .booking-table tbody tr.status-confirmed {
+            background: rgba(56, 189, 248, 0.055);
+        }
+
+        .booking-table tbody tr.status-in-progress {
+            background: rgba(192, 132, 252, 0.055);
+        }
+
+        .booking-table tbody tr.status-completed {
+            background: rgba(34, 197, 94, 0.055);
+        }
+
+        .booking-table tbody tr.status-cancelled {
+            background: rgba(239, 68, 68, 0.085);
+        }
+
+        .booking-table tbody tr.status-cancelled:hover {
+            background: rgba(239, 68, 68, 0.13);
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            margin-right: 7px;
+            border-radius: 50%;
+            vertical-align: middle;
+            box-shadow: 0 0 8px currentColor;
+        }
+
+        .status-indicator-pending {
+            background: #ffb020;
+            color: #ffb020;
+        }
+
+        .status-indicator-confirmed {
+            background: #38bdf8;
+            color: #38bdf8;
+        }
+
+        .status-indicator-in-progress {
+            background: #c084fc;
+            color: #c084fc;
+        }
+
+        .status-indicator-completed {
+            background: #22c55e;
+            color: #22c55e;
+        }
+
+        .status-indicator-cancelled {
+            background: #ef4444;
+            color: #ef4444;
+        }
+
+        .cancellation-note {
+            margin-top: 7px;
+            padding: 8px 10px;
+            border-left: 3px solid #ef4444;
+            border-radius: 0 6px 6px 0;
+            background: rgba(239, 68, 68, 0.08);
+            color: #fca5a5;
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        .cancellation-note strong {
+            display: block;
+            margin-bottom: 2px;
+            color: #f87171;
+        }
+
+        .customer-cancelled-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 6px;
+            padding: 4px 8px;
+            border-radius: 999px;
+            background: rgba(239, 68, 68, 0.12);
+            color: #fca5a5;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+    </style>
 
 </head>
 
@@ -727,6 +906,30 @@ function statusClass($status)
     <?php endif; ?>
 
 
+    <?php if ($customerCancelledCount > 0): ?>
+
+        <div class="admin-notification customer-cancelled-notification">
+
+            <i class="fa-solid fa-bell"></i>
+
+            <div>
+                <strong>
+                    Customer cancellation<?= $customerCancelledCount === 1 ? '' : 's' ?>
+                </strong>
+
+                <span>
+                    <?= $customerCancelledCount ?>
+                    booking<?= $customerCancelledCount === 1 ? '' : 's' ?>
+                    <?= $customerCancelledCount === 1 ? 'has' : 'have' ?>
+                    been cancelled by the customer.
+                </span>
+            </div>
+
+        </div>
+
+    <?php endif; ?>
+
+
     <!-- STATISTICS -->
 
     <section class="stats-grid">
@@ -966,7 +1169,7 @@ function statusClass($status)
                             ?>
 
 
-                            <tr>
+                            <tr class="status-<?= e($statusCss) ?>">
 
 
                                 <!-- ID -->
@@ -1092,13 +1295,44 @@ function statusClass($status)
                                         class="status-badge status-<?= e($statusCss) ?>"
                                     >
 
-                                        <span></span>
+                                        <span
+                                            class="status-indicator status-indicator-<?= e($statusCss) ?>"
+                                        ></span>
 
                                         <?= e(
                                             $currentStatus
                                         ) ?>
 
                                     </span>
+
+                                    <?php if (
+                                        $currentStatus === 'Cancelled' &&
+                                        !empty($booking['cancellation_reason'])
+                                    ): ?>
+
+                                        <div class="cancellation-note">
+                                            <strong>
+                                                <?= ($booking['cancelled_by'] ?? '') === 'customer'
+                                                    ? 'Customer reason'
+                                                    : 'Cancellation reason' ?>
+                                            </strong>
+
+                                            <?= e($booking['cancellation_reason']) ?>
+                                        </div>
+
+                                    <?php endif; ?>
+
+                                    <?php if (
+                                        $currentStatus === 'Cancelled' &&
+                                        ($booking['cancelled_by'] ?? '') === 'customer'
+                                    ): ?>
+
+                                        <div class="customer-cancelled-badge">
+                                            <i class="fa-solid fa-user"></i>
+                                            Customer cancelled
+                                        </div>
+
+                                    <?php endif; ?>
 
                                 </td>
 
