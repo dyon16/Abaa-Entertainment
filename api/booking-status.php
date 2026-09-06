@@ -4,55 +4,139 @@ session_start();
 
 include(__DIR__ . '/conn.php');
 
+/*
+|--------------------------------------------------------------------------
+| HELPERS
+|--------------------------------------------------------------------------
+*/
 
-/* ==================================================
-   GET SEARCH DATA
-================================================== */
+function e($value)
+{
+    return htmlspecialchars(
+        (string) ($value ?? ''),
+        ENT_QUOTES,
+        'UTF-8'
+    );
+}
+
+function statusClass($status)
+{
+    return strtolower(
+        str_replace(
+            ' ',
+            '-',
+            trim((string) $status)
+        )
+    );
+}
+
+/*
+|--------------------------------------------------------------------------
+| CSRF
+|--------------------------------------------------------------------------
+*/
+
+if (empty($_SESSION['booking_status_csrf'])) {
+    $_SESSION['booking_status_csrf'] = bin2hex(random_bytes(32));
+}
+
+$csrfToken = $_SESSION['booking_status_csrf'];
+
+/*
+|--------------------------------------------------------------------------
+| GET SEARCH DATA
+|--------------------------------------------------------------------------
+*/
 
 $email = trim($_GET['email'] ?? '');
-
 $bookingId = (int) ($_GET['id'] ?? 0);
 
 $booking = null;
-
 $error = '';
+$success = '';
 
+if (
+    isset($_GET['cancelled']) &&
+    $_GET['cancelled'] === '1'
+) {
+    $success =
+        'Your booking request has been cancelled successfully.';
+}
 
-/* ==================================================
-   CANCEL BOOKING REQUEST
-================================================== */
-
-$_SESSION['booking_status_cancel_success'] = $_SESSION['booking_status_cancel_success'] ?? '';
-
-$cancelSuccess = $_SESSION['booking_status_cancel_success'];
-$cancelError = '';
-
-unset($_SESSION['booking_status_cancel_success']);
+/*
+|--------------------------------------------------------------------------
+| CUSTOMER CANCELLATION
+|--------------------------------------------------------------------------
+*/
 
 if (
     $_SERVER['REQUEST_METHOD'] === 'POST' &&
     isset($_POST['cancel_booking'])
 ) {
 
-    $cancelBookingId = (int) ($_POST['booking_id'] ?? 0);
-    $cancelEmail = trim($_POST['email'] ?? '');
-    $submittedCsrf = $_POST['csrf_token'] ?? '';
+    $postedToken =
+        (string) ($_POST['csrf_token'] ?? '');
+
+    $cancelEmail =
+        trim($_POST['email'] ?? '');
+
+    $cancelBookingId =
+        (int) ($_POST['booking_id'] ?? 0);
+
+    $cancellationReason =
+        trim($_POST['cancellation_reason'] ?? '');
 
     if (
-        empty($_SESSION['booking_status_csrf']) ||
-        !hash_equals($_SESSION['booking_status_csrf'], $submittedCsrf)
+        empty($csrfToken) ||
+        empty($postedToken) ||
+        !hash_equals($csrfToken, $postedToken)
     ) {
-        $cancelError = 'Your session has expired. Please check your booking status again.';
 
-    } elseif ($cancelBookingId <= 0 || $cancelEmail === '') {
-        $cancelError = 'Invalid booking cancellation request.';
+        $error =
+            'Your session has expired. Please check your booking again and try again.';
+
+        $email = $cancelEmail;
+        $bookingId = $cancelBookingId;
+
+    } elseif (
+        $cancelBookingId <= 0 ||
+        !filter_var($cancelEmail, FILTER_VALIDATE_EMAIL)
+    ) {
+
+        $error =
+            'Please provide a valid Booking ID and email address.';
+
+        $email = $cancelEmail;
+        $bookingId = $cancelBookingId;
+
+    } elseif ($cancellationReason === '') {
+
+        $error =
+            'Please provide a reason for cancelling your booking request.';
+
+        $email = $cancelEmail;
+        $bookingId = $cancelBookingId;
+
+    } elseif (mb_strlen($cancellationReason) > 500) {
+
+        $error =
+            'Your cancellation reason must be 500 characters or fewer.';
+
+        $email = $cancelEmail;
+        $bookingId = $cancelBookingId;
 
     } else {
 
         try {
 
+            /*
+             * Verify the booking using BOTH the ID and email.
+             */
             $stmt = $pdo->prepare(
-                "SELECT id, status
+                "SELECT
+                    id,
+                    email,
+                    status
                  FROM bookings
                  WHERE id = :id
                  AND email = :email
@@ -64,46 +148,61 @@ if (
                 ':email' => $cancelEmail
             ]);
 
-            $cancelBooking = $stmt->fetch(PDO::FETCH_ASSOC);
+            $cancelBooking =
+                $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$cancelBooking) {
-                $cancelError =
+
+                $error =
                     'No booking was found with that Booking ID and email address.';
 
-            } elseif (($cancelBooking['status'] ?? 'Pending') !== 'Pending') {
-                $cancelError =
-                    'This booking can no longer be cancelled from the status page.';
+            } elseif (
+                ($cancelBooking['status'] ?? '') !== 'Pending'
+            ) {
+
+                $error =
+                    'Only Pending booking requests can be cancelled from this page.';
 
             } else {
 
-                $updateStmt = $pdo->prepare(
+                /*
+                 * Conditional UPDATE prevents a race where an admin
+                 * changes the booking between SELECT and UPDATE.
+                 */
+                $stmt = $pdo->prepare(
                     "UPDATE bookings
-                     SET status = 'Cancelled'
+                     SET
+                        status = 'Cancelled',
+                        cancellation_reason = :reason,
+                        cancelled_by = 'customer',
+                        cancelled_at = NOW()
                      WHERE id = :id
                      AND email = :email
                      AND status = 'Pending'"
                 );
 
-                $updateStmt->execute([
+                $stmt->execute([
+                    ':reason' => $cancellationReason,
                     ':id' => $cancelBookingId,
                     ':email' => $cancelEmail
                 ]);
 
-                if ($updateStmt->rowCount() === 1) {
-                    $_SESSION['booking_status_cancel_success'] =
-                        'Your booking request has been cancelled successfully.';
+                if ($stmt->rowCount() === 1) {
 
                     header(
                         'Location: /booking-status?id=' .
                         urlencode((string) $cancelBookingId) .
                         '&email=' .
-                        urlencode($cancelEmail)
+                        urlencode($cancelEmail) .
+                        '&cancelled=1'
                     );
+
                     exit;
-                } else {
-                    $cancelError =
-                        'This booking could not be cancelled. Please check its current status.';
+
                 }
+
+                $error =
+                    'This booking could not be cancelled because its status has already changed.';
             }
 
         } catch (PDOException $e) {
@@ -113,23 +212,28 @@ if (
                 $e->getMessage()
             );
 
-            $cancelError =
+            $error =
                 'Unable to cancel your booking right now. Please try again later.';
         }
+
+        $email = $cancelEmail;
+        $bookingId = $cancelBookingId;
     }
 }
 
-
-/* ==================================================
-   SEARCH BOOKING
-================================================== */
+/*
+|--------------------------------------------------------------------------
+| SEARCH BOOKING
+|--------------------------------------------------------------------------
+*/
 
 if ($email !== '' && $bookingId > 0) {
 
     try {
 
         $stmt = $pdo->prepare(
-            "SELECT *
+            "SELECT
+                *
              FROM bookings
              WHERE id = :id
              AND email = :email
@@ -141,7 +245,8 @@ if ($email !== '' && $bookingId > 0) {
             ':email' => $email
         ]);
 
-        $booking = $stmt->fetch();
+        $booking =
+            $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$booking) {
 
@@ -159,39 +264,20 @@ if ($email !== '' && $bookingId > 0) {
 
         $error =
             'Unable to check your booking right now. Please try again later.';
-
     }
-
 }
 
-
-/* ==================================================
-   CSRF TOKEN
-================================================== */
-
-if (empty($_SESSION['booking_status_csrf'])) {
-    $_SESSION['booking_status_csrf'] = bin2hex(random_bytes(32));
-}
-
-$csrfToken = $_SESSION['booking_status_csrf'];
-
-
-/* ==================================================
-   STATUS
-================================================== */
+/*
+|--------------------------------------------------------------------------
+| STATUS
+|--------------------------------------------------------------------------
+*/
 
 $currentStatus =
     $booking['status'] ?? '';
 
 $statusClass =
-    strtolower(
-        str_replace(
-            ' ',
-            '-',
-            $currentStatus
-        )
-    );
-
+    statusClass($currentStatus);
 
 ?>
 
@@ -217,7 +303,6 @@ $statusClass =
         Check Booking Status | ABAA Entertainment
     </title>
 
-
     <style>
 
         * {
@@ -225,7 +310,6 @@ $statusClass =
             padding: 0;
             box-sizing: border-box;
         }
-
 
         body {
 
@@ -256,18 +340,14 @@ $statusClass =
             background-size: cover;
 
             background-position: center;
-
         }
-
 
         .status-container {
 
             width: 100%;
 
-            max-width: 600px;
-
+            max-width: 620px;
         }
-
 
         .status-card {
 
@@ -295,18 +375,14 @@ $statusClass =
 
                 0 0 40px
                 rgba(255, 61, 2, 0.12);
-
         }
-
 
         .logo {
 
             text-align: center;
 
             margin-bottom: 25px;
-
         }
-
 
         .logo img {
 
@@ -315,9 +391,7 @@ $statusClass =
             height: 90px;
 
             object-fit: contain;
-
         }
-
 
         h1 {
 
@@ -328,9 +402,7 @@ $statusClass =
             text-transform: uppercase;
 
             margin-bottom: 10px;
-
         }
-
 
         .subtitle {
 
@@ -341,16 +413,12 @@ $statusClass =
             line-height: 1.6;
 
             margin-bottom: 30px;
-
         }
-
 
         .form-group {
 
             margin-bottom: 20px;
-
         }
-
 
         label {
 
@@ -361,11 +429,10 @@ $statusClass =
             font-weight: bold;
 
             color: #ddd;
-
         }
 
-
-        input {
+        input,
+        textarea {
 
             width: 100%;
 
@@ -383,19 +450,27 @@ $statusClass =
 
             outline: none;
 
+            font-family: inherit;
         }
 
+        textarea {
 
-        input:focus {
+            min-height: 110px;
+
+            resize: vertical;
+
+            line-height: 1.5;
+        }
+
+        input:focus,
+        textarea:focus {
 
             border-color: #ff3d02;
 
             box-shadow:
                 0 0 0 2px
                 rgba(255, 61, 2, 0.15);
-
         }
-
 
         .check-button {
 
@@ -422,84 +497,44 @@ $statusClass =
             cursor: pointer;
 
             transition: 0.3s;
-
         }
-
 
         .check-button:hover {
 
             background: transparent;
 
             color: #ff3d02;
-
         }
 
-
-        .error {
+        .error,
+        .success {
 
             margin-bottom: 25px;
 
             padding: 14px 16px;
+
+            border-radius: 6px;
+
+            line-height: 1.5;
+        }
+
+        .error {
 
             background: rgba(220, 38, 38, 0.15);
 
             border: 1px solid #dc2626;
 
-            border-radius: 6px;
-
             color: #ff8a8a;
-
-            line-height: 1.5;
-
         }
-
 
         .success {
-            margin-bottom: 25px;
-            padding: 14px 16px;
-            background: rgba(34, 197, 94, 0.15);
+
+            background: rgba(34, 197, 94, 0.12);
+
             border: 1px solid #22c55e;
-            border-radius: 6px;
+
             color: #86efac;
-            line-height: 1.5;
         }
-
-        .cancel-section {
-            margin-top: 25px;
-            padding: 20px;
-            background: rgba(255, 61, 2, 0.06);
-            border: 1px solid #3a211a;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .cancel-section p {
-            margin-bottom: 14px;
-            color: #999;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        .cancel-button {
-            width: 100%;
-            padding: 13px 16px;
-            border: 1px solid #dc2626;
-            border-radius: 50px;
-            background: rgba(220, 38, 38, 0.12);
-            color: #f87171;
-            font-size: 14px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .cancel-button:hover {
-            background: #dc2626;
-            color: white;
-        }
-
 
         .booking-result {
 
@@ -508,9 +543,7 @@ $statusClass =
             padding-top: 30px;
 
             border-top: 1px solid #333;
-
         }
-
 
         .result-title {
 
@@ -523,9 +556,7 @@ $statusClass =
             letter-spacing: 1px;
 
             margin-bottom: 8px;
-
         }
-
 
         .booking-name {
 
@@ -534,9 +565,7 @@ $statusClass =
             font-weight: bold;
 
             margin-bottom: 20px;
-
         }
-
 
         .status-box {
 
@@ -549,9 +578,7 @@ $statusClass =
             background: #111;
 
             border: 1px solid #333;
-
         }
-
 
         .status-box small {
 
@@ -564,9 +591,7 @@ $statusClass =
             letter-spacing: 1px;
 
             margin-bottom: 10px;
-
         }
-
 
         .status {
 
@@ -583,9 +608,7 @@ $statusClass =
             font-size: 17px;
 
             font-weight: bold;
-
         }
-
 
         .status span {
 
@@ -599,9 +622,7 @@ $statusClass =
 
             box-shadow:
                 0 0 10px currentColor;
-
         }
-
 
         .status-pending {
 
@@ -610,9 +631,7 @@ $statusClass =
             background: rgba(255, 176, 32, 0.15);
 
             border: 1px solid #ffb020;
-
         }
-
 
         .status-confirmed {
 
@@ -621,9 +640,7 @@ $statusClass =
             background: rgba(56, 189, 248, 0.15);
 
             border: 1px solid #38bdf8;
-
         }
-
 
         .status-in-progress {
 
@@ -632,9 +649,7 @@ $statusClass =
             background: rgba(192, 132, 252, 0.15);
 
             border: 1px solid #c084fc;
-
         }
-
 
         .status-completed {
 
@@ -643,9 +658,7 @@ $statusClass =
             background: rgba(34, 197, 94, 0.15);
 
             border: 1px solid #22c55e;
-
         }
-
 
         .status-cancelled {
 
@@ -654,9 +667,7 @@ $statusClass =
             background: rgba(239, 68, 68, 0.15);
 
             border: 1px solid #ef4444;
-
         }
-
 
         .details {
 
@@ -665,9 +676,7 @@ $statusClass =
             display: grid;
 
             gap: 10px;
-
         }
-
 
         .detail {
 
@@ -680,16 +689,12 @@ $statusClass =
             padding: 12px 0;
 
             border-bottom: 1px solid #222;
-
         }
-
 
         .detail span:first-child {
 
             color: #888;
-
         }
-
 
         .detail span:last-child {
 
@@ -697,8 +702,98 @@ $statusClass =
 
             color: #ddd;
 
+            overflow-wrap: anywhere;
         }
 
+        .cancellation-box {
+
+            margin-top: 20px;
+
+            padding: 16px;
+
+            border-radius: 8px;
+
+            background: rgba(239, 68, 68, 0.08);
+
+            border: 1px solid rgba(239, 68, 68, 0.35);
+        }
+
+        .cancellation-box strong {
+
+            display: block;
+
+            margin-bottom: 7px;
+
+            color: #fca5a5;
+        }
+
+        .cancellation-box p {
+
+            color: #ddd;
+
+            line-height: 1.55;
+
+            overflow-wrap: anywhere;
+        }
+
+        .cancel-section {
+
+            margin-top: 25px;
+
+            padding-top: 25px;
+
+            border-top: 1px solid #333;
+        }
+
+        .cancel-section h3 {
+
+            font-size: 18px;
+
+            margin-bottom: 7px;
+        }
+
+        .cancel-section .help {
+
+            color: #999;
+
+            font-size: 13px;
+
+            line-height: 1.5;
+
+            margin-bottom: 15px;
+        }
+
+        .cancel-button {
+
+            width: 100%;
+
+            margin-top: 4px;
+
+            padding: 13px 18px;
+
+            border: 1px solid #ef4444;
+
+            border-radius: 50px;
+
+            background: rgba(239, 68, 68, 0.12);
+
+            color: #fca5a5;
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition: 0.25s;
+        }
+
+        .cancel-button:hover {
+
+            background: #ef4444;
+
+            color: white;
+        }
 
         .back-button {
 
@@ -713,63 +808,47 @@ $statusClass =
             text-decoration: none;
 
             font-weight: bold;
-
         }
-
 
         .back-button:hover {
 
             text-decoration: underline;
-
         }
-
 
         @media (max-width: 600px) {
 
             .status-card {
 
                 padding: 35px 22px;
-
             }
-
 
             h1 {
 
                 font-size: 25px;
-
             }
-
 
             .detail {
 
                 flex-direction: column;
 
                 gap: 4px;
-
             }
-
 
             .detail span:last-child {
 
                 text-align: left;
-
             }
-
         }
 
     </style>
 
 </head>
 
-
 <body>
-
 
 <div class="status-container">
 
-
     <div class="status-card">
-
 
         <div class="logo">
 
@@ -780,11 +859,9 @@ $statusClass =
 
         </div>
 
-
         <h1>
             Booking Status
         </h1>
-
 
         <p class="subtitle">
 
@@ -793,45 +870,26 @@ $statusClass =
 
         </p>
 
+        <?php if ($success): ?>
+
+            <div class="success">
+                <?= e($success) ?>
+            </div>
+
+        <?php endif; ?>
 
         <?php if ($error): ?>
 
             <div class="error">
-
-                <?= htmlspecialchars($error) ?>
-
+                <?= e($error) ?>
             </div>
 
         <?php endif; ?>
-
-
-        <?php if ($cancelSuccess): ?>
-
-            <div class="success">
-
-                <?= htmlspecialchars($cancelSuccess) ?>
-
-            </div>
-
-        <?php endif; ?>
-
-
-        <?php if ($cancelError): ?>
-
-            <div class="error">
-
-                <?= htmlspecialchars($cancelError) ?>
-
-            </div>
-
-        <?php endif; ?>
-
 
         <form
             method="GET"
             action="/booking-status"
         >
-
 
             <div class="form-group">
 
@@ -844,15 +902,12 @@ $statusClass =
                     id="id"
                     name="id"
                     min="1"
-                    value="<?= htmlspecialchars(
-                        (string) $bookingId
-                    ) ?>"
+                    value="<?= e((string) $bookingId) ?>"
                     placeholder="Example: 123"
                     required
                 >
 
             </div>
-
 
             <div class="form-group">
 
@@ -864,13 +919,12 @@ $statusClass =
                     type="email"
                     id="email"
                     name="email"
-                    value="<?= htmlspecialchars($email) ?>"
+                    value="<?= e($email) ?>"
                     placeholder="your@email.com"
                     required
                 >
 
             </div>
-
 
             <button
                 type="submit"
@@ -881,61 +935,42 @@ $statusClass =
 
             </button>
 
-
         </form>
-
 
         <?php if ($booking): ?>
 
-
             <div class="booking-result">
-
 
                 <div class="result-title">
                     Booking For
                 </div>
 
-
                 <div class="booking-name">
-
-                    <?= htmlspecialchars(
-                        $booking['name']
-                    ) ?>
-
+                    <?= e($booking['name'] ?? $booking['contact_person'] ?? '') ?>
                 </div>
 
-
                 <div class="status-box">
-
 
                     <small>
                         Current Status
                     </small>
 
-
                     <div
                         class="
                             status
-                            status-<?= htmlspecialchars(
-                                $statusClass
-                            )
-                            ?>"
+                            status-<?= e($statusClass) ?>
+                        "
                     >
 
                         <span></span>
 
-                        <?= htmlspecialchars(
-                            $currentStatus
-                        ) ?>
+                        <?= e($currentStatus) ?>
 
                     </div>
 
-
                 </div>
 
-
                 <div class="details">
-
 
                     <div class="detail">
 
@@ -949,7 +984,6 @@ $statusClass =
 
                     </div>
 
-
                     <div class="detail">
 
                         <span>
@@ -957,13 +991,10 @@ $statusClass =
                         </span>
 
                         <span>
-                            <?= htmlspecialchars(
-                                $booking['event_type']
-                            ) ?>
+                            <?= e($booking['event_type'] ?? '') ?>
                         </span>
 
                     </div>
-
 
                     <div class="detail">
 
@@ -972,13 +1003,10 @@ $statusClass =
                         </span>
 
                         <span>
-                            <?= htmlspecialchars(
-                                $booking['event_date']
-                            ) ?>
+                            <?= e($booking['event_date'] ?? '') ?>
                         </span>
 
                     </div>
-
 
                     <div class="detail">
 
@@ -987,30 +1015,57 @@ $statusClass =
                         </span>
 
                         <span>
-                            <?= htmlspecialchars(
-                                $booking['service']
-                            ) ?>
+                            <?= e($booking['service'] ?? '') ?>
                         </span>
 
                     </div>
 
-
                 </div>
 
+                <?php if (
+                    $currentStatus === 'Cancelled' &&
+                    !empty($booking['cancellation_reason'])
+                ): ?>
+
+                    <div class="cancellation-box">
+
+                        <strong>
+                            Cancellation Reason
+                        </strong>
+
+                        <p>
+                            <?= nl2br(e($booking['cancellation_reason'])) ?>
+                        </p>
+
+                        <?php if (($booking['cancelled_by'] ?? '') === 'customer'): ?>
+
+                            <p style="margin-top:8px;color:#f87171;font-size:13px;">
+                                Cancelled by you.
+                            </p>
+
+                        <?php endif; ?>
+
+                    </div>
+
+                <?php endif; ?>
 
                 <?php if ($currentStatus === 'Pending'): ?>
 
                     <div class="cancel-section">
 
-                        <p>
-                            Need to change your plans? You can cancel a pending
-                            booking request from here.
+                        <h3>
+                            Need to cancel your request?
+                        </h3>
+
+                        <p class="help">
+                            You can cancel while your booking is still Pending.
+                            Please provide a reason for the cancellation.
                         </p>
 
                         <form
                             method="POST"
                             action="/booking-status"
-                            onsubmit="return confirm('Are you sure you want to cancel this booking request? This action cannot be undone.');"
+                            onsubmit="return confirm('Are you sure you want to cancel this booking request?');"
                         >
 
                             <input
@@ -1022,19 +1077,34 @@ $statusClass =
                             <input
                                 type="hidden"
                                 name="email"
-                                value="<?= htmlspecialchars($email, ENT_QUOTES, 'UTF-8') ?>"
+                                value="<?= e($email) ?>"
                             >
 
                             <input
                                 type="hidden"
                                 name="csrf_token"
-                                value="<?= htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8') ?>"
+                                value="<?= e($csrfToken) ?>"
                             >
+
+                            <div class="form-group">
+
+                                <label for="cancellation_reason">
+                                    Reason for cancellation
+                                </label>
+
+                                <textarea
+                                    id="cancellation_reason"
+                                    name="cancellation_reason"
+                                    maxlength="500"
+                                    placeholder="Please tell us why you would like to cancel this request."
+                                    required
+                                ></textarea>
+
+                            </div>
 
                             <button
                                 type="submit"
                                 name="cancel_booking"
-                                value="1"
                                 class="cancel-button"
                             >
                                 Cancel Booking Request
@@ -1044,24 +1114,11 @@ $statusClass =
 
                     </div>
 
-                <?php elseif ($currentStatus === 'Cancelled'): ?>
-
-                    <div class="cancel-section">
-
-                        <p>
-                            This booking request has already been cancelled.
-                        </p>
-
-                    </div>
-
                 <?php endif; ?>
-
 
             </div>
 
-
         <?php endif; ?>
-
 
         <a
             href="/"
@@ -1070,12 +1127,9 @@ $statusClass =
             ← Back To Home
         </a>
 
-
     </div>
 
-
 </div>
-
 
 </body>
 
