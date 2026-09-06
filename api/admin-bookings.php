@@ -307,7 +307,6 @@ try {
     $stmt = $pdo->query(
         "SELECT
             id,
-            name,
             phone,
             email,
             event_type,
@@ -905,7 +904,7 @@ function statusClass($status)
                             </th>
 
                             <th>
-                                Customer
+                                Contact Person
                             </th>
 
                             <th>
@@ -922,10 +921,6 @@ function statusClass($status)
 
                             <th>
                                 Company
-                            </th>
-
-                            <th>
-                                Contact Person
                             </th>
 
                             <th>
@@ -985,12 +980,14 @@ function statusClass($status)
                                 </td>
 
 
-                                <!-- CUSTOMER -->
+                                <!-- CONTACT PERSON -->
 
                                 <td>
 
                                     <strong>
-                                        <?= e($booking['name']) ?>
+                                        <?= e(
+                                            $booking['contact_person']
+                                        ) ?>
                                     </strong>
 
                                 </td>
@@ -1001,11 +998,15 @@ function statusClass($status)
                                 <td>
 
                                     <div>
-                                        <?= e($booking['phone']) ?>
+                                        <?= e(
+                                            $booking['phone']
+                                        ) ?>
                                     </div>
 
                                     <div>
-                                        <?= e($booking['email']) ?>
+                                        <?= e(
+                                            $booking['email']
+                                        ) ?>
                                     </div>
 
                                 </td>
@@ -1039,17 +1040,6 @@ function statusClass($status)
 
                                     <?= e(
                                         $booking['cname']
-                                    ) ?>
-
-                                </td>
-
-
-                                <!-- CONTACT PERSON -->
-
-                                <td>
-
-                                    <?= e(
-                                        $booking['contact_person']
                                     ) ?>
 
                                 </td>
@@ -1104,7 +1094,9 @@ function statusClass($status)
 
                                         <span></span>
 
-                                        <?= e($currentStatus) ?>
+                                        <?= e(
+                                            $currentStatus
+                                        ) ?>
 
                                     </span>
 
