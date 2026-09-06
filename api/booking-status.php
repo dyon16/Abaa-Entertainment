@@ -1,5 +1,7 @@
 <?php
 
+session_start();
+
 include(__DIR__ . '/conn.php');
 
 
@@ -14,6 +16,108 @@ $bookingId = (int) ($_GET['id'] ?? 0);
 $booking = null;
 
 $error = '';
+
+
+/* ==================================================
+   CANCEL BOOKING REQUEST
+================================================== */
+
+$_SESSION['booking_status_cancel_success'] = $_SESSION['booking_status_cancel_success'] ?? '';
+
+$cancelSuccess = $_SESSION['booking_status_cancel_success'];
+$cancelError = '';
+
+unset($_SESSION['booking_status_cancel_success']);
+
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST' &&
+    isset($_POST['cancel_booking'])
+) {
+
+    $cancelBookingId = (int) ($_POST['booking_id'] ?? 0);
+    $cancelEmail = trim($_POST['email'] ?? '');
+    $submittedCsrf = $_POST['csrf_token'] ?? '';
+
+    if (
+        empty($_SESSION['booking_status_csrf']) ||
+        !hash_equals($_SESSION['booking_status_csrf'], $submittedCsrf)
+    ) {
+        $cancelError = 'Your session has expired. Please check your booking status again.';
+
+    } elseif ($cancelBookingId <= 0 || $cancelEmail === '') {
+        $cancelError = 'Invalid booking cancellation request.';
+
+    } else {
+
+        try {
+
+            $stmt = $pdo->prepare(
+                "SELECT id, status
+                 FROM bookings
+                 WHERE id = :id
+                 AND email = :email
+                 LIMIT 1"
+            );
+
+            $stmt->execute([
+                ':id' => $cancelBookingId,
+                ':email' => $cancelEmail
+            ]);
+
+            $cancelBooking = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$cancelBooking) {
+                $cancelError =
+                    'No booking was found with that Booking ID and email address.';
+
+            } elseif (($cancelBooking['status'] ?? 'Pending') !== 'Pending') {
+                $cancelError =
+                    'This booking can no longer be cancelled from the status page.';
+
+            } else {
+
+                $updateStmt = $pdo->prepare(
+                    "UPDATE bookings
+                     SET status = 'Cancelled'
+                     WHERE id = :id
+                     AND email = :email
+                     AND status = 'Pending'"
+                );
+
+                $updateStmt->execute([
+                    ':id' => $cancelBookingId,
+                    ':email' => $cancelEmail
+                ]);
+
+                if ($updateStmt->rowCount() === 1) {
+                    $_SESSION['booking_status_cancel_success'] =
+                        'Your booking request has been cancelled successfully.';
+
+                    header(
+                        'Location: /booking-status?id=' .
+                        urlencode((string) $cancelBookingId) .
+                        '&email=' .
+                        urlencode($cancelEmail)
+                    );
+                    exit;
+                } else {
+                    $cancelError =
+                        'This booking could not be cancelled. Please check its current status.';
+                }
+            }
+
+        } catch (PDOException $e) {
+
+            error_log(
+                'Booking cancellation error: ' .
+                $e->getMessage()
+            );
+
+            $cancelError =
+                'Unable to cancel your booking right now. Please try again later.';
+        }
+    }
+}
 
 
 /* ==================================================
@@ -59,6 +163,17 @@ if ($email !== '' && $bookingId > 0) {
     }
 
 }
+
+
+/* ==================================================
+   CSRF TOKEN
+================================================== */
+
+if (empty($_SESSION['booking_status_csrf'])) {
+    $_SESSION['booking_status_csrf'] = bin2hex(random_bytes(32));
+}
+
+$csrfToken = $_SESSION['booking_status_csrf'];
 
 
 /* ==================================================
@@ -336,6 +451,53 @@ $statusClass =
 
             line-height: 1.5;
 
+        }
+
+
+        .success {
+            margin-bottom: 25px;
+            padding: 14px 16px;
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid #22c55e;
+            border-radius: 6px;
+            color: #86efac;
+            line-height: 1.5;
+        }
+
+        .cancel-section {
+            margin-top: 25px;
+            padding: 20px;
+            background: rgba(255, 61, 2, 0.06);
+            border: 1px solid #3a211a;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .cancel-section p {
+            margin-bottom: 14px;
+            color: #999;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .cancel-button {
+            width: 100%;
+            padding: 13px 16px;
+            border: 1px solid #dc2626;
+            border-radius: 50px;
+            background: rgba(220, 38, 38, 0.12);
+            color: #f87171;
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .cancel-button:hover {
+            background: #dc2626;
+            color: white;
         }
 
 
@@ -643,6 +805,28 @@ $statusClass =
         <?php endif; ?>
 
 
+        <?php if ($cancelSuccess): ?>
+
+            <div class="success">
+
+                <?= htmlspecialchars($cancelSuccess) ?>
+
+            </div>
+
+        <?php endif; ?>
+
+
+        <?php if ($cancelError): ?>
+
+            <div class="error">
+
+                <?= htmlspecialchars($cancelError) ?>
+
+            </div>
+
+        <?php endif; ?>
+
+
         <form
             method="GET"
             action="/booking-status"
@@ -812,6 +996,65 @@ $statusClass =
 
 
                 </div>
+
+
+                <?php if ($currentStatus === 'Pending'): ?>
+
+                    <div class="cancel-section">
+
+                        <p>
+                            Need to change your plans? You can cancel a pending
+                            booking request from here.
+                        </p>
+
+                        <form
+                            method="POST"
+                            action="/booking-status"
+                            onsubmit="return confirm('Are you sure you want to cancel this booking request? This action cannot be undone.');"
+                        >
+
+                            <input
+                                type="hidden"
+                                name="booking_id"
+                                value="<?= (int) $booking['id'] ?>"
+                            >
+
+                            <input
+                                type="hidden"
+                                name="email"
+                                value="<?= htmlspecialchars($email, ENT_QUOTES, 'UTF-8') ?>"
+                            >
+
+                            <input
+                                type="hidden"
+                                name="csrf_token"
+                                value="<?= htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8') ?>"
+                            >
+
+                            <button
+                                type="submit"
+                                name="cancel_booking"
+                                value="1"
+                                class="cancel-button"
+                            >
+                                Cancel Booking Request
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                <?php elseif ($currentStatus === 'Cancelled'): ?>
+
+                    <div class="cancel-section">
+
+                        <p>
+                            This booking request has already been cancelled.
+                        </p>
+
+                    </div>
+
+                <?php endif; ?>
 
 
             </div>
