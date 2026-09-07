@@ -137,9 +137,8 @@ try {
             width:min(95%, 1400px);
             margin:20px auto 0;
             padding:clamp(60px, 8vw, 90px) 5%;
-            background:linear-gradient(135deg, rgba(7,7,7,.98), rgba(24,7,4,.96));
-            border-top:1px solid #262626;
-            border-bottom:1px solid #262626;
+          
+
         }
 
         .founders-heading {
@@ -752,7 +751,7 @@ try {
 <section class="about-cta">
     <span class="section-label">LET'S WORK TOGETHER</span>
     <h2>Ready To Create Something Amazing?</h2>
-    <p>Let ABAA Entertainment help bring your next event, performance, or project to life.</p>
+    <p>From Lights & Sounds to Full Event Production, ABAA Entertainment is ready to bring your vision to life.</p>
 
     <a href="#" class="cta-button" onclick="openBookingModal(event)">
         Book An Event
