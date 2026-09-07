@@ -77,6 +77,7 @@ try {
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
     >
 
+
     <style>
 
         /* ==================================================
@@ -87,14 +88,17 @@ try {
             display: none;
         }
 
+
         .service-unavailable-checkbox {
             opacity: 0.65;
             cursor: not-allowed;
         }
 
+
         .service-unavailable-checkbox input {
             cursor: not-allowed;
         }
+
 
         .service-unavailable-text {
             color: #dc2626;
@@ -102,10 +106,12 @@ try {
             margin-left: 4px;
         }
 
+
         .booking-no-services {
             margin: 0;
             color: #777;
         }
+
 
         .service-unavailable-link {
             color: #dc2626 !important;
@@ -113,9 +119,41 @@ try {
             opacity: .85;
         }
 
+
         .footer-empty {
             color: #777;
             font-size: 13px;
+        }
+
+
+        /* ==================================================
+           HERO CONTENT
+        ================================================== */
+
+        .about-content {
+            flex: 1;
+            min-width: 0;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+
+        .about-intro {
+            max-width: 950px;
+
+            margin-top: 25px;
+
+            color: #e0e0e0;
+
+            font-size: clamp(20px, 2.3vw, 30px);
+
+            line-height: 1.7;
+
+            font-weight: 500;
+
+            letter-spacing: 0.3px;
         }
 
 
@@ -757,73 +795,22 @@ try {
 
 
         /* ==================================================
-           HISTORY IMAGE PLACEHOLDER
-        ================================================== */
-
-        .history-image.placeholder {
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            text-align: center;
-
-            padding: 25px;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #0c0c0c,
-                    #180604
-                );
-
-        }
-
-
-        .history-placeholder-inner {
-
-            color: #555;
-
-        }
-
-
-        .history-placeholder-inner i {
-
-            margin-bottom: 12px;
-
-            color: #ff3d02;
-
-            font-size: 30px;
-
-            opacity: 0.8;
-
-        }
-
-
-        .history-placeholder-inner span {
-
-            display: block;
-
-            color: #777;
-
-            font-size: 12px;
-
-            font-weight: bold;
-
-            letter-spacing: 1px;
-
-            text-transform: uppercase;
-
-        }
-
-
-        /* ==================================================
            RESPONSIVE FOUNDERS + HISTORY
         ================================================== */
 
         @media (max-width: 900px) {
+
+            .about-intro {
+
+                max-width: 100%;
+
+                font-size:
+                    clamp(18px, 2.6vw, 24px);
+
+                line-height: 1.7;
+
+            }
+
 
             .founders-stage {
 
@@ -953,6 +940,26 @@ try {
 
 
         @media (max-width: 600px) {
+
+            .about-content {
+
+                text-align: center;
+
+            }
+
+
+            .about-intro {
+
+                max-width: 100%;
+
+                margin-top: 20px;
+
+                font-size: 18px;
+
+                line-height: 1.7;
+
+            }
+
 
             .founders-section {
 
@@ -1094,6 +1101,10 @@ try {
 <body>
 
 
+<!-- ==================================================
+     HEADER
+================================================== -->
+
 <header class="header">
 
     <a
@@ -1115,13 +1126,16 @@ try {
             Home
         </a>
 
+
         <a href="/#events">
             Events
         </a>
 
+
         <a href="/#services">
             Services
         </a>
+
 
         <a
             href="/about"
@@ -1129,6 +1143,7 @@ try {
         >
             About
         </a>
+
 
         <a
             href="#"
@@ -1155,13 +1170,15 @@ try {
             ABOUT ABAA ENTERTAINMENT
         </span>
 
+
         <h1>
             Creating Experiences.
             <br>
             Supporting Talent.
         </h1>
 
-        <p>
+
+        <p class="about-intro">
 
             Founded by passionate individuals with a commitment
             to entertainment, creativity, and professional event
@@ -1174,13 +1191,16 @@ try {
     </div>
 
 
-    <!-- Founder images replace the old video -->
+    <!-- ==================================================
+         FOUNDERS
+    ================================================== -->
 
     <div class="founders-stage">
 
+
         <!-- ==================================================
              FOUNDER 1
-             EDIT IMAGE HERE
+             CHANGE IMAGE HERE
         ================================================== -->
 
         <div class="founder-card russel">
@@ -1188,17 +1208,19 @@ try {
             <div class="founder-image">
 
                 <img
-                    src="/russel.png"
+                    src="/russel-guiller-ynares.jpg"
                     alt="Mr. Russel Guiller Ynares"
                 >
 
             </div>
+
 
             <div class="founder-info">
 
                 <span class="founder-role">
                     Founder
                 </span>
+
 
                 <h3>
                     MR. RUSSEL GUILLER YNARES
@@ -1211,7 +1233,7 @@ try {
 
         <!-- ==================================================
              FOUNDER 2
-             EDIT IMAGE HERE
+             CHANGE IMAGE HERE
         ================================================== -->
 
         <div class="founder-card ramon">
@@ -1219,17 +1241,19 @@ try {
             <div class="founder-image">
 
                 <img
-                    src="/koy.png"
+                    src="/ramon-emmanuel-quevedo.jpg"
                     alt="Mr. Ramon Emmanuel C. Quevedo"
                 >
 
             </div>
+
 
             <div class="founder-info">
 
                 <span class="founder-role">
                     Founder
                 </span>
+
 
                 <h3>
                     MR. RAMON EMMANUEL C. QUEVEDO
@@ -1239,7 +1263,9 @@ try {
 
         </div>
 
+
     </div>
+
 
     <div class="founders-accent"></div>
 
@@ -1247,10 +1273,14 @@ try {
 
 
 <!-- ==================================================
-     COMPANY HISTORY
+     HISTORY
 ================================================== -->
 
-<section class="history-section" id="history">
+<section
+    class="history-section"
+    id="history"
+>
+
 
     <div class="history-heading">
 
@@ -1258,15 +1288,18 @@ try {
             OUR JOURNEY
         </span>
 
+
         <h2>
             The History of ABAA Entertainment
         </h2>
 
+
         <p>
-            From a small initiative focused on discovering local
-            talent to a growing entertainment, production, and
-            film company, ABAA Entertainment continues to build
-            opportunities and create unforgettable experiences.
+            From a small initiative focused on discovering
+            local talent to a growing entertainment,
+            production, and film company, ABAA Entertainment
+            continues to build opportunities and create
+            unforgettable experiences.
         </p>
 
     </div>
@@ -1277,10 +1310,12 @@ try {
 
         <!-- ==================================================
              HISTORY 01
-             EDIT IMAGE HERE: /history-01.jpg
+             CHANGE IMAGE HERE:
+             /history-01.jpg
         ================================================== -->
 
         <article class="history-item">
+
 
             <div class="history-image">
 
@@ -1298,9 +1333,11 @@ try {
                     Chapter 01
                 </span>
 
+
                 <h3>
                     Our Beginning
                 </h3>
+
 
                 <p>
                     ABAA Entertainment Inc. was established with
@@ -1316,6 +1353,7 @@ try {
 
             </div>
 
+
             <div class="history-number">
                 01
             </div>
@@ -1325,10 +1363,12 @@ try {
 
         <!-- ==================================================
              HISTORY 02
-             EDIT IMAGE HERE: /history-02.jpg
+             CHANGE IMAGE HERE:
+             /history-02.jpg
         ================================================== -->
 
         <article class="history-item">
+
 
             <div class="history-image">
 
@@ -1346,9 +1386,11 @@ try {
                     Chapter 02
                 </span>
 
+
                 <h3>
                     Building The Foundation
                 </h3>
+
 
                 <p>
                     In its early years, ABAA Entertainment Inc.
@@ -1367,6 +1409,7 @@ try {
 
             </div>
 
+
             <div class="history-number">
                 02
             </div>
@@ -1376,10 +1419,12 @@ try {
 
         <!-- ==================================================
              HISTORY 03
-             EDIT IMAGE HERE: /history-03.jpg
+             CHANGE IMAGE HERE:
+             /history-03.jpg
         ================================================== -->
 
         <article class="history-item">
+
 
             <div class="history-image">
 
@@ -1397,9 +1442,11 @@ try {
                     Chapter 03
                 </span>
 
+
                 <h3>
                     Expanding Our Services
                 </h3>
+
 
                 <p>
                     As the organization continued to grow, ABAA
@@ -1418,6 +1465,7 @@ try {
 
             </div>
 
+
             <div class="history-number">
                 03
             </div>
@@ -1427,10 +1475,12 @@ try {
 
         <!-- ==================================================
              HISTORY 04
-             EDIT IMAGE HERE: /history-04.jpg
+             CHANGE IMAGE HERE:
+             /history-04.jpg
         ================================================== -->
 
         <article class="history-item">
+
 
             <div class="history-image">
 
@@ -1448,9 +1498,11 @@ try {
                     Chapter 04
                 </span>
 
+
                 <h3>
                     Film & Creative Production
                 </h3>
+
 
                 <p>
                     ABAA Entertainment Inc. also caters to film
@@ -1466,6 +1518,7 @@ try {
 
             </div>
 
+
             <div class="history-number">
                 04
             </div>
@@ -1475,10 +1528,12 @@ try {
 
         <!-- ==================================================
              HISTORY 05
-             EDIT IMAGE HERE: /history-05.jpg
+             CHANGE IMAGE HERE:
+             /history-05.jpg
         ================================================== -->
 
         <article class="history-item">
+
 
             <div class="history-image">
 
@@ -1496,9 +1551,11 @@ try {
                     Chapter 05
                 </span>
 
+
                 <h3>
                     Growing Beyond Rizal
                 </h3>
+
 
                 <p>
                     Over the years, the company successfully
@@ -1515,6 +1572,7 @@ try {
 
             </div>
 
+
             <div class="history-number">
                 05
             </div>
@@ -1524,10 +1582,12 @@ try {
 
         <!-- ==================================================
              HISTORY 06
-             EDIT IMAGE HERE: /history-06.jpg
+             CHANGE IMAGE HERE:
+             /history-06.jpg
         ================================================== -->
 
         <article class="history-item">
+
 
             <div class="history-image">
 
@@ -1545,9 +1605,11 @@ try {
                     Chapter 06
                 </span>
 
+
                 <h3>
                     Today & The Future
                 </h3>
+
 
                 <p>
                     Today, ABAA Entertainment Inc. continues to
@@ -1564,6 +1626,7 @@ try {
                 </p>
 
             </div>
+
 
             <div class="history-number">
                 06
@@ -1583,6 +1646,7 @@ try {
 
 <section class="why-us">
 
+
     <div class="why-image">
 
         <img
@@ -1599,9 +1663,11 @@ try {
             WHY ABAA ENTERTAINMENT
         </span>
 
+
         <h2>
             Built For Unforgettable Events
         </h2>
+
 
         <p>
             We combine creativity, technology,
@@ -1681,13 +1747,16 @@ try {
 
 <section class="about-cta">
 
+
     <span class="section-label">
         LET'S WORK TOGETHER
     </span>
 
+
     <h2>
         Ready To Create Something Amazing?
     </h2>
+
 
     <p>
         Let ABAA Entertainment help bring your next
@@ -1716,6 +1785,7 @@ try {
 
 <footer class="footer">
 
+
     <div class="footer-container">
 
 
@@ -1725,6 +1795,7 @@ try {
                 src="/logo.png"
                 alt="ABAA Entertainment Logo"
             >
+
 
             <p>
                 Creating unforgettable events,
@@ -1742,21 +1813,26 @@ try {
                 Quick Links
             </h3>
 
+
             <a href="/">
                 Home
             </a>
+
 
             <a href="/#events">
                 Events
             </a>
 
+
             <a href="/#services">
                 Services
             </a>
 
+
             <a href="/about">
                 About Us
             </a>
+
 
             <a
                 href="/booking-status"
@@ -1802,6 +1878,7 @@ try {
 
                     ?>
 
+
                     <?php if (
                         $serviceSlug !== '' &&
                         $serviceName !== ''
@@ -1826,6 +1903,7 @@ try {
                     <?php endif; ?>
 
                 <?php endforeach; ?>
+
 
             <?php else: ?>
 
@@ -1892,6 +1970,7 @@ try {
 
             <div class="social-links">
 
+
                 <a
                     href="https://www.facebook.com/ABAAEntertainment"
                     target="_blank"
@@ -1939,6 +2018,7 @@ try {
             All Rights Reserved.
         </p>
 
+
         <p>
             Entertainment • Events • Experiences
         </p>
@@ -1957,6 +2037,7 @@ try {
     id="bookingModal"
     aria-hidden="true"
 >
+
 
     <div class="booking-modal">
 
@@ -1979,9 +2060,11 @@ try {
                 ABAA ENTERTAINMENT
             </span>
 
+
             <h2>
                 Book An Event
             </h2>
+
 
             <p>
                 Tell us about your event and our team
@@ -2008,6 +2091,7 @@ try {
                         Contact Person
                     </label>
 
+
                     <input
                         type="text"
                         id="booking_contact_person"
@@ -2024,6 +2108,7 @@ try {
                     <label for="booking_phone">
                         Contact Number
                     </label>
+
 
                     <input
                         type="tel"
@@ -2048,6 +2133,7 @@ try {
                         Email Address
                     </label>
 
+
                     <input
                         type="email"
                         id="booking_email"
@@ -2064,6 +2150,7 @@ try {
                     <label for="booking_company">
                         Company Name
                     </label>
+
 
                     <input
                         type="text"
@@ -2088,6 +2175,7 @@ try {
                         Event Type
                     </label>
 
+
                     <select
                         id="booking_event"
                         name="event_type"
@@ -2103,29 +2191,36 @@ try {
                             Select event type
                         </option>
 
+
                         <option value="Birthday">
                             Birthday
                         </option>
+
 
                         <option value="Wedding">
                             Wedding
                         </option>
 
+
                         <option value="Concert">
                             Concert
                         </option>
+
 
                         <option value="Corporate Event">
                             Corporate Event
                         </option>
 
+
                         <option value="Festival">
                             Festival
                         </option>
 
+
                         <option value="Product Launch">
                             Product Launch
                         </option>
+
 
                         <option value="Other">
                             Other
@@ -2141,6 +2236,7 @@ try {
                     <label for="booking_date">
                         Event Date
                     </label>
+
 
                     <input
                         type="date"
@@ -2165,6 +2261,7 @@ try {
                     Please Specify Event Type
                 </label>
 
+
                 <input
                     type="text"
                     id="other_event_type"
@@ -2183,9 +2280,11 @@ try {
                     Services Needed
                 </label>
 
+
                 <div class="service-checkboxes">
 
                     <?php if (!empty($services)): ?>
+
 
                         <?php foreach ($services as $service): ?>
 
@@ -2198,12 +2297,14 @@ try {
 
                             ?>
 
+
                             <label
                                 class="service-checkbox<?= !$serviceAvailable
                                     ? ' service-unavailable-checkbox'
                                     : ''
                                 ?>"
                             >
+
 
                                 <input
                                     type="checkbox"
@@ -2217,11 +2318,13 @@ try {
                                     ?>
                                 >
 
+
                                 <span>
 
                                     <?= e(
                                         $service['name']
                                     ) ?>
+
 
                                     <?php if (
                                         !$serviceAvailable
@@ -2240,6 +2343,7 @@ try {
                             </label>
 
                         <?php endforeach; ?>
+
 
                     <?php else: ?>
 
@@ -2262,6 +2366,7 @@ try {
                     Event Details
                 </label>
 
+
                 <textarea
                     id="booking_message"
                     name="message"
@@ -2280,6 +2385,7 @@ try {
                 <span>
                     Submit Booking Request
                 </span>
+
 
                 <i class="fa-solid fa-arrow-right"></i>
 
@@ -2307,10 +2413,12 @@ function toggleOtherEventType()
             "booking_event"
         );
 
+
     const otherGroup =
         document.getElementById(
             "otherEventTypeGroup"
         );
+
 
     const otherInput =
         document.getElementById(
@@ -2336,6 +2444,7 @@ function toggleOtherEventType()
         otherGroup.style.display =
             "block";
 
+
         otherInput.required =
             true;
 
@@ -2344,8 +2453,10 @@ function toggleOtherEventType()
         otherGroup.style.display =
             "none";
 
+
         otherInput.required =
             false;
+
 
         otherInput.value =
             "";
