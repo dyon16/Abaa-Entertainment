@@ -43,6 +43,108 @@ try {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
     <style>
+
+/* ==================================================
+   MOBILE HAMBURGER MENU
+================================================== */
+
+.menu-toggle {
+    display: none;
+    width: 46px;
+    height: 46px;
+    padding: 8px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    background: transparent;
+    border: 2px solid #ff3d02;
+    border-radius: 6px;
+    cursor: pointer;
+    flex-shrink: 0;
+    z-index: 1100;
+}
+
+.menu-toggle span {
+    display: block;
+    width: 24px;
+    height: 3px;
+    background: #fff;
+    border-radius: 2px;
+    transition: transform .3s ease, opacity .3s ease;
+}
+
+.menu-toggle:hover {
+    background: rgba(255, 61, 2, .12);
+}
+
+.menu-toggle.active span:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+}
+
+.menu-toggle.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.menu-toggle.active span:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+}
+
+@media (max-width: 600px) {
+    .menu-toggle {
+        display: flex;
+    }
+
+    .header {
+        position: fixed;
+    }
+
+    .header nav {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        display: none;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        padding: 10px 20px 20px;
+        background: rgba(0, 0, 0, .98);
+        border-bottom: 2px solid #ff3d02;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, .65);
+    }
+
+    .header nav.mobile-open {
+        display: flex;
+    }
+
+    .header nav a {
+        width: 100%;
+        padding: 15px 10px;
+        text-align: center;
+        font-size: 14px;
+        letter-spacing: 1px;
+        white-space: nowrap;
+        border-bottom: 1px solid #222;
+    }
+
+    .header nav a:not(.book-button)::after,
+    .header nav a.active::after {
+        display: none;
+    }
+
+    .header nav a.book-button {
+        margin-top: 10px;
+        padding: 12px;
+        font-size: 14px;
+        border-radius: 50px;
+    }
+
+    .header nav a:last-child {
+        border-bottom: none;
+    }
+}
+
         #otherEventTypeGroup { display:none; }
 
         .service-unavailable-checkbox { opacity:.65; cursor:not-allowed; }
@@ -501,7 +603,20 @@ try {
         <img src="/logo.png" alt="ABAA Entertainment Logo">
     </a>
 
-    <nav>
+        <button
+        type="button"
+        class="menu-toggle"
+        onclick="toggleMobileMenu()"
+        aria-label="Open menu"
+        aria-controls="mainNav"
+        aria-expanded="false"
+    >
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <nav id="mainNav">
         <a href="/">Home</a>
         <a href="/#events">Events</a>
         <a href="/#services">Services</a>
@@ -999,6 +1114,59 @@ if (isset($conn)) {
     $conn->close();
 }
 ?>
+
+
+<script>
+function toggleMobileMenu() {
+    const nav = document.getElementById("mainNav");
+    const button = document.querySelector(".menu-toggle");
+    if (!nav || !button) return;
+
+    const isOpen = nav.classList.toggle("mobile-open");
+    button.classList.toggle("active", isOpen);
+    button.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    button.setAttribute("aria-label", isOpen ? "Close menu" : "Open menu");
+}
+
+document.addEventListener("click", function (event) {
+    const nav = document.getElementById("mainNav");
+    const button = document.querySelector(".menu-toggle");
+    if (!nav || !button || !nav.classList.contains("mobile-open")) return;
+
+    if (!nav.contains(event.target) && !button.contains(event.target)) {
+        nav.classList.remove("mobile-open");
+        button.classList.remove("active");
+        button.setAttribute("aria-expanded", "false");
+        button.setAttribute("aria-label", "Open menu");
+    }
+});
+
+document.querySelectorAll("#mainNav a").forEach(function (link) {
+    link.addEventListener("click", function () {
+        const nav = document.getElementById("mainNav");
+        const button = document.querySelector(".menu-toggle");
+        if (!nav || !button) return;
+
+        nav.classList.remove("mobile-open");
+        button.classList.remove("active");
+        button.setAttribute("aria-expanded", "false");
+        button.setAttribute("aria-label", "Open menu");
+    });
+});
+
+window.addEventListener("resize", function () {
+    if (window.innerWidth > 600) {
+        const nav = document.getElementById("mainNav");
+        const button = document.querySelector(".menu-toggle");
+        if (nav) nav.classList.remove("mobile-open");
+        if (button) {
+            button.classList.remove("active");
+            button.setAttribute("aria-expanded", "false");
+            button.setAttribute("aria-label", "Open menu");
+        }
+    }
+});
+</script>
 
 </body>
 </html>
