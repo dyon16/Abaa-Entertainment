@@ -2150,6 +2150,61 @@ body::-webkit-scrollbar {
 
 
 /* ==================================================
+   MOBILE HAMBURGER BUTTON
+================================================== */
+
+.menu-toggle {
+    display: none;
+
+    width: 45px;
+    height: 45px;
+
+    padding: 8px;
+
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 5px;
+
+    background: transparent;
+
+    border: 2px solid #ff3d02;
+    border-radius: 5px;
+
+    cursor: pointer;
+}
+
+.menu-toggle span {
+    display: block;
+
+    width: 24px;
+    height: 3px;
+
+    background: white;
+    border-radius: 2px;
+
+    transition: 0.3s;
+}
+
+.menu-toggle:hover {
+    background: rgba(255, 61, 2, 0.12);
+}
+
+.menu-toggle.active span:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+}
+
+.menu-toggle.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.menu-toggle.active span:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+}
+
+
+/* ==================================================
    MOBILE
 ================================================== */
 
@@ -2179,30 +2234,70 @@ body::-webkit-scrollbar {
         width: 90px;
     }
 
+    /* MOBILE HAMBURGER */
+    .menu-toggle {
+        display: flex;
+    }
+
+    /* MOBILE NAVIGATION */
     .header nav {
-        gap: 7px;
+        position: absolute;
+
+        top: 105px;
+        left: 0;
+
+        width: 100%;
+
+        display: none;
+        flex-direction: column;
+        align-items: stretch;
+
+        gap: 0;
+
+        padding: 10px 20px 20px;
+
+        background: rgba(0, 0, 0, 0.98);
+
+        border-bottom: 2px solid #ff3d02;
+
+        box-shadow:
+            0 10px 25px
+            rgba(0, 0, 0, 0.6);
+    }
+
+    .header nav.mobile-open {
+        display: flex;
     }
 
     .header nav a {
-        font-size: 8px;
+        width: 100%;
 
-        letter-spacing: 0;
+        padding: 15px 10px;
+
+        text-align: center;
+
+        font-size: 14px;
+
+        letter-spacing: 1px;
+
+        border-bottom: 1px solid #222;
     }
 
     .header nav a:not(.book-button)::after,
     .header nav a.active::after {
-        bottom: -6px;
-
-        height: 2px;
+        display: none;
     }
 
     .header nav a.book-button {
-        padding:
-            7px 11px;
+        margin-top: 10px;
 
-        font-size: 8px;
+        padding: 12px;
 
-        border-width: 1px;
+        font-size: 14px;
+    }
+
+    .header nav a:last-child {
+        border-bottom: none;
     }
 
 
