@@ -394,7 +394,7 @@ if (!$admin):
     <div class="login-shell">
         <div class="login-card">
             <div class="login-brand">
-                <img src="/logo.png" alt="ABAA Entertainment">
+                <img src="/logo2.png" alt="ABAA Entertainment">
                 <div>
                     <strong>ABAA</strong>
                     <span>ADMIN PANEL</span>
