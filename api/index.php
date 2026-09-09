@@ -596,7 +596,22 @@ $firstMimeType =
 </a>
 
 
-<nav>
+<!-- MOBILE MENU BUTTON -->
+<button
+    type="button"
+    class="menu-toggle"
+    onclick="toggleMobileMenu()"
+    aria-label="Open menu"
+    aria-expanded="false"
+    aria-controls="mainNav"
+>
+    <span></span>
+    <span></span>
+    <span></span>
+</button>
+
+
+<nav id="mainNav">
 
     <a href="/">
         Home
@@ -2456,6 +2471,137 @@ function toggleOtherEventType()
 | BOOKING MODAL
 |--------------------------------------------------------------------------
 */
+
+function toggleMobileMenu()
+{
+
+    const nav =
+        document.getElementById(
+            "mainNav"
+        );
+
+    const button =
+        document.querySelector(
+            ".menu-toggle"
+        );
+
+    if (!nav || !button) {
+        return;
+    }
+
+    const isOpen =
+        nav.classList.toggle(
+            "mobile-open"
+        );
+
+    button.classList.toggle(
+        "active",
+        isOpen
+    );
+
+    button.setAttribute(
+        "aria-expanded",
+        isOpen ? "true" : "false"
+    );
+
+    button.setAttribute(
+        "aria-label",
+        isOpen ? "Close menu" : "Open menu"
+    );
+}
+
+
+/* CLOSE MOBILE MENU AFTER SELECTING A LINK */
+document.addEventListener(
+    "click",
+    function(event) {
+
+        const link =
+            event.target.closest(
+                "#mainNav a"
+            );
+
+        if (!link) {
+            return;
+        }
+
+        const nav =
+            document.getElementById(
+                "mainNav"
+            );
+
+        const button =
+            document.querySelector(
+                ".menu-toggle"
+            );
+
+        if (!nav || !button) {
+            return;
+        }
+
+        nav.classList.remove(
+            "mobile-open"
+        );
+
+        button.classList.remove(
+            "active"
+        );
+
+        button.setAttribute(
+            "aria-expanded",
+            "false"
+        );
+
+        button.setAttribute(
+            "aria-label",
+            "Open menu"
+        );
+    }
+);
+
+
+/* CLOSE MOBILE MENU WHEN RESIZING TO DESKTOP */
+window.addEventListener(
+    "resize",
+    function() {
+
+        if (window.innerWidth > 600) {
+
+            const nav =
+                document.getElementById(
+                    "mainNav"
+                );
+
+            const button =
+                document.querySelector(
+                    ".menu-toggle"
+                );
+
+            if (nav) {
+                nav.classList.remove(
+                    "mobile-open"
+                );
+            }
+
+            if (button) {
+                button.classList.remove(
+                    "active"
+                );
+
+                button.setAttribute(
+                    "aria-expanded",
+                    "false"
+                );
+
+                button.setAttribute(
+                    "aria-label",
+                    "Open menu"
+                );
+            }
+        }
+    }
+);
+
 
 function openBookingModal(event)
 {
