@@ -1225,7 +1225,7 @@ $serviceDetails =
                     <a
                         href="#"
                         class="service-book-button"
-                        onclick="openBookingModal(event)"
+                        onclick="openBookingModal(event, <?= htmlspecialchars(json_encode($service['name']), ENT_QUOTES, 'UTF-8') ?>)"
                     >
 
                         Book This Service
@@ -1913,7 +1913,7 @@ $serviceDetails =
    BOOKING MODAL
 ================================================== */
 
-function openBookingModal(event)
+function openBookingModal(event, selectedService)
 {
     if (event) {
 
@@ -1928,6 +1928,30 @@ function openBookingModal(event)
 
         return;
 
+    }
+
+    /*
+     * Automatically select the service that the visitor
+     * clicked "Book This Service" for.
+     */
+    if (selectedService) {
+
+        const serviceCheckboxes =
+            document.querySelectorAll(
+                'input[name="service[]"]'
+            );
+
+        serviceCheckboxes.forEach(
+            function (checkbox) {
+
+                if (checkbox.value === selectedService) {
+
+                    checkbox.checked = true;
+
+                }
+
+            }
+        );
     }
 
     modal.classList.add('active');
