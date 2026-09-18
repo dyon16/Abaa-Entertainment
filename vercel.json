@@ -24,7 +24,10 @@
 "source": "/booking",
 "destination": "/api/booking.php"
 },
-
+{
+"source": "/event",
+"destination": "/api/event.php"
+},
 {
   "source": "/admin",
   "destination": "/api/admin.php"
@@ -40,7 +43,8 @@
 {
   "source": "/admin/services",
   "destination": "/api/admin-service.php"
-},{
+},
+  {
   "source": "/booking-status",
   "destination": "/api/booking-status.php"
 }
