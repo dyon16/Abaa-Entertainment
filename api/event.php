@@ -26,6 +26,35 @@ $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 $event = null;
 $eventPhotos = [];
 
+$services = [];
+
+try {
+    $serviceStmt = $pdo->query(
+        "SELECT
+            id,
+            name,
+            slug,
+            image_url,
+            description,
+            details,
+            is_available,
+            created_at
+         FROM services
+         ORDER BY id ASC"
+    );
+
+    $services = $serviceStmt->fetchAll(PDO::FETCH_ASSOC);
+
+} catch (PDOException $serviceError) {
+    error_log(
+        'Event page services query error: ' .
+        $serviceError->getMessage()
+    );
+
+    $services = [];
+}
+
+
 if ($id > 0) {
     try {
         $stmt = $pdo->prepare(
@@ -512,6 +541,68 @@ if (!empty($date)) {
                 flex-direction: column;
             }
         }
+    
+/* ==================================================
+   MOBILE HEADER / BURGER
+================================================== */
+@media (max-width: 768px) {
+    .header {
+        height: 90px;
+        min-height: 90px;
+        padding: 0 20px;
+    }
+
+    .menu-toggle {
+        display: flex !important;
+        position: relative;
+        width: 46px;
+        height: 46px;
+        margin-left: auto;
+        flex-shrink: 0;
+        z-index: 1101;
+    }
+
+    .header nav {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        display: none;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        padding: 10px 20px 20px;
+        background: rgba(0, 0, 0, .98);
+        border-bottom: 2px solid #ff3d02;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, .65);
+    }
+
+    .header nav.mobile-open {
+        display: flex !important;
+    }
+
+    .header nav a {
+        width: 100%;
+        padding: 15px 10px;
+        text-align: center;
+        font-size: 14px;
+        letter-spacing: 1px;
+        white-space: nowrap;
+        border-bottom: 1px solid #222;
+    }
+
+    .header nav a:not(.book-button)::after,
+    .header nav a.active::after {
+        display: none;
+    }
+
+    .header nav a.book-button {
+        margin-top: 10px;
+        padding: 12px;
+        border-radius: 50px;
+    }
+}
+
     </style>
 </head>
 <body>
