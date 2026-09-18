@@ -692,6 +692,76 @@ if (
     }
 }
 
+
+/*
+|--------------------------------------------------------------------------
+| EDIT EVENT DETAILS
+|--------------------------------------------------------------------------
+|
+| Existing events can be updated without re-uploading their media.
+| This updates the title, place, and event date.
+|--------------------------------------------------------------------------
+*/
+
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST' &&
+    isset($_POST['update_event'])
+) {
+
+    $eventId = (int)($_POST['event_id'] ?? 0);
+    $editTitle = trim($_POST['edit_title'] ?? '');
+    $editPlace = trim($_POST['edit_place'] ?? '');
+    $editDate = trim($_POST['edit_event_date'] ?? '');
+
+    if ($eventId <= 0) {
+
+        $statusError = 'Invalid event.';
+
+    } elseif ($editTitle === '') {
+
+        $statusError = 'Please enter an event title.';
+
+    } elseif (
+        $editDate !== '' &&
+        !preg_match('/^\d{4}-\d{2}-\d{2}$/', $editDate)
+    ) {
+
+        $statusError = 'Please enter a valid event date.';
+
+    } else {
+
+        try {
+
+            $stmt = $pdo->prepare(
+                "UPDATE events
+                 SET
+                    title = :title,
+                    place = :place,
+                    event_date = :event_date
+                 WHERE id = :id"
+            );
+
+            $stmt->execute([
+                ':title' => $editTitle,
+                ':place' => ($editPlace !== '' ? $editPlace : null),
+                ':event_date' => ($editDate !== '' ? $editDate : null),
+                ':id' => $eventId
+            ]);
+
+            $statusMessage = 'Event details updated successfully.';
+
+        } catch (PDOException $e) {
+
+            error_log(
+                'Event edit error: ' .
+                $e->getMessage()
+            );
+
+            $statusError = 'Unable to update event details.';
+        }
+    }
+}
+
 /*
 |--------------------------------------------------------------------------
 | UPLOAD EVENT
@@ -1700,6 +1770,87 @@ foreach ($events as $event) {
 
     }
 
+
+/* ==================================================
+   EVENT EDIT PANEL
+================================================== */
+.event-edit-panel {
+    margin-top: 14px;
+    border: 1px solid #2f2f2f;
+    border-radius: 6px;
+    background: #0b0b0b;
+    overflow: hidden;
+}
+
+.event-edit-panel summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 11px 13px;
+    color: #ff3d02;
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .7px;
+}
+
+.event-edit-panel summary::-webkit-details-marker {
+    display: none;
+}
+
+.event-edit-panel summary i {
+    margin-right: 7px;
+}
+
+.event-edit-panel[open] summary {
+    border-bottom: 1px solid #222;
+}
+
+.event-edit-form {
+    display: grid;
+    gap: 10px;
+    padding: 13px;
+}
+
+.event-edit-form label {
+    display: grid;
+    gap: 6px;
+    color: #aaa;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+}
+
+.event-edit-form input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 11px;
+    color: #fff;
+    background: #050505;
+    border: 1px solid #333;
+    border-radius: 4px;
+    outline: none;
+}
+
+.event-edit-form input:focus {
+    border-color: #ff3d02;
+}
+
+.event-save-button {
+    border: 2px solid #ff3d02;
+    border-radius: 5px;
+    padding: 10px 13px;
+    color: #fff;
+    background: #ff3d02;
+    cursor: pointer;
+    font-weight: 800;
+}
+
+.event-save-button:hover {
+    color: #ff3d02;
+    background: transparent;
+}
+
 </style>
 
 </head>
@@ -2564,6 +2715,65 @@ foreach ($events as $event) {
 
                         </div>
 
+
+                        <details class="event-edit-panel">
+                            <summary>
+                                <i class="fa-solid fa-pen-to-square"></i>
+                                Edit Event Details
+                            </summary>
+
+                            <form
+                                method="POST"
+                                action="/admin/events"
+                                class="event-edit-form"
+                            >
+                                <input
+                                    type="hidden"
+                                    name="event_id"
+                                    value="<?= (int) $event['id'] ?>"
+                                >
+
+                                <label>
+                                    Event Title
+                                    <input
+                                        type="text"
+                                        name="edit_title"
+                                        value="<?= e($event['title']) ?>"
+                                        maxlength="255"
+                                        required
+                                    >
+                                </label>
+
+                                <label>
+                                    Event Place
+                                    <input
+                                        type="text"
+                                        name="edit_place"
+                                        value="<?= e($event['place'] ?? '') ?>"
+                                        maxlength="255"
+                                        placeholder="Venue or location"
+                                    >
+                                </label>
+
+                                <label>
+                                    Event Date
+                                    <input
+                                        type="date"
+                                        name="edit_event_date"
+                                        value="<?= e($event['event_date'] ?? '') ?>"
+                                    >
+                                </label>
+
+                                <button
+                                    type="submit"
+                                    name="update_event"
+                                    class="event-save-button"
+                                >
+                                    <i class="fa-solid fa-floppy-disk"></i>
+                                    Save Changes
+                                </button>
+                            </form>
+                        </details>
 
                         <div
                             class="event-admin-actions"
