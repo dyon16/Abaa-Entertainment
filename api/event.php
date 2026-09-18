@@ -357,6 +357,112 @@ if (!empty($date)) {
             gap: 20px;
         }
 
+
+
+        /* ==================================================
+           EVENT PHOTO VIEWER
+        ================================================== */
+
+        .event-detail-media {
+            position: relative;
+        }
+
+        .event-media-stage {
+            position: relative;
+            width: 100%;
+            min-height: 520px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: #050505;
+        }
+
+        .event-media-stage img,
+        .event-media-stage video {
+            width: 100%;
+            max-height: 650px;
+            height: auto;
+            display: block;
+            object-fit: contain;
+            background: #050505;
+        }
+
+        .event-media-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 5;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255,255,255,.25);
+            border-radius: 50%;
+            background: rgba(0,0,0,.72);
+            color: #fff;
+            cursor: pointer;
+            transition: .25s ease;
+        }
+
+        .event-media-arrow:hover {
+            background: #ff3d02;
+            border-color: #ff3d02;
+        }
+
+        .event-media-arrow.left { left: 18px; }
+        .event-media-arrow.right { right: 18px; }
+
+        .event-media-counter {
+            position: absolute;
+            right: 18px;
+            bottom: 18px;
+            z-index: 5;
+            padding: 7px 11px;
+            border: 1px solid rgba(255,255,255,.2);
+            border-radius: 999px;
+            background: rgba(0,0,0,.72);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .event-photo-item {
+            position: relative;
+        }
+
+        .event-photo-item.active {
+            border-color: #ff3d02;
+            box-shadow: 0 0 0 2px rgba(255,61,2,.18);
+        }
+
+        .event-photo-item .event-photo-play {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255,61,2,.95);
+            color: #fff;
+            pointer-events: none;
+        }
+
+        .event-photo-empty {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid #292929;
+            background: #080808;
+            color: #777;
+            text-align: center;
+        }
+
         @media (max-width: 900px) {
             .event-photo-grid {
                 grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -411,31 +517,39 @@ if (!empty($date)) {
 <body>
 
 <header class="header">
+
     <a href="/" class="logo">
-        <img src="/logo.png" alt="ABAA Entertainment Logo">
+
+        <img
+            src="/logo.png"
+            alt="ABAA Entertainment Logo"
+        >
+
     </a>
 
-    <button
-        type="button"
-        class="menu-toggle"
-        onclick="toggleMobileMenu()"
-        aria-label="Open menu"
-        aria-expanded="false"
-        aria-controls="mainNav"
-    >
-        <span></span>
-        <span></span>
-        <span></span>
-    </button>
+    <nav>
 
-    <nav id="mainNav">
         <a href="/">Home</a>
+
         <a href="/#events">Events</a>
+
         <a href="/#services">Services</a>
+
         <a href="/about">About</a>
-        <a href="/#booking" class="book-button">Book</a>
+
+        <a
+            href="#"
+            class="book-button"
+            onclick="openBookingModal(event)"
+        >
+            Book
+        </a>
+
     </nav>
+
 </header>
+
+
 
 <main class="event-details-page">
 
@@ -453,21 +567,125 @@ if (!empty($date)) {
 
     <?php else: ?>
 
+        <?php
+        /*
+         * Build one media list so the main event media and every
+         * uploaded event photo can be viewed from the same viewer.
+         */
+        $mediaItems = [];
+
+        if (!empty($file)) {
+            $mediaItems[] = [
+                'type' => $type === 'video' ? 'video' : 'image',
+                'source' => $file,
+                'thumbnail' => $type === 'video'
+                    ? ($thumbnail ?: '/logo.png')
+                    : $file,
+                'title' => $title
+            ];
+        }
+
+        foreach ($eventPhotos as $photo) {
+            $photoUrl = trim((string)($photo['image_url'] ?? ''));
+
+            if ($photoUrl === '') {
+                continue;
+            }
+
+            $mediaItems[] = [
+                'type' => 'image',
+                'source' => $photoUrl,
+                'thumbnail' => $photoUrl,
+                'title' => $title . ' event photo'
+            ];
+        }
+
+        $mediaCount = count($mediaItems);
+        ?>
+
         <a href="/#events" class="event-back-link">
             <i class="fa-solid fa-arrow-left"></i>
             Back to Events
         </a>
 
         <section class="event-detail-card">
+
             <div class="event-detail-media">
-                <?php if ($type === 'video'): ?>
-                    <video controls playsinline preload="metadata" poster="<?= e($thumbnail) ?>">
-                        <source src="<?= e($file) ?>" type="<?= e(getVideoMimeType($file)) ?>">
-                        Your browser does not support the video tag.
-                    </video>
-                <?php else: ?>
-                    <img src="<?= e($file ?: $thumbnail ?: '/logo.png') ?>" alt="<?= e($title) ?>">
-                <?php endif; ?>
+
+                <div class="event-media-stage" id="eventMediaStage">
+
+                    <?php if ($mediaCount > 0): ?>
+
+                        <?php if ($mediaItems[0]['type'] === 'video'): ?>
+                            <video
+                                id="featuredVideo"
+                                controls
+                                playsinline
+                                preload="metadata"
+                                poster="<?= e($mediaItems[0]['thumbnail']) ?>"
+                            >
+                                <source
+                                    src="<?= e($mediaItems[0]['source']) ?>"
+                                    type="<?= e(getVideoMimeType($mediaItems[0]['source'])) ?>"
+                                >
+                                Your browser does not support the video tag.
+                            </video>
+
+                            <img
+                                id="featuredImage"
+                                src=""
+                                alt=""
+                                style="display:none;"
+                            >
+                        <?php else: ?>
+                            <img
+                                id="featuredImage"
+                                src="<?= e($mediaItems[0]['source']) ?>"
+                                alt="<?= e($mediaItems[0]['title']) ?>"
+                            >
+
+                            <video
+                                id="featuredVideo"
+                                controls
+                                playsinline
+                                preload="metadata"
+                                style="display:none;"
+                            ></video>
+                        <?php endif; ?>
+
+                        <?php if ($mediaCount > 1): ?>
+                            <button
+                                type="button"
+                                class="event-media-arrow left"
+                                onclick="changeEventMedia(-1)"
+                                aria-label="Previous event photo"
+                            >
+                                <i class="fa-solid fa-chevron-left"></i>
+                            </button>
+
+                            <button
+                                type="button"
+                                class="event-media-arrow right"
+                                onclick="changeEventMedia(1)"
+                                aria-label="Next event photo"
+                            >
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </button>
+
+                            <span class="event-media-counter" id="eventMediaCounter">
+                                1 / <?= $mediaCount ?>
+                            </span>
+                        <?php endif; ?>
+
+                    <?php else: ?>
+                        <img
+                            src="/logo.png"
+                            alt="<?= e($title) ?>"
+                        >
+                    <?php endif; ?>
+
+                </div>
+
             </div>
 
             <div class="event-detail-content">
@@ -506,21 +724,30 @@ if (!empty($date)) {
                 </div>
 
                 <div class="event-photo-grid">
-                    <?php foreach ($eventPhotos as $photo): ?>
-                        <a
-                            href="<?= e($photo['image_url']) ?>"
-                            class="event-photo-item"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="View event photo"
+
+                    <?php foreach ($mediaItems as $index => $media): ?>
+
+                        <button
+                            type="button"
+                            class="event-photo-item<?= $index === 0 ? ' active' : '' ?>"
+                            onclick="showEventMedia(<?= $index ?>)"
+                            aria-label="View event media <?= $index + 1 ?>"
                         >
                             <img
-                                src="<?= e($photo['image_url']) ?>"
-                                alt="<?= e($title) ?> event photo"
+                                src="<?= e($media['thumbnail']) ?>"
+                                alt="<?= e($media['title']) ?>"
                                 loading="lazy"
                             >
-                        </a>
+
+                            <?php if ($media['type'] === 'video'): ?>
+                                <span class="event-photo-play">
+                                    <i class="fa-solid fa-play"></i>
+                                </span>
+                            <?php endif; ?>
+                        </button>
+
                     <?php endforeach; ?>
+
                 </div>
             </section>
         <?php endif; ?>
@@ -529,90 +756,807 @@ if (!empty($date)) {
 
 </main>
 
-<footer class="event-footer">
-    <div class="event-footer-inner">
-        <div class="event-footer-brand">
-            <img src="/logo.png" alt="ABAA Entertainment Logo">
+<footer class="footer">
+
+    <div class="footer-container">
+
+        <div class="footer-section footer-brand">
+
+            <img
+                src="/logo.png"
+                alt="ABAA Entertainment Logo"
+            >
+
             <p>
-                Creating unforgettable events, entertainment, and experiences through creativity,
-                technology, and professional event services.
+                Creating unforgettable events,
+                entertainment, and experiences
+                through creativity, technology,
+                and professional event services.
             </p>
+
         </div>
 
-        <div>
+
+        <div class="footer-section">
+
             <h3>Quick Links</h3>
+
             <a href="/">Home</a>
+
             <a href="/#events">Events</a>
+
             <a href="/#services">Services</a>
-            <a href="/about">About</a>
-            <a href="/#booking">Book</a>
+
+            <a href="/about">About Us</a>
+
+            <a
+                href="/booking-status"
+                class="booking-status-link"
+            >
+                Check Booking Status
+            </a>
+
         </div>
 
-        <div>
-            <h3>Contact</h3>
-            <span>2F, Casa Ynares, P. Gomez, Libis, Binangonan, Rizal</span>
-            <a href="mailto:abaaentertainment@gmail.com">abaaentertainment@gmail.com</a>
-            <a href="https://www.facebook.com/ABAAEntertainment" target="_blank" rel="noopener noreferrer">Facebook</a>
+
+        <div class="footer-section">
+
+            <h3>Our Services</h3>
+
+            <?php foreach ($services as $item): ?>
+
+                <a
+                    href="<?= (int)$item['is_available'] === 1
+                        ? '/service?service='
+                            . urlencode($item['slug'])
+                        : '#services'
+                    ?>"
+                >
+
+                    <?= e($item['name']) ?>
+
+                    <?php if (
+                        (int)$item['is_available'] !== 1
+                    ): ?>
+
+                        <small style="color:#f87171;">
+                            (Not Available)
+                        </small>
+
+                    <?php endif; ?>
+
+                </a>
+
+            <?php endforeach; ?>
+
         </div>
+
+
+        <div class="footer-section">
+
+            <h3>Contact Us</h3>
+
+            <a
+                href="https://www.google.com/maps/place/ABAA+Entertainment/@14.4652755,121.1915078,19z"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="contact-item"
+            >
+
+                <i
+                    class="fa-solid
+                    fa-location-dot"
+                ></i>
+
+                <span>
+                    2F, Casa Ynares, P. Gomez,
+                    Libis, Binangonan, Rizal
+                </span>
+
+            </a>
+
+
+            <a
+                href="tel:+639231476552"
+                class="contact-item"
+            >
+
+                <i
+                    class="fa-solid
+                    fa-phone"
+                ></i>
+
+                <span>
+                    +63 923 147 6552
+                </span>
+
+            </a>
+
+
+            <a
+                href="mailto:abaaentertainment@gmail.com"
+                class="contact-item"
+            >
+
+                <i
+                    class="fa-solid
+                    fa-envelope"
+                ></i>
+
+                <span>
+                    abaaentertainment@gmail.com
+                </span>
+
+            </a>
+
+
+            <div class="social-links">
+
+                <a
+                    href="https://www.facebook.com/ABAAEntertainment"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Facebook"
+                >
+
+                    <i
+                        class="fa-brands
+                        fa-facebook-f"
+                    ></i>
+
+                </a>
+
+
+                <a
+                    href="#"
+                    aria-label="Instagram"
+                >
+
+                    <i
+                        class="fa-brands
+                        fa-instagram"
+                    ></i>
+
+                </a>
+
+
+                <a
+                    href="https://www.tiktok.com/@markebpmbta?_r=1&_t=ZS-99DpdJXY5sD"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="TikTok"
+                >
+
+                    <i
+                        class="fa-brands
+                        fa-tiktok"
+                    ></i>
+
+                </a>
+
+            </div>
+
+        </div>
+
     </div>
 
-    <div class="event-footer-bottom">
-        <span>© <?= date('Y') ?> ABAA Entertainment. All Rights Reserved.</span>
-        <span>Entertainment • Events • Experiences</span>
+
+    <div class="footer-bottom">
+
+        <p>
+            © <?= date('Y') ?>
+            ABAA Entertainment.
+            All Rights Reserved.
+        </p>
+
+        <p>
+            Entertainment • Events • Experiences
+        </p>
+
     </div>
+
 </footer>
 
-<script>
-function toggleMobileMenu() {
-    const nav = document.getElementById("mainNav");
-    const button = document.querySelector(".menu-toggle");
-    if (!nav || !button) return;
 
-    const isOpen = nav.classList.toggle("mobile-open");
-    button.classList.toggle("active", isOpen);
-    button.setAttribute("aria-expanded", isOpen ? "true" : "false");
-    button.setAttribute("aria-label", isOpen ? "Close menu" : "Open menu");
+
+<!-- ==================================================
+     BOOKING MODAL
+================================================== -->
+
+<div
+    class="booking-overlay"
+    id="bookingModal"
+    aria-hidden="true"
+>
+
+    <div class="booking-modal">
+
+        <button
+            type="button"
+            class="booking-close"
+            onclick="closeBookingModal()"
+            aria-label="Close booking form"
+        >
+
+            <i class="fa-solid fa-xmark"></i>
+
+        </button>
+
+
+        <div class="booking-header">
+
+            <span class="booking-label">
+                ABAA ENTERTAINMENT
+            </span>
+
+            <h2>
+                Book An Event
+            </h2>
+
+            <p>
+                Tell us about your event
+                and our team will get back to you.
+            </p>
+
+        </div>
+
+
+        <form
+            action="/booking"
+            method="POST"
+            class="booking-form"
+        >
+
+            <!-- CONTACT PERSON FIRST -->
+
+            <div class="form-group">
+
+                <label for="booking_contact_person">
+                    Contact Person
+                </label>
+
+                <input
+                    type="text"
+                    id="booking_contact_person"
+                    name="contact_person"
+                    placeholder="Enter contact person's name"
+                    required
+                >
+
+            </div>
+
+
+            <!-- PHONE + EMAIL -->
+
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <label for="booking_phone">
+                        Phone Number
+                    </label>
+
+                    <input
+                        type="tel"
+                        id="booking_phone"
+                        name="phone"
+                        placeholder="09XX XXX XXXX"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="booking_email">
+                        Email Address
+                    </label>
+
+                    <input
+                        type="email"
+                        id="booking_email"
+                        name="email"
+                        placeholder="your@email.com"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- COMPANY -->
+
+            <div class="form-group">
+
+                <label for="booking_company">
+                    Company Name
+                </label>
+
+                <input
+                    type="text"
+                    id="booking_company"
+                    name="cname"
+                    placeholder="Enter company name"
+                    required
+                >
+
+            </div>
+
+
+            <!-- EVENT TYPE + DATE -->
+
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <label for="booking_event">
+                        Event Type
+                    </label>
+
+                    <select
+                        id="booking_event"
+                        name="event_type"
+                        required
+                        onchange="toggleOtherEventType()"
+                    >
+
+                        <option
+                            value=""
+                            disabled
+                            selected
+                        >
+                            Select event type
+                        </option>
+
+                        <option value="Birthday">
+                            Birthday
+                        </option>
+
+                        <option value="Wedding">
+                            Wedding
+                        </option>
+
+                        <option value="Concert">
+                            Concert
+                        </option>
+
+                        <option value="Corporate Event">
+                            Corporate Event
+                        </option>
+
+                        <option value="Festival">
+                            Festival
+                        </option>
+
+                        <option value="Product Launch">
+                            Product Launch
+                        </option>
+
+                        <option value="Other">
+                            Other
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="booking_date">
+                        Event Date
+                    </label>
+
+                    <input
+                        type="date"
+                        id="booking_date"
+                        name="event_date"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- OTHER EVENT TYPE -->
+
+            <div
+                class="form-group"
+                id="otherEventTypeGroup"
+                style="display:none;"
+            >
+
+                <label for="other_event_type">
+                    Please Specify Event Type
+                </label>
+
+                <input
+                    type="text"
+                    id="other_event_type"
+                    name="other_event_type"
+                    placeholder="Enter your event type"
+                >
+
+            </div>
+
+
+            <!-- SERVICES -->
+
+            <div class="form-group">
+
+                <label>
+                    Services Needed
+                </label>
+
+                <div class="service-checkboxes">
+
+                    <?php if (!empty($services)): ?>
+
+                        <?php foreach ($services as $serviceItem): ?>
+
+                            <?php
+                            $serviceAvailable =
+                                (int)(
+                                    $serviceItem['is_available']
+                                    ?? 0
+                                ) === 1;
+                            ?>
+
+                            <label
+                                class="service-checkbox
+                                <?= !$serviceAvailable
+                                    ? 'service-unavailable-checkbox'
+                                    : ''
+                                ?>"
+                            >
+
+                                <input
+                                    type="checkbox"
+                                    name="service[]"
+                                    value="<?= e(
+                                        $serviceItem['name']
+                                    ) ?>"
+                                    <?= !$serviceAvailable
+                                        ? 'disabled'
+                                        : ''
+                                    ?>
+                                >
+
+                                <span>
+
+                                    <?= e(
+                                        $serviceItem['name']
+                                    ) ?>
+
+                                    <?php if (!$serviceAvailable): ?>
+
+                                        <small
+                                            class="service-unavailable-text"
+                                        >
+                                            (Unavailable)
+                                        </small>
+
+                                    <?php endif; ?>
+
+                                </span>
+
+                            </label>
+
+                        <?php endforeach; ?>
+
+                    <?php else: ?>
+
+                        <p class="booking-no-services">
+                            No services are currently available.
+                        </p>
+
+                    <?php endif; ?>
+
+                </div>
+
+            </div>
+
+
+            <!-- EVENT DETAILS -->
+
+            <div class="form-group">
+
+                <label for="booking_message">
+                    Event Details
+                </label>
+
+                <textarea
+                    id="booking_message"
+                    name="message"
+                    rows="4"
+                    placeholder="Tell us about your event, location, preferred setup, budget, or other requirements..."
+                ></textarea>
+
+            </div>
+
+
+            <!-- SUBMIT -->
+
+            <button
+                type="submit"
+                class="booking-submit"
+            >
+
+                <span>
+                    Submit Booking Request
+                </span>
+
+                <i
+                    class="fa-solid
+                    fa-arrow-right"
+                ></i>
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script>
+/* ==================================================
+   EVENT MEDIA VIEWER
+================================================== */
+
+const eventMedia = <?= json_encode(
+    $mediaItems ?? [],
+    JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
+) ?>;
+
+let currentEventMedia = 0;
+
+function showEventMedia(index) {
+    if (!eventMedia.length) return;
+
+    if (index < 0) {
+        index = eventMedia.length - 1;
+    }
+
+    if (index >= eventMedia.length) {
+        index = 0;
+    }
+
+    currentEventMedia = index;
+
+    const item = eventMedia[index];
+    const image = document.getElementById('featuredImage');
+    const video = document.getElementById('featuredVideo');
+    const counter = document.getElementById('eventMediaCounter');
+
+    if (!image || !video) return;
+
+    if (item.type === 'video') {
+        image.style.display = 'none';
+        image.removeAttribute('src');
+
+        video.pause();
+        video.style.display = 'block';
+        video.poster = item.thumbnail || '';
+        video.innerHTML = '';
+
+        const source = document.createElement('source');
+        source.src = item.source;
+        source.type = getVideoMimeTypeFromUrl(item.source);
+        video.appendChild(source);
+        video.load();
+    } else {
+        video.pause();
+        video.removeAttribute('src');
+        video.innerHTML = '';
+        video.style.display = 'none';
+
+        image.style.display = 'block';
+        image.src = item.source;
+        image.alt = item.title || 'Event photo';
+    }
+
+    if (counter) {
+        counter.textContent = (index + 1) + ' / ' + eventMedia.length;
+    }
+
+    document.querySelectorAll('.event-photo-item').forEach(function(button, buttonIndex) {
+        button.classList.toggle('active', buttonIndex === index);
+    });
 }
 
-document.addEventListener("click", function (event) {
-    const nav = document.getElementById("mainNav");
-    const button = document.querySelector(".menu-toggle");
-    if (!nav || !button || !nav.classList.contains("mobile-open")) return;
+function changeEventMedia(direction) {
+    showEventMedia(currentEventMedia + direction);
+}
 
-    if (!nav.contains(event.target) && !button.contains(event.target)) {
-        nav.classList.remove("mobile-open");
-        button.classList.remove("active");
-        button.setAttribute("aria-expanded", "false");
-        button.setAttribute("aria-label", "Open menu");
+function getVideoMimeTypeFromUrl(url) {
+    const cleanUrl = String(url || '').split('?')[0].split('#')[0];
+    const extension = cleanUrl.split('.').pop().toLowerCase();
+
+    if (extension === 'webm') return 'video/webm';
+    if (extension === 'ogg') return 'video/ogg';
+    if (extension === 'mov') return 'video/quicktime';
+    return 'video/mp4';
+}
+
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'ArrowLeft') {
+        changeEventMedia(-1);
     }
-});
 
-document.querySelectorAll("#mainNav a").forEach(function (link) {
-    link.addEventListener("click", function () {
-        const nav = document.getElementById("mainNav");
-        const button = document.querySelector(".menu-toggle");
-        if (!nav || !button) return;
-
-        nav.classList.remove("mobile-open");
-        button.classList.remove("active");
-        button.setAttribute("aria-expanded", "false");
-        button.setAttribute("aria-label", "Open menu");
-    });
-});
-
-window.addEventListener("resize", function () {
-    if (window.innerWidth > 600) {
-        const nav = document.getElementById("mainNav");
-        const button = document.querySelector(".menu-toggle");
-        if (nav) nav.classList.remove("mobile-open");
-        if (button) {
-            button.classList.remove("active");
-            button.setAttribute("aria-expanded", "false");
-            button.setAttribute("aria-label", "Open menu");
-        }
+    if (event.key === 'ArrowRight') {
+        changeEventMedia(1);
     }
 });
 </script>
+
+<script>
+
+/* ==================================================
+   BOOKING MODAL
+================================================== */
+
+function openBookingModal(event)
+{
+    if (event) {
+
+        event.preventDefault();
+
+    }
+
+    const modal =
+        document.getElementById('bookingModal');
+
+    if (!modal) {
+
+        return;
+
+    }
+
+    modal.classList.add('active');
+
+    modal.setAttribute(
+        'aria-hidden',
+        'false'
+    );
+
+    document.body.style.overflow =
+        'hidden';
+}
+
+
+/* ==================================================
+   CLOSE BOOKING MODAL
+================================================== */
+
+function closeBookingModal()
+{
+    const modal =
+        document.getElementById('bookingModal');
+
+    if (!modal) {
+
+        return;
+
+    }
+
+    modal.classList.remove('active');
+
+    modal.setAttribute(
+        'aria-hidden',
+        'true'
+    );
+
+    document.body.style.overflow =
+        '';
+}
+
+
+/* ==================================================
+   OTHER EVENT TYPE
+================================================== */
+
+function toggleOtherEventType()
+{
+    const eventType =
+        document.getElementById(
+            'booking_event'
+        );
+
+    const otherGroup =
+        document.getElementById(
+            'otherEventTypeGroup'
+        );
+
+    const otherInput =
+        document.getElementById(
+            'other_event_type'
+        );
+
+    if (
+        !eventType ||
+        !otherGroup ||
+        !otherInput
+    ) {
+
+        return;
+
+    }
+
+
+    if (eventType.value === 'Other') {
+
+        otherGroup.style.display =
+            'block';
+
+        otherInput.required =
+            true;
+
+    } else {
+
+        otherGroup.style.display =
+            'none';
+
+        otherInput.required =
+            false;
+
+        otherInput.value =
+            '';
+
+    }
+}
+
+
+/* ==================================================
+   CLOSE WHEN CLICKING OVERLAY
+================================================== */
+
+document.addEventListener(
+    'click',
+    function(event)
+    {
+        const modal =
+            document.getElementById(
+                'bookingModal'
+            );
+
+        if (
+            modal &&
+            event.target === modal
+        ) {
+
+            closeBookingModal();
+
+        }
+
+    }
+);
+
+
+/* ==================================================
+   ESC KEY
+================================================== */
+
+document.addEventListener(
+    'keydown',
+    function(event)
+    {
+        if (event.key === 'Escape') {
+
+            closeBookingModal();
+
+        }
+
+    }
+);
+
+</script>
+
+
 
 </body>
 </html>
