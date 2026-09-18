@@ -543,58 +543,23 @@ if (!empty($date)) {
         }
     
 /* ==================================================
-   MOBILE HAMBURGER MENU
+   MOBILE HEADER / BURGER
 ================================================== */
-
-.menu-toggle {
-    display: none;
-    width: 46px;
-    height: 46px;
-    padding: 8px;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    background: transparent;
-    border: 2px solid #ff3d02;
-    border-radius: 6px;
-    cursor: pointer;
-    flex-shrink: 0;
-    z-index: 1100;
-}
-
-.menu-toggle span {
-    display: block;
-    width: 24px;
-    height: 3px;
-    background: #fff;
-    border-radius: 2px;
-    transition: transform .3s ease, opacity .3s ease;
-}
-
-.menu-toggle:hover {
-    background: rgba(255, 61, 2, .12);
-}
-
-.menu-toggle.active span:nth-child(1) {
-    transform: translateY(8px) rotate(45deg);
-}
-
-.menu-toggle.active span:nth-child(2) {
-    opacity: 0;
-}
-
-.menu-toggle.active span:nth-child(3) {
-    transform: translateY(-8px) rotate(-45deg);
-}
-
-@media (max-width: 600px) {
-    .menu-toggle {
-        display: flex;
+@media (max-width: 768px) {
+    .header {
+        height: 90px;
+        min-height: 90px;
+        padding: 0 20px;
     }
 
-    .header {
-        position: fixed;
+    .menu-toggle {
+        display: flex !important;
+        position: relative;
+        width: 46px;
+        height: 46px;
+        margin-left: auto;
+        flex-shrink: 0;
+        z-index: 1101;
     }
 
     .header nav {
@@ -613,7 +578,7 @@ if (!empty($date)) {
     }
 
     .header nav.mobile-open {
-        display: flex;
+        display: flex !important;
     }
 
     .header nav a {
@@ -634,16 +599,9 @@ if (!empty($date)) {
     .header nav a.book-button {
         margin-top: 10px;
         padding: 12px;
-        font-size: 14px;
         border-radius: 50px;
     }
-
-    .header nav a:last-child {
-        border-bottom: none;
-    }
 }
-
-        
 
     </style>
 </head>
