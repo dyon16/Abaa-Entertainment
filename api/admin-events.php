@@ -187,6 +187,32 @@ try {
 
 /*
 |--------------------------------------------------------------------------
+| EVENT PHOTOS TABLE
+|--------------------------------------------------------------------------
+| Each event can have multiple additional photos.
+|--------------------------------------------------------------------------
+*/
+
+try {
+    $pdo->exec(
+        "CREATE TABLE IF NOT EXISTS event_photos (
+            id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+            event_id INT UNSIGNED NOT NULL,
+            image_url TEXT NOT NULL,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            INDEX idx_event_id (event_id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+    );
+} catch (PDOException $e) {
+    error_log(
+        'Event photos table error: ' .
+        $e->getMessage()
+    );
+}
+
+/*
+|--------------------------------------------------------------------------
 | BLOB UPLOAD FUNCTION
 |--------------------------------------------------------------------------
 */
@@ -493,6 +519,22 @@ if (
 
                 /*
                 |--------------------------------------------------------------------------
+                | LOAD ADDITIONAL EVENT PHOTOS
+                |--------------------------------------------------------------------------
+                */
+
+                $photoStmt = $pdo->prepare(
+                    "SELECT id, image_url
+                     FROM event_photos
+                     WHERE event_id = :event_id"
+                );
+                $photoStmt->execute([
+                    ':event_id' => $eventId
+                ]);
+                $eventPhotos = $photoStmt->fetchAll(PDO::FETCH_ASSOC);
+
+                /*
+                |--------------------------------------------------------------------------
                 | DELETE MAIN BLOB
                 |--------------------------------------------------------------------------
                 */
@@ -529,9 +571,32 @@ if (
 
                 /*
                 |--------------------------------------------------------------------------
+                | DELETE ADDITIONAL PHOTO BLOBS
+                |--------------------------------------------------------------------------
+                */
+
+                foreach ($eventPhotos as $photo) {
+                    if (!empty($photo['image_url'])) {
+                        deleteFromVercelBlob(
+                            $photo['image_url'],
+                            $blobToken
+                        );
+                    }
+                }
+
+                /*
+                |--------------------------------------------------------------------------
                 | DELETE DATABASE RECORD
                 |--------------------------------------------------------------------------
                 */
+
+                $photoDeleteStmt = $pdo->prepare(
+                    "DELETE FROM event_photos
+                     WHERE event_id = :event_id"
+                );
+                $photoDeleteStmt->execute([
+                    ':event_id' => $eventId
+                ]);
 
                 $stmt =
                     $pdo->prepare(
@@ -1045,8 +1110,100 @@ if (
                                 $thumbnailUrl
                         ]);
 
+                        $eventId = (int) $pdo->lastInsertId();
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | UPLOAD ADDITIONAL EVENT PHOTOS
+                        |--------------------------------------------------------------------------
+                        */
+
+                        $additionalPhotoCount = 0;
+                        $additionalPhotoUrls = [];
+
+                        if (
+                            isset($_FILES['event_photos']) &&
+                            is_array($_FILES['event_photos']['name'] ?? null)
+                        ) {
+
+                            $photoCount = count($_FILES['event_photos']['name']);
+
+                            $allowedPhotoExtensions = [
+                                'jpg', 'jpeg', 'png', 'webp'
+                            ];
+
+                            for ($i = 0; $i < $photoCount; $i++) {
+
+                                if (
+                                    ($_FILES['event_photos']['error'][$i] ?? UPLOAD_ERR_NO_FILE) !==
+                                    UPLOAD_ERR_OK
+                                ) {
+                                    continue;
+                                }
+
+                                $photoTmp = $_FILES['event_photos']['tmp_name'][$i] ?? '';
+                                $photoOriginal = $_FILES['event_photos']['name'][$i] ?? '';
+                                $photoSize = (int) ($_FILES['event_photos']['size'][$i] ?? 0);
+
+                                if (!is_file($photoTmp) || $photoSize > 50 * 1024 * 1024) {
+                                    continue;
+                                }
+
+                                $photoExtension = strtolower(
+                                    pathinfo($photoOriginal, PATHINFO_EXTENSION)
+                                );
+
+                                if (!in_array($photoExtension, $allowedPhotoExtensions, true)) {
+                                    continue;
+                                }
+
+                                $photoMime = mime_content_type($photoTmp);
+                                if (!$photoMime) {
+                                    $photoMime = 'image/jpeg';
+                                }
+
+                                $photoFileName =
+                                    'events/' .
+                                    $safeTitle .
+                                    '-photo-' .
+                                    bin2hex(random_bytes(8)) .
+                                    '.' .
+                                    $photoExtension;
+
+                                $photoResult = uploadToVercelBlob(
+                                    $photoTmp,
+                                    $photoFileName,
+                                    $photoMime,
+                                    $blobToken
+                                );
+
+                                if (!$photoResult['success']) {
+                                    continue;
+                                }
+
+                                $photoUrl = $photoResult['url'];
+                                $additionalPhotoUrls[] = $photoUrl;
+
+                                $photoStmt = $pdo->prepare(
+                                    "INSERT INTO event_photos
+                                     (event_id, image_url, created_at)
+                                     VALUES (:event_id, :image_url, NOW())"
+                                );
+
+                                $photoStmt->execute([
+                                    ':event_id' => $eventId,
+                                    ':image_url' => $photoUrl
+                                ]);
+
+                                $additionalPhotoCount++;
+                            }
+                        }
+
                         $statusMessage =
-                            'Event uploaded successfully.';
+                            'Event uploaded successfully' .
+                            ($additionalPhotoCount > 0
+                                ? ' with ' . $additionalPhotoCount . ' additional photo' . ($additionalPhotoCount === 1 ? '' : 's') . '.'
+                                : '.');
 
                     } catch (PDOException $e) {
 
@@ -1139,7 +1296,8 @@ try {
                 file_url,
                 thumbnail_url,
                 is_visible,
-                created_at
+                created_at,
+                (SELECT COUNT(*) FROM event_photos ep WHERE ep.event_id = events.id) AS photo_count
              FROM events
              ORDER BY id DESC"
         );
@@ -1429,6 +1587,16 @@ foreach ($events as $event) {
         font-size: 16px;
         color: var(--dark);
         margin-bottom: 5px;
+    }
+
+    .event-photo-count {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin: 3px 0 4px;
+        color: var(--orange);
+        font-size: 11px;
+        font-weight: 700;
     }
 
     .event-admin-date {
@@ -2054,6 +2222,27 @@ foreach ($events as $event) {
             </div>
 
 
+            <div class="event-form-group full">
+
+                <label for="event_photos">
+                    Additional Event Photos
+                </label>
+
+                <input
+                    type="file"
+                    id="event_photos"
+                    name="event_photos[]"
+                    accept=".jpg,.jpeg,.png,.webp"
+                    multiple
+                >
+
+                <span class="event-help">
+                    Select multiple photos to create a gallery for this event. JPG, PNG, WEBP · Maximum 50MB each.
+                </span>
+
+            </div>
+
+
             <div
                 class="event-form-group"
                 id="thumbnailGroup"
@@ -2320,6 +2509,11 @@ foreach ($events as $event) {
                             ) ?>
 
                         </h3>
+
+                        <div class="event-photo-count">
+                            <i class="fa-regular fa-images"></i>
+                            <?= (int) ($event['photo_count'] ?? 0) ?> additional photo<?= ((int) ($event['photo_count'] ?? 0) === 1 ? '' : 's') ?>
+                        </div>
 
 
                         <div class="event-admin-details">
