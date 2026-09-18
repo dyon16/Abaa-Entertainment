@@ -165,6 +165,28 @@ function e($value)
 
 /*
 |--------------------------------------------------------------------------
+| EVENT DETAILS COLUMNS
+|--------------------------------------------------------------------------
+*/
+
+try {
+    $pdo->exec(
+        "ALTER TABLE events
+         ADD COLUMN IF NOT EXISTS place VARCHAR(255) NULL AFTER title"
+    );
+    $pdo->exec(
+        "ALTER TABLE events
+         ADD COLUMN IF NOT EXISTS event_date DATE NULL AFTER place"
+    );
+} catch (PDOException $e) {
+    error_log(
+        'Event details schema update error: ' .
+        $e->getMessage()
+    );
+}
+
+/*
+|--------------------------------------------------------------------------
 | BLOB UPLOAD FUNCTION
 |--------------------------------------------------------------------------
 */
@@ -626,6 +648,16 @@ if (
             $_POST['type'] ?? ''
         );
 
+    $place =
+        trim(
+            $_POST['place'] ?? ''
+        );
+
+    $eventDate =
+        trim(
+            $_POST['event_date'] ?? ''
+        );
+
     /*
     |--------------------------------------------------------------------------
     | VALIDATE BLOB TOKEN
@@ -647,6 +679,20 @@ if (
 
         $statusError =
             'Please enter an event title.';
+
+    /*
+    |--------------------------------------------------------------------------
+    | VALIDATE DATE
+    |--------------------------------------------------------------------------
+    */
+
+    } elseif (
+        $eventDate !== '' &&
+        !preg_match('/^\\d{4}-\\d{2}-\\d{2}$/', $eventDate)
+    ) {
+
+        $statusError =
+            'Please enter a valid event date.';
 
     /*
     |--------------------------------------------------------------------------
@@ -958,6 +1004,8 @@ if (
                                 "INSERT INTO events
                                 (
                                     title,
+                                    place,
+                                    event_date,
                                     type,
                                     file_url,
                                     thumbnail_url,
@@ -967,6 +1015,8 @@ if (
                                 VALUES
                                 (
                                     :title,
+                                    :place,
+                                    :event_date,
                                     :type,
                                     :file_url,
                                     :thumbnail_url,
@@ -978,6 +1028,12 @@ if (
                         $stmt->execute([
                             ':title' =>
                                 $title,
+
+                            ':place' =>
+                                ($place !== '' ? $place : null),
+
+                            ':event_date' =>
+                                ($eventDate !== '' ? $eventDate : null),
 
                             ':type' =>
                                 $type,
@@ -1077,6 +1133,8 @@ try {
             "SELECT
                 id,
                 title,
+                place,
+                event_date,
                 type,
                 file_url,
                 thumbnail_url,
@@ -1417,6 +1475,34 @@ foreach ($events as $event) {
         color: white;
     }
 
+    .event-admin-details {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin: 8px 0 14px;
+        color: #6b7280;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+
+    .event-admin-details div {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .event-admin-details i {
+        width: 14px;
+        margin-top: 2px;
+        color: var(--orange);
+        text-align: center;
+    }
+
+    .event-admin-details strong {
+        color: #374151;
+        font-weight: 700;
+    }
+
     @media (max-width: 1000px) {
 
         .event-admin-grid {
@@ -1681,8 +1767,8 @@ foreach ($events as $event) {
         </h1>
 
         <p>
-            Upload and manage your event images
-            and videos.
+            Upload and manage event images, videos,
+            places, and dates.
         </p>
 
     </div>
@@ -1874,6 +1960,46 @@ foreach ($events as $event) {
                     placeholder=""
                     required
                 >
+
+            </div>
+
+
+            <div class="event-form-group">
+
+                <label for="place">
+                    Event Place
+                </label>
+
+                <input
+                    type="text"
+                    id="place"
+                    name="place"
+                    placeholder="e.g. Casa Ynares, Binangonan"
+                    maxlength="255"
+                >
+
+                <span class="event-help">
+                    Venue or location shown on the event details page.
+                </span>
+
+            </div>
+
+
+            <div class="event-form-group">
+
+                <label for="event_date">
+                    Event Date
+                </label>
+
+                <input
+                    type="date"
+                    id="event_date"
+                    name="event_date"
+                >
+
+                <span class="event-help">
+                    Date shown on the event details page.
+                </span>
 
             </div>
 
@@ -2196,6 +2322,39 @@ foreach ($events as $event) {
                         </h3>
 
 
+                        <div class="event-admin-details">
+
+                            <div>
+                                <i class="fa-solid fa-location-dot"></i>
+                                <span>
+                                    <strong>Place:</strong>
+                                    <?= e(
+                                        !empty($event['place'])
+                                            ? $event['place']
+                                            : 'Not specified'
+                                    ) ?>
+                                </span>
+                            </div>
+
+                            <div>
+                                <i class="fa-regular fa-calendar"></i>
+                                <span>
+                                    <strong>Date:</strong>
+                                    <?php if (!empty($event['event_date'])): ?>
+                                        <?= e(
+                                            date(
+                                                'F j, Y',
+                                                strtotime($event['event_date'])
+                                            )
+                                        ) ?>
+                                    <?php else: ?>
+                                        Not specified
+                                    <?php endif; ?>
+                                </span>
+                            </div>
+
+                        </div>
+
                         <div
                             class="event-admin-date"
                         >
@@ -2204,6 +2363,7 @@ foreach ($events as $event) {
                                 class="fa-regular fa-clock"
                             ></i>
 
+                            Uploaded:
                             <?= e(
                                 $event['created_at']
                             ) ?>
