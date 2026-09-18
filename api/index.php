@@ -855,328 +855,80 @@ $firstMimeType =
     id="events"
 >
 
-
     <h2>
         Events
     </h2>
 
-
     <p class="events-description">
-
         Explore our latest events, performances,
         and memorable experiences.
-
     </p>
-
 
     <?php if (empty($events)): ?>
 
-
-        <div class="featured-event">
-
-
-            <img
-                id="featuredImage"
-                src="/logo.png"
-                alt="ABAA Entertainment"
-            >
-
-
-            <video
-                id="featuredVideo"
-                controls
-                playsinline
-                preload="metadata"
-                style="display:none;"
-            >
-
-                Your browser does not support
-                the video tag.
-
-            </video>
-
-
-            <button
-                type="button"
-                id="featuredPlayButton"
-                class="featured-play-button"
-                style="display:none;"
-                onclick="playFeaturedVideo()"
-                aria-label="Play video"
-            >
-
-                <i class="fa-solid fa-play"></i>
-
-            </button>
-
-
-            <div
-                class="featured-title"
-                id="featuredTitle"
-            >
-
-                No events available
-
-            </div>
-
-
+        <div class="events-empty">
+            <i class="fa-regular fa-calendar-xmark"></i>
+            <p>No events are currently available.</p>
         </div>
-
 
     <?php else: ?>
 
+        <div class="event-gallery">
 
-        <div
-            class="featured-event"
-            id="featuredEvent"
-        >
-
-
-            <img
-                id="featuredImage"
-                src="<?= e(
-                    $firstType === 'video'
-                        ? (
-                            $firstThumbnail
-                            ?: '/logo.png'
-                        )
-                        : $firstFile
-                ) ?>"
-                alt="<?= e($firstTitle) ?>"
-                <?= (
-                    $firstType === 'video'
-                    && !$firstThumbnail
-                )
-                    ? 'style="display:none;"'
-                    : ''
-                ?>
-            >
-
-
-            <video
-                id="featuredVideo"
-                controls
-                playsinline
-                preload="metadata"
-                <?= (
-                    $firstType === 'video'
-                    && !$firstThumbnail
-                )
-                    ? ''
-                    : 'style="display:none;"'
-                ?>
-            >
-
-
-                <?php if (
-                    $firstType === 'video'
-                ): ?>
-
-
-                    <source
-                        id="featuredVideoSource"
-                        src="<?= e($firstFile) ?>"
-                        type="<?= e($firstMimeType) ?>"
-                    >
-
-
-                <?php endif; ?>
-
-
-                Your browser does not support
-                the video tag.
-
-
-            </video>
-
-
-            <div
-                id="featuredVideoLoading"
-                class="featured-video-loading"
-            ></div>
-
-
-            <button
-                type="button"
-                id="featuredPlayButton"
-                class="featured-play-button"
-                <?= (
-                    $firstType === 'video'
-                    && $firstThumbnail
-                )
-                    ? ''
-                    : 'style="display:none;"'
-                ?>
-                onclick="playFeaturedVideo()"
-                aria-label="Play video"
-            >
-
-                <i class="fa-solid fa-play"></i>
-
-            </button>
-
-
-            <div
-                class="featured-title"
-                id="featuredTitle"
-            >
-
-                <?= e($firstTitle) ?>
-
-            </div>
-
-
-        </div>
-
-
-        <div class="event-thumbnails">
-
-
-            <?php foreach (
-                $events as $index => $event
-            ): ?>
-
+            <?php foreach ($events as $event): ?>
 
                 <?php
+                $eventType = $event['type'] ?? 'image';
+                $eventFile = $event['file_url'] ?? '';
+                $eventThumbnail = $event['thumbnail_url'] ?? '';
+                $eventTitle = $event['title'] ?? 'Untitled Event';
+                $eventId = (int)($event['id'] ?? 0);
 
-                $eventType =
-                    $event['type'];
-
-                $eventFile =
-                    $event['file_url'];
-
-                $eventTitle =
-                    $event['title'];
-
-                $eventThumbnail =
-                    $event['thumbnail_url'];
-
-                $eventMimeType =
-                    $eventType === 'video'
-                        ? getVideoMimeType(
-                            $eventFile
-                        )
-                        : '';
-
+                $eventImage =
+                    $eventThumbnail
+                    ?: ($eventType === 'video' ? '/logo.png' : $eventFile);
                 ?>
 
-
-                <button
-                    type="button"
-                    class="event-thumbnail <?= $index === 0
-                        ? 'active'
-                        : ''
-                    ?>"
-                    onclick="showEvent(
-                        <?= htmlspecialchars(
-                            json_encode(
-                                $eventType
-                            ),
-                            ENT_QUOTES,
-                            'UTF-8'
-                        ) ?>,
-                        <?= htmlspecialchars(
-                            json_encode(
-                                $eventFile
-                            ),
-                            ENT_QUOTES,
-                            'UTF-8'
-                        ) ?>,
-                        <?= htmlspecialchars(
-                            json_encode(
-                                $eventTitle
-                            ),
-                            ENT_QUOTES,
-                            'UTF-8'
-                        ) ?>,
-                        this,
-                        <?= htmlspecialchars(
-                            json_encode(
-                                $eventThumbnail
-                            ),
-                            ENT_QUOTES,
-                            'UTF-8'
-                        ) ?>,
-                        <?= htmlspecialchars(
-                            json_encode(
-                                $eventMimeType
-                            ),
-                            ENT_QUOTES,
-                            'UTF-8'
-                        ) ?>
-                    )"
+                <a
+                    href="/event?id=<?= $eventId ?>"
+                    class="event-card"
+                    aria-label="View details for <?= e($eventTitle) ?>"
                 >
 
-
-                    <?php if (
-                        $eventType === 'video'
-                    ): ?>
-
-
-                        <div class="video-thumbnail">
-
-
-                            <img
-                                src="<?= e(
-                                    $eventThumbnail
-                                    ?: '/logo.png'
-                                ) ?>"
-                                alt="<?= e(
-                                    $eventTitle
-                                ) ?>"
-                            >
-
-
-                            <span
-                                class="video-thumbnail-play"
-                            >
-
-                                <i
-                                    class="fa-solid fa-play"
-                                ></i>
-
-                            </span>
-
-
-                        </div>
-
-
-                    <?php else: ?>
-
+                    <div class="event-card-image">
 
                         <img
-                            src="<?= e(
-                                $eventFile
-                            ) ?>"
-                            alt="<?= e(
-                                $eventTitle
-                            ) ?>"
+                            src="<?= e($eventImage ?: '/logo.png') ?>"
+                            alt="<?= e($eventTitle) ?>"
                         >
 
+                        <?php if ($eventType === 'video'): ?>
+                            <span class="event-card-type">
+                                <i class="fa-solid fa-play"></i>
+                                Video
+                            </span>
+                        <?php endif; ?>
 
-                    <?php endif; ?>
+                        <span class="event-card-overlay">
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </span>
 
+                    </div>
 
-                    <span class="event-thumbnail-title">
+                    <div class="event-card-content">
+                        <h3><?= e($eventTitle) ?></h3>
+                        <span class="event-card-view">
+                            View Event Details
+                        </span>
+                    </div>
 
-                        <?= e(
-                            $eventTitle
-                        ) ?>
-
-                    </span>
-
-
-                </button>
-
+                </a>
 
             <?php endforeach; ?>
 
-
         </div>
 
-
     <?php endif; ?>
-
 
 </section>
 
