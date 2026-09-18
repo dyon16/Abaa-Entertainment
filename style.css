@@ -2717,6 +2717,7 @@ body::-webkit-scrollbar {
 
 .menu-toggle {
     display: none;
+    position: relative;
     width: 46px;
     height: 46px;
     padding: 8px;
@@ -2729,7 +2730,7 @@ body::-webkit-scrollbar {
     border-radius: 6px;
     cursor: pointer;
     flex-shrink: 0;
-    z-index: 1100;
+    z-index: 1101;
 }
 
 .menu-toggle span {
@@ -2757,7 +2758,7 @@ body::-webkit-scrollbar {
     transform: translateY(-8px) rotate(-45deg);
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
     .menu-toggle {
         display: flex;
     }
