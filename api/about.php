@@ -728,7 +728,7 @@ What started as a shared passion for music gradually evolved into a professional
 
         <article class="history-item">
             <div class="history-image">
-                <img src="/history1.png" alt="ABAA Entertainment beginning">
+                <img src="/logo.png" alt="ABAA Entertainment beginning">
             </div>
             <div class="history-content">
                 <span class="history-label">Chapter 01</span>
