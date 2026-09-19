@@ -167,6 +167,10 @@ function e($value)
 |--------------------------------------------------------------------------
 | EVENT DETAILS COLUMNS
 |--------------------------------------------------------------------------
+|
+| These are kept here so existing installations automatically receive
+| the required columns if they do not already exist.
+|
 */
 
 try {
@@ -198,8 +202,9 @@ try {
 |--------------------------------------------------------------------------
 | EVENT PHOTOS TABLE
 |--------------------------------------------------------------------------
-| Each event can have multiple additional photos.
-|--------------------------------------------------------------------------
+|
+| One event can have multiple additional photos.
+|
 */
 
 try {
@@ -327,14 +332,11 @@ function uploadToVercelBlob(
 
     /*
     |--------------------------------------------------------------------------
-    | PHP 8.5 FIX
+    | PHP 8.5
     |--------------------------------------------------------------------------
     |
-    | curl_close() is deprecated since PHP 8.5 because CurlHandle
-    | objects are automatically cleaned up.
+    | curl_close() is deprecated in PHP 8.5.
     |
-    | Do NOT use curl_close($ch).
-    |--------------------------------------------------------------------------
     */
 
     unset($ch);
@@ -455,7 +457,7 @@ function deleteFromVercelBlob(
 
     /*
     |--------------------------------------------------------------------------
-    | PHP 8.5 FIX
+    | PHP 8.5
     |--------------------------------------------------------------------------
     */
 
@@ -505,6 +507,12 @@ if (
 
         try {
 
+            /*
+            |--------------------------------------------------------------------------
+            | GET EVENT MEDIA
+            |--------------------------------------------------------------------------
+            */
+
             $stmt =
                 $pdo->prepare(
                     "SELECT
@@ -532,11 +540,14 @@ if (
                 |--------------------------------------------------------------------------
                 */
 
-                $photoStmt = $pdo->prepare(
-                    "SELECT id, image_url
-                     FROM event_photos
-                     WHERE event_id = :event_id"
-                );
+                $photoStmt =
+                    $pdo->prepare(
+                        "SELECT
+                            id,
+                            image_url
+                         FROM event_photos
+                         WHERE event_id = :event_id"
+                    );
 
                 $photoStmt->execute([
                     ':event_id' => $eventId
@@ -567,7 +578,7 @@ if (
 
                 /*
                 |--------------------------------------------------------------------------
-                | DELETE THUMBNAIL BLOB
+                | DELETE THUMBNAIL
                 |--------------------------------------------------------------------------
                 */
 
@@ -589,7 +600,9 @@ if (
                 |--------------------------------------------------------------------------
                 */
 
-                foreach ($eventPhotos as $photo) {
+                foreach (
+                    $eventPhotos as $photo
+                ) {
 
                     if (
                         !empty(
@@ -606,7 +619,7 @@ if (
 
                 /*
                 |--------------------------------------------------------------------------
-                | DELETE DATABASE PHOTO RECORDS
+                | DELETE PHOTO RECORDS
                 |--------------------------------------------------------------------------
                 */
 
@@ -660,6 +673,132 @@ if (
 
         $statusError =
             'Invalid event.';
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| DELETE ADDITIONAL PHOTO
+|--------------------------------------------------------------------------
+*/
+
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST' &&
+    isset($_POST['delete_event_photo'])
+) {
+
+    $photoId =
+        (int) (
+            $_POST['photo_id'] ?? 0
+        );
+
+    $eventId =
+        (int) (
+            $_POST['event_id'] ?? 0
+        );
+
+    if (
+        $photoId > 0 &&
+        $eventId > 0
+    ) {
+
+        try {
+
+            /*
+            |--------------------------------------------------------------------------
+            | FIND PHOTO
+            |--------------------------------------------------------------------------
+            */
+
+            $stmt =
+                $pdo->prepare(
+                    "SELECT
+                        id,
+                        image_url
+                     FROM event_photos
+                     WHERE id = :id
+                     AND event_id = :event_id
+                     LIMIT 1"
+                );
+
+            $stmt->execute([
+                ':id' =>
+                    $photoId,
+
+                ':event_id' =>
+                    $eventId
+            ]);
+
+            $photo =
+                $stmt->fetch(
+                    PDO::FETCH_ASSOC
+                );
+
+            if (!$photo) {
+
+                $statusError =
+                    'Additional photo not found.';
+
+            } else {
+
+                /*
+                |--------------------------------------------------------------------------
+                | DELETE BLOB
+                |--------------------------------------------------------------------------
+                */
+
+                if (
+                    !empty(
+                        $photo['image_url']
+                    )
+                ) {
+
+                    deleteFromVercelBlob(
+                        $photo['image_url'],
+                        $blobToken
+                    );
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | DELETE DATABASE RECORD
+                |--------------------------------------------------------------------------
+                */
+
+                $deleteStmt =
+                    $pdo->prepare(
+                        "DELETE FROM event_photos
+                         WHERE id = :id
+                         AND event_id = :event_id"
+                    );
+
+                $deleteStmt->execute([
+                    ':id' =>
+                        $photoId,
+
+                    ':event_id' =>
+                        $eventId
+                ]);
+
+                $statusMessage =
+                    'Additional photo removed successfully.';
+            }
+
+        } catch (PDOException $e) {
+
+            error_log(
+                'Additional photo delete error: ' .
+                $e->getMessage()
+            );
+
+            $statusError =
+                'Unable to remove additional photo.';
+        }
+
+    } else {
+
+        $statusError =
+            'Invalid photo.';
     }
 }
 
@@ -722,11 +861,7 @@ if (
 
 /*
 |--------------------------------------------------------------------------
-| EDIT EVENT DETAILS
-|--------------------------------------------------------------------------
-|
-| Existing events can be updated without re-uploading their media.
-| This updates the title, place, event date, and service provided.
+| EDIT EVENT DETAILS + ADD MORE PHOTOS
 |--------------------------------------------------------------------------
 */
 
@@ -760,6 +895,12 @@ if (
             $_POST['edit_service_provided'] ?? ''
         );
 
+    /*
+    |--------------------------------------------------------------------------
+    | VALIDATE EVENT
+    |--------------------------------------------------------------------------
+    */
+
     if ($eventId <= 0) {
 
         $statusError =
@@ -785,6 +926,12 @@ if (
 
         try {
 
+            /*
+            |--------------------------------------------------------------------------
+            | UPDATE EVENT DETAILS
+            |--------------------------------------------------------------------------
+            */
+
             $stmt =
                 $pdo->prepare(
                     "UPDATE events
@@ -801,26 +948,305 @@ if (
                     $editTitle,
 
                 ':place' =>
-                    ($editPlace !== ''
+                    (
+                        $editPlace !== ''
                         ? $editPlace
-                        : null),
+                        : null
+                    ),
 
                 ':event_date' =>
-                    ($editDate !== ''
+                    (
+                        $editDate !== ''
                         ? $editDate
-                        : null),
+                        : null
+                    ),
 
                 ':service_provided' =>
-                    ($editServiceProvided !== ''
+                    (
+                        $editServiceProvided !== ''
                         ? $editServiceProvided
-                        : null),
+                        : null
+                    ),
 
                 ':id' =>
                     $eventId
             ]);
 
-            $statusMessage =
-                'Event details updated successfully.';
+            /*
+            |--------------------------------------------------------------------------
+            | ADD MORE PHOTOS
+            |--------------------------------------------------------------------------
+            */
+
+            $additionalPhotoCount = 0;
+
+            if (
+                isset(
+                    $_FILES['edit_event_photos']
+                ) &&
+                is_array(
+                    $_FILES['edit_event_photos']['name'] ?? null
+                )
+            ) {
+
+                $photoCount =
+                    count(
+                        $_FILES['edit_event_photos']['name']
+                    );
+
+                $allowedPhotoExtensions = [
+                    'jpg',
+                    'jpeg',
+                    'png',
+                    'webp'
+                ];
+
+                /*
+                |--------------------------------------------------------------------------
+                | CHECK EVENT EXISTS
+                |--------------------------------------------------------------------------
+                */
+
+                $eventCheckStmt =
+                    $pdo->prepare(
+                        "SELECT id
+                         FROM events
+                         WHERE id = :id
+                         LIMIT 1"
+                    );
+
+                $eventCheckStmt->execute([
+                    ':id' => $eventId
+                ]);
+
+                $existingEvent =
+                    $eventCheckStmt->fetch(
+                        PDO::FETCH_ASSOC
+                    );
+
+                if ($existingEvent) {
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | UPLOAD EACH PHOTO
+                    |--------------------------------------------------------------------------
+                    */
+
+                    for (
+                        $i = 0;
+                        $i < $photoCount;
+                        $i++
+                    ) {
+
+                        $uploadError =
+                            $_FILES['edit_event_photos']['error'][$i]
+                            ??
+                            UPLOAD_ERR_NO_FILE;
+
+                        if (
+                            $uploadError !==
+                            UPLOAD_ERR_OK
+                        ) {
+                            continue;
+                        }
+
+                        $photoTmp =
+                            $_FILES['edit_event_photos']['tmp_name'][$i]
+                            ??
+                            '';
+
+                        $photoOriginal =
+                            $_FILES['edit_event_photos']['name'][$i]
+                            ??
+                            '';
+
+                        $photoSize =
+                            (int) (
+                                $_FILES['edit_event_photos']['size'][$i]
+                                ??
+                                0
+                            );
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | VALIDATE SIZE
+                        |--------------------------------------------------------------------------
+                        */
+
+                        if (
+                            !is_file($photoTmp) ||
+                            $photoSize >
+                            50 * 1024 * 1024
+                        ) {
+                            continue;
+                        }
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | VALIDATE EXTENSION
+                        |--------------------------------------------------------------------------
+                        */
+
+                        $photoExtension =
+                            strtolower(
+                                pathinfo(
+                                    $photoOriginal,
+                                    PATHINFO_EXTENSION
+                                )
+                            );
+
+                        if (
+                            !in_array(
+                                $photoExtension,
+                                $allowedPhotoExtensions,
+                                true
+                            )
+                        ) {
+                            continue;
+                        }
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | MIME
+                        |--------------------------------------------------------------------------
+                        */
+
+                        $photoMime =
+                            mime_content_type(
+                                $photoTmp
+                            );
+
+                        if (!$photoMime) {
+
+                            $photoMime =
+                                'image/jpeg';
+                        }
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | SAFE EVENT TITLE
+                        |--------------------------------------------------------------------------
+                        */
+
+                        $safeTitle =
+                            preg_replace(
+                                '/[^a-zA-Z0-9_-]+/',
+                                '-',
+                                $editTitle
+                            );
+
+                        $safeTitle =
+                            trim(
+                                $safeTitle,
+                                '-'
+                            );
+
+                        if ($safeTitle === '') {
+
+                            $safeTitle =
+                                'event';
+                        }
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | UNIQUE FILE NAME
+                        |--------------------------------------------------------------------------
+                        */
+
+                        $photoFileName =
+                            'events/' .
+                            $safeTitle .
+                            '-photo-' .
+                            bin2hex(
+                                random_bytes(8)
+                            ) .
+                            '.' .
+                            $photoExtension;
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | UPLOAD TO VERCEL BLOB
+                        |--------------------------------------------------------------------------
+                        */
+
+                        $photoResult =
+                            uploadToVercelBlob(
+                                $photoTmp,
+                                $photoFileName,
+                                $photoMime,
+                                $blobToken
+                            );
+
+                        if (
+                            !$photoResult['success']
+                        ) {
+                            continue;
+                        }
+
+                        $photoUrl =
+                            $photoResult['url'];
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | SAVE PHOTO DATABASE RECORD
+                        |--------------------------------------------------------------------------
+                        */
+
+                        $photoStmt =
+                            $pdo->prepare(
+                                "INSERT INTO event_photos
+                                (
+                                    event_id,
+                                    image_url,
+                                    created_at
+                                )
+                                VALUES
+                                (
+                                    :event_id,
+                                    :image_url,
+                                    NOW()
+                                )"
+                            );
+
+                        $photoStmt->execute([
+                            ':event_id' =>
+                                $eventId,
+
+                            ':image_url' =>
+                                $photoUrl
+                        ]);
+
+                        $additionalPhotoCount++;
+                    }
+                }
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | SUCCESS MESSAGE
+            |--------------------------------------------------------------------------
+            */
+
+            if (
+                $additionalPhotoCount > 0
+            ) {
+
+                $statusMessage =
+                    'Event details updated with ' .
+                    $additionalPhotoCount .
+                    ' additional photo' .
+                    (
+                        $additionalPhotoCount === 1
+                        ? ''
+                        : 's'
+                    ) .
+                    '.';
+
+            } else {
+
+                $statusMessage =
+                    'Event details updated successfully.';
+            }
 
         } catch (PDOException $e) {
 
@@ -837,7 +1263,7 @@ if (
 
 /*
 |--------------------------------------------------------------------------
-| UPLOAD EVENT
+| UPLOAD NEW EVENT
 |--------------------------------------------------------------------------
 */
 
@@ -1102,7 +1528,7 @@ if (
 
                 /*
                 |--------------------------------------------------------------------------
-                | UPLOAD MAIN FILE TO BLOB
+                | UPLOAD MAIN FILE
                 |--------------------------------------------------------------------------
                 */
 
@@ -1209,7 +1635,7 @@ if (
 
                     /*
                     |--------------------------------------------------------------------------
-                    | INSERT DATABASE RECORD
+                    | INSERT EVENT
                     |--------------------------------------------------------------------------
                     */
 
@@ -1248,19 +1674,25 @@ if (
                                 $title,
 
                             ':place' =>
-                                ($place !== ''
+                                (
+                                    $place !== ''
                                     ? $place
-                                    : null),
+                                    : null
+                                ),
 
                             ':event_date' =>
-                                ($eventDate !== ''
+                                (
+                                    $eventDate !== ''
                                     ? $eventDate
-                                    : null),
+                                    : null
+                                ),
 
                             ':service_provided' =>
-                                ($serviceProvided !== ''
+                                (
+                                    $serviceProvided !== ''
                                     ? $serviceProvided
-                                    : null),
+                                    : null
+                                ),
 
                             ':type' =>
                                 $type,
@@ -1568,6 +2000,52 @@ try {
 
 /*
 |--------------------------------------------------------------------------
+| LOAD ADDITIONAL PHOTOS FOR EACH EVENT
+|--------------------------------------------------------------------------
+*/
+
+foreach (
+    $events as &$event
+) {
+
+    $event['additional_photos'] = [];
+
+    try {
+
+        $photoStmt =
+            $pdo->prepare(
+                "SELECT
+                    id,
+                    image_url,
+                    created_at
+                 FROM event_photos
+                 WHERE event_id = :event_id
+                 ORDER BY id ASC"
+            );
+
+        $photoStmt->execute([
+            ':event_id' =>
+                (int) $event['id']
+        ]);
+
+        $event['additional_photos'] =
+            $photoStmt->fetchAll(
+                PDO::FETCH_ASSOC
+            );
+
+    } catch (PDOException $e) {
+
+        error_log(
+            'Event photos query error: ' .
+            $e->getMessage()
+        );
+    }
+}
+
+unset($event);
+
+/*
+|--------------------------------------------------------------------------
 | STATISTICS
 |--------------------------------------------------------------------------
 */
@@ -1625,355 +2103,304 @@ foreach (
 
 <style>
 
-    .event-upload-card {
-        background: white;
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        padding: 25px;
-        margin-bottom: 30px;
-        box-shadow: 0 2px 8px rgba(0,0,0,.03);
-    }
+/* ==================================================
+   UPLOAD CARD
+================================================== */
 
-    .event-upload-header {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 22px;
-    }
+.event-upload-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.03);
+}
 
-    .event-upload-icon {
-        width: 42px;
-        height: 42px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--orange);
-        background: var(--orange-light);
-    }
+.event-upload-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 22px;
+}
 
-    .event-upload-header span {
-        display: block;
-        color: var(--orange);
-        font-size: 10px;
-        font-weight: 800;
-        letter-spacing: 1.5px;
-    }
+.event-upload-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--orange);
+    background: var(--orange-light);
+}
 
-    .event-upload-header h2 {
-        margin-top: 4px;
-        font-size: 20px;
-        color: var(--dark);
-    }
+.event-upload-header span {
+    display: block;
+    color: var(--orange);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
 
-    .event-form-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 18px;
-    }
+.event-upload-header h2 {
+    margin-top: 4px;
+    font-size: 20px;
+    color: var(--dark);
+}
 
-    .event-form-group {
-        display: flex;
-        flex-direction: column;
-        gap: 7px;
-    }
+.event-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
 
-    .event-form-group.full {
-        grid-column: 1 / -1;
-    }
+.event-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
 
-    .event-form-group label {
-        font-size: 12px;
-        font-weight: 700;
-        color: #374151;
-    }
+.event-form-group.full {
+    grid-column: 1 / -1;
+}
 
-    .event-form-group input,
-    .event-form-group select {
-        width: 100%;
-        height: 45px;
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        padding: 0 12px;
-        background: #fafafa;
-        color: var(--text);
-        outline: none;
-        box-sizing: border-box;
-    }
+.event-form-group label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #374151;
+}
 
-    .event-form-group input:focus,
-    .event-form-group select:focus {
-        background: white;
-        border-color: var(--orange);
-        box-shadow: 0 0 0 3px rgba(255,90,31,.08);
-    }
+.event-form-group input,
+.event-form-group select {
+    width: 100%;
+    height: 45px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0 12px;
+    background: #fafafa;
+    color: var(--text);
+    outline: none;
+    box-sizing: border-box;
+}
 
-    .event-form-group input[type="file"] {
-        padding: 9px;
-        height: auto;
-    }
+.event-form-group input:focus,
+.event-form-group select:focus {
+    background: white;
+    border-color: var(--orange);
+    box-shadow: 0 0 0 3px rgba(255,90,31,.08);
+}
 
-    .event-help {
-        color: #9ca3af;
-        font-size: 11px;
-    }
+.event-form-group input[type="file"] {
+    padding: 9px;
+    height: auto;
+}
 
-    .event-upload-button {
-        margin-top: 20px;
-        border: none;
-        border-radius: 9px;
-        padding: 12px 18px;
-        background: var(--orange);
-        color: white;
-        font-size: 13px;
-        font-weight: 700;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 9px;
-        transition: .2s;
-    }
+.event-help {
+    color: #9ca3af;
+    font-size: 11px;
+}
 
-    .event-upload-button:hover {
-        background: var(--orange-dark);
-        transform: translateY(-1px);
-    }
+.event-upload-button {
+    margin-top: 20px;
+    border: none;
+    border-radius: 9px;
+    padding: 12px 18px;
+    background: var(--orange);
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    transition: .2s;
+}
 
-    .event-admin-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
-        padding: 25px;
-    }
-
-    .event-admin-card {
-        border: 1px solid var(--border);
-        border-radius: 13px;
-        overflow: hidden;
-        background: white;
-        box-shadow: 0 2px 8px rgba(0,0,0,.04);
-    }
-
-    .event-preview {
-        height: 190px;
-        background: #111;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .event-preview img,
-    .event-preview video {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-    }
-
-    .event-video-preview {
-        position: relative;
-        width: 100%;
-        height: 100%;
-    }
-
-    .event-video-preview img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .event-video-icon {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        width: 52px;
-        height: 52px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        background: rgba(255,90,31,.92);
-        box-shadow: 0 5px 20px rgba(0,0,0,.25);
-    }
-
-    .event-type-badge {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        padding: 6px 9px;
-        border-radius: 6px;
-        background: rgba(0,0,0,.72);
-        color: white;
-        font-size: 10px;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: .5px;
-    }
-
-    .event-visibility {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        padding: 6px 9px;
-        border-radius: 6px;
-        font-size: 10px;
-        font-weight: 800;
-        color: white;
-    }
-
-    .event-visibility.visible {
-        background: #16a34a;
-    }
-
-    .event-visibility.hidden {
-        background: #6b7280;
-    }
-
-    .event-admin-content {
-        padding: 16px;
-    }
-
-    .event-admin-content h3 {
-        font-size: 16px;
-        color: var(--dark);
-        margin-bottom: 5px;
-    }
-
-    .event-photo-count {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        margin: 3px 0 4px;
-        color: var(--orange);
-        font-size: 11px;
-        font-weight: 700;
-    }
-
-    .event-admin-date {
-        color: #9ca3af;
-        font-size: 11px;
-        margin-bottom: 15px;
-    }
-
-    .event-admin-actions {
-        display: flex;
-        gap: 8px;
-    }
-
-    .event-action-button {
-        flex: 1;
-        min-height: 36px;
-        border-radius: 7px;
-        border: 1px solid var(--border);
-        background: white;
-        color: #374151;
-        font-size: 11px;
-        font-weight: 700;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-    }
-
-    .event-action-button:hover {
-        border-color: var(--orange);
-        color: var(--orange);
-    }
-
-    .event-action-button.delete {
-        flex: 0 0 40px;
-        color: #dc2626;
-        border-color: #fecaca;
-        background: #fef2f2;
-    }
-
-    .event-action-button.delete:hover {
-        background: #dc2626;
-        color: white;
-    }
-
-    .event-admin-details {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        margin: 8px 0 14px;
-        color: #6b7280;
-        font-size: 11px;
-        line-height: 1.4;
-    }
-
-    .event-admin-details div {
-        display: flex;
-        align-items: flex-start;
-        gap: 8px;
-    }
-
-    .event-admin-details i {
-        width: 14px;
-        margin-top: 2px;
-        color: var(--orange);
-        text-align: center;
-        flex-shrink: 0;
-    }
-
-    .event-admin-details strong {
-        color: #374151;
-        font-weight: 700;
-    }
-
-    @media (max-width: 1000px) {
-
-        .event-admin-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-
-    }
-
-    @media (max-width: 600px) {
-
-        .event-form-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .event-form-group.full {
-            grid-column: auto;
-        }
-
-        .event-admin-grid {
-            grid-template-columns: 1fr;
-            padding: 18px;
-        }
-
-        .event-upload-card {
-            padding: 20px;
-        }
-
-    }
+.event-upload-button:hover {
+    background: var(--orange-dark);
+    transform: translateY(-1px);
+}
 
 
 /* ==================================================
-   EVENT EDIT PANEL
+   EVENT GRID
+================================================== */
+
+.event-admin-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding: 25px;
+}
+
+.event-admin-card {
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,.04);
+}
+
+.event-preview {
+    height: 190px;
+    background: #111;
+    position: relative;
+    overflow: hidden;
+}
+
+.event-preview img,
+.event-preview video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.event-video-preview {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.event-video-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.event-video-icon {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    background: rgba(255,90,31,.92);
+    box-shadow: 0 5px 20px rgba(0,0,0,.25);
+}
+
+.event-type-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 6px 9px;
+    border-radius: 6px;
+    background: rgba(0,0,0,.72);
+    color: white;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+.event-visibility {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 6px 9px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 800;
+    color: white;
+}
+
+.event-visibility.visible {
+    background: #16a34a;
+}
+
+.event-visibility.hidden {
+    background: #6b7280;
+}
+
+
+/* ==================================================
+   EVENT CONTENT
+================================================== */
+
+.event-admin-content {
+    padding: 16px;
+}
+
+.event-admin-content h3 {
+    font-size: 16px;
+    color: var(--dark);
+    margin-bottom: 5px;
+}
+
+.event-photo-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 3px 0 4px;
+    color: var(--orange);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.event-admin-date {
+    color: #9ca3af;
+    font-size: 11px;
+    margin-bottom: 15px;
+}
+
+.event-admin-details {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 8px 0 14px;
+    color: #6b7280;
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+.event-admin-details div {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.event-admin-details i {
+    width: 14px;
+    margin-top: 2px;
+    color: var(--orange);
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.event-admin-details strong {
+    color: #374151;
+    font-weight: 700;
+}
+
+
+/* ==================================================
+   EDIT EVENT PANEL
 ================================================== */
 
 .event-edit-panel {
     margin-top: 14px;
-    border: 1px solid #2f2f2f;
-    border-radius: 6px;
-    background: #0b0b0b;
+    border: 1px solid #ff5a1f;
+    border-radius: 8px;
+    background: #111;
     overflow: hidden;
 }
 
 .event-edit-panel summary {
     list-style: none;
     cursor: pointer;
-    padding: 11px 13px;
-    color: #ff3d02;
+    padding: 12px 14px;
+    color: #ff5a1f;
+    background: #090909;
     font-size: 12px;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: .7px;
+    transition: .2s;
 }
 
 .event-edit-panel summary::-webkit-details-marker {
@@ -1984,20 +2411,25 @@ foreach (
     margin-right: 7px;
 }
 
+.event-edit-panel summary:hover {
+    background: #171717;
+    color: #ff7a4d;
+}
+
 .event-edit-panel[open] summary {
-    border-bottom: 1px solid #222;
+    border-bottom: 1px solid #292929;
 }
 
 .event-edit-form {
     display: grid;
-    gap: 10px;
-    padding: 13px;
+    gap: 12px;
+    padding: 14px;
 }
 
 .event-edit-form label {
     display: grid;
     gap: 6px;
-    color: #aaa;
+    color: #bcbcbc;
     font-size: 10px;
     font-weight: 800;
     text-transform: uppercase;
@@ -2011,27 +2443,258 @@ foreach (
     color: #fff;
     background: #050505;
     border: 1px solid #333;
-    border-radius: 4px;
+    border-radius: 5px;
     outline: none;
+    transition: .2s;
 }
 
 .event-edit-form input:focus {
-    border-color: #ff3d02;
+    border-color: #ff5a1f;
+    box-shadow: 0 0 0 2px rgba(255,90,31,.12);
 }
 
+
+/* ==================================================
+   EDIT DATE
+================================================== */
+
+.event-edit-form input[type="date"] {
+    color-scheme: dark;
+    color: #fff;
+    border-color: #ff5a1f;
+    accent-color: #ff5a1f;
+}
+
+.event-edit-form input[type="date"]:focus {
+    border-color: #ff7a4d;
+    box-shadow: 0 0 0 3px rgba(255,90,31,.14);
+}
+
+.event-edit-form input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(46%) sepia(96%) saturate(3588%) hue-rotate(347deg) brightness(101%) contrast(101%);
+    cursor: pointer;
+}
+
+
+/* ==================================================
+   SAVE BUTTON
+================================================== */
+
 .event-save-button {
-    border: 2px solid #ff3d02;
-    border-radius: 5px;
+    border: 2px solid #ff5a1f;
+    border-radius: 6px;
     padding: 10px 13px;
     color: #fff;
-    background: #ff3d02;
+    background: #ff5a1f;
     cursor: pointer;
     font-weight: 800;
+    transition: .2s;
 }
 
 .event-save-button:hover {
-    color: #ff3d02;
+    color: #ff5a1f;
     background: transparent;
+}
+
+
+/* ==================================================
+   ADDITIONAL PHOTOS EDITOR
+================================================== */
+
+.event-edit-photos-section {
+    border-top: 1px solid #292929;
+    margin-top: 3px;
+    padding-top: 14px;
+}
+
+.event-edit-photos-title {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #ff5a1f;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .7px;
+    margin-bottom: 10px;
+}
+
+.event-existing-photos {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.event-existing-photo {
+    position: relative;
+    height: 85px;
+    border-radius: 5px;
+    overflow: hidden;
+    background: #050505;
+    border: 1px solid #333;
+}
+
+.event-existing-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.event-existing-photo-delete {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 27px;
+    height: 27px;
+    border: none;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(220,38,38,.95);
+    color: white;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.event-existing-photo-delete:hover {
+    background: #ef4444;
+    transform: scale(1.05);
+}
+
+.event-no-photos {
+    padding: 14px;
+    border: 1px dashed #333;
+    border-radius: 5px;
+    color: #777;
+    text-align: center;
+    font-size: 10px;
+    margin-bottom: 12px;
+}
+
+.event-add-photos-label {
+    display: grid;
+    gap: 6px;
+    color: #aaa;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+}
+
+.event-add-photos-label input[type="file"] {
+    padding: 9px;
+    color: #aaa;
+    background: #050505;
+    border: 1px solid #333;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.event-add-photos-label input[type="file"]:hover {
+    border-color: #ff5a1f;
+}
+
+.event-photo-help {
+    color: #777;
+    font-size: 9px;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+
+/* ==================================================
+   ACTION BUTTONS
+================================================== */
+
+.event-admin-actions {
+    display: flex;
+    gap: 14px;
+    margin-top: 14px;
+}
+
+.event-admin-actions form {
+    flex: 1;
+}
+
+.event-action-button {
+    width: 100%;
+    min-height: 38px;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    background: white;
+    color: #374151;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: .2s;
+}
+
+.event-action-button:hover {
+    border-color: var(--orange);
+    color: var(--orange);
+}
+
+.event-action-button.delete {
+    flex: 0 0 auto;
+    width: 42px;
+    color: #dc2626;
+    border-color: #fecaca;
+    background: #fef2f2;
+}
+
+.event-action-button.delete:hover {
+    background: #dc2626;
+    color: white;
+}
+
+
+/* ==================================================
+   RESPONSIVE
+================================================== */
+
+@media (max-width: 1000px) {
+
+    .event-admin-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .event-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .event-form-group.full {
+        grid-column: auto;
+    }
+
+    .event-admin-grid {
+        grid-template-columns: 1fr;
+        padding: 18px;
+    }
+
+    .event-upload-card {
+        padding: 20px;
+    }
+
+    .event-admin-actions {
+        gap: 12px;
+    }
+
+    .event-existing-photos {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
 }
 
 </style>
@@ -2270,7 +2933,7 @@ foreach (
 
         <p>
             Upload and manage event images, videos,
-            places, services, and dates.
+            places, services, dates, and galleries.
         </p>
 
     </div>
@@ -2449,6 +3112,8 @@ foreach (
         <div class="event-form-grid">
 
 
+            <!-- TITLE -->
+
             <div class="event-form-group">
 
                 <label for="title">
@@ -2464,6 +3129,8 @@ foreach (
 
             </div>
 
+
+            <!-- PLACE -->
 
             <div class="event-form-group">
 
@@ -2486,6 +3153,8 @@ foreach (
             </div>
 
 
+            <!-- DATE -->
+
             <div class="event-form-group">
 
                 <label for="event_date">
@@ -2504,6 +3173,8 @@ foreach (
 
             </div>
 
+
+            <!-- SERVICE -->
 
             <div class="event-form-group">
 
@@ -2525,6 +3196,8 @@ foreach (
 
             </div>
 
+
+            <!-- TYPE -->
 
             <div class="event-form-group">
 
@@ -2552,6 +3225,8 @@ foreach (
             </div>
 
 
+            <!-- MAIN FILE -->
+
             <div class="event-form-group">
 
                 <label for="event_file">
@@ -2567,14 +3242,14 @@ foreach (
                 >
 
                 <span class="event-help">
-
                     Images: JPG, PNG, WEBP ·
                     Videos: MP4, WEBM, MOV
-
                 </span>
 
             </div>
 
+
+            <!-- ADDITIONAL PHOTOS -->
 
             <div class="event-form-group full">
 
@@ -2591,12 +3266,14 @@ foreach (
                 >
 
                 <span class="event-help">
-                    Select multiple photos to create a gallery for this event.
+                    Select multiple photos to create a gallery.
                     JPG, PNG, WEBP · Maximum 50MB each.
                 </span>
 
             </div>
 
+
+            <!-- THUMBNAIL -->
 
             <div
                 class="event-form-group"
@@ -2616,10 +3293,7 @@ foreach (
                 >
 
                 <span class="event-help">
-
-                    Optional image displayed
-                    before the video plays.
-
+                    Optional image displayed before the video plays.
                 </span>
 
             </div>
@@ -2709,8 +3383,7 @@ foreach (
             </h3>
 
             <p>
-                Upload your first event image
-                or video above.
+                Upload your first event image or video above.
             </p>
 
         </div>
@@ -2746,7 +3419,6 @@ foreach (
                                 )
                             ): ?>
 
-
                                 <div
                                     class="event-video-preview"
                                 >
@@ -2755,7 +3427,6 @@ foreach (
                                         src="<?= e($event['thumbnail_url']) ?>"
                                         alt="<?= e($event['title']) ?>"
                                     >
-
 
                                     <div
                                         class="event-video-icon"
@@ -2772,14 +3443,12 @@ foreach (
 
                             <?php else: ?>
 
-
                                 <video
                                     src="<?= e($event['file_url']) ?>"
                                     muted
                                     preload="metadata"
                                     controls
                                 ></video>
-
 
                             <?php endif; ?>
 
@@ -2813,7 +3482,6 @@ foreach (
                             (int) $event['is_visible'] === 1
                         ): ?>
 
-
                             <span
                                 class="event-visibility visible"
                             >
@@ -2826,9 +3494,7 @@ foreach (
 
                             </span>
 
-
                         <?php else: ?>
-
 
                             <span
                                 class="event-visibility hidden"
@@ -2841,7 +3507,6 @@ foreach (
                                 Hidden
 
                             </span>
-
 
                         <?php endif; ?>
 
@@ -3026,6 +3691,7 @@ foreach (
                             <form
                                 method="POST"
                                 action="/admin/events"
+                                enctype="multipart/form-data"
                                 class="event-edit-form"
                             >
 
@@ -3102,6 +3768,141 @@ foreach (
                                 </label>
 
 
+                                <!-- =================================================
+                                     ADDITIONAL PHOTOS
+                                ================================================= -->
+
+                                <div class="event-edit-photos-section">
+
+                                    <div
+                                        class="event-edit-photos-title"
+                                    >
+
+                                        <i
+                                            class="fa-regular fa-images"
+                                        ></i>
+
+                                        Additional Event Photos
+
+                                    </div>
+
+
+                                    <?php if (
+                                        !empty(
+                                            $event['additional_photos']
+                                        )
+                                    ): ?>
+
+
+                                        <div
+                                            class="event-existing-photos"
+                                        >
+
+
+                                            <?php foreach (
+                                                $event['additional_photos']
+                                                as $photo
+                                            ): ?>
+
+
+                                                <div
+                                                    class="event-existing-photo"
+                                                >
+
+                                                    <img
+                                                        src="<?= e($photo['image_url']) ?>"
+                                                        alt="Event photo"
+                                                        loading="lazy"
+                                                    >
+
+
+                                                    <!-- DELETE PHOTO -->
+
+                                                    <form
+                                                        method="POST"
+                                                        action="/admin/events"
+                                                        onsubmit="return confirm('Remove this photo from the event?');"
+                                                    >
+
+                                                        <input
+                                                            type="hidden"
+                                                            name="event_id"
+                                                            value="<?= (int) $event['id'] ?>"
+                                                        >
+
+                                                        <input
+                                                            type="hidden"
+                                                            name="photo_id"
+                                                            value="<?= (int) $photo['id'] ?>"
+                                                        >
+
+                                                        <button
+                                                            type="submit"
+                                                            name="delete_event_photo"
+                                                            class="event-existing-photo-delete"
+                                                            title="Remove photo"
+                                                        >
+
+                                                            <i
+                                                                class="fa-solid fa-trash"
+                                                            ></i>
+
+                                                        </button>
+
+                                                    </form>
+
+                                                </div>
+
+
+                                            <?php endforeach; ?>
+
+
+                                        </div>
+
+
+                                    <?php else: ?>
+
+
+                                        <div
+                                            class="event-no-photos"
+                                        >
+
+                                            No additional photos yet.
+
+                                        </div>
+
+
+                                    <?php endif; ?>
+
+
+                                    <!-- ADD MORE PHOTOS -->
+
+                                    <label
+                                        class="event-add-photos-label"
+                                    >
+
+                                        Add More Photos
+
+                                        <input
+                                            type="file"
+                                            name="edit_event_photos[]"
+                                            accept=".jpg,.jpeg,.png,.webp"
+                                            multiple
+                                        >
+
+                                        <span
+                                            class="event-photo-help"
+                                        >
+                                            Select one or multiple photos.
+                                            JPG, PNG, WEBP · Maximum 50MB each.
+                                        </span>
+
+                                    </label>
+
+
+                                </div>
+
+
                                 <!-- SAVE -->
 
                                 <button
@@ -3137,7 +3938,6 @@ foreach (
                             <form
                                 method="POST"
                                 action="/admin/events"
-                                style="flex:1;"
                             >
 
                                 <input
@@ -3153,11 +3953,9 @@ foreach (
                                     class="event-action-button"
                                 >
 
-
                                     <?php if (
                                         (int) $event['is_visible'] === 1
                                     ): ?>
-
 
                                         <i
                                             class="fa-solid fa-eye-slash"
@@ -3165,9 +3963,7 @@ foreach (
 
                                         Hide
 
-
                                     <?php else: ?>
-
 
                                         <i
                                             class="fa-solid fa-eye"
@@ -3175,21 +3971,19 @@ foreach (
 
                                         Show
 
-
                                     <?php endif; ?>
-
 
                                 </button>
 
                             </form>
 
 
-                            <!-- DELETE -->
+                            <!-- DELETE EVENT -->
 
                             <form
                                 method="POST"
                                 action="/admin/events"
-                                onsubmit="return confirm('Are you sure you want to delete this event?');"
+                                onsubmit="return confirm('Are you sure you want to delete this entire event and all of its additional photos?');"
                             >
 
                                 <input
@@ -3263,6 +4057,12 @@ foreach (
 
 <script>
 
+/*
+|--------------------------------------------------------------------------
+| VIDEO THUMBNAIL
+|--------------------------------------------------------------------------
+*/
+
 function toggleThumbnail()
 {
     const type =
@@ -3292,6 +4092,78 @@ function toggleThumbnail()
 
     }
 }
+
+
+/*
+|--------------------------------------------------------------------------
+| PREVENT ACCIDENTAL DOUBLE SUBMISSION
+|--------------------------------------------------------------------------
+*/
+
+document.querySelectorAll(
+    'form'
+).forEach(
+    function(form)
+    {
+
+        form.addEventListener(
+            'submit',
+            function(event)
+            {
+
+                const submitButton =
+                    event.submitter;
+
+                if (!submitButton) {
+                    return;
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | Do not disable delete/photo buttons immediately because
+                | browser confirmation forms need to finish normally.
+                |--------------------------------------------------------------------------
+                */
+
+                if (
+                    submitButton.name ===
+                    'delete_event' ||
+                    submitButton.name ===
+                    'delete_event_photo'
+                ) {
+                    return;
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | Prevent repeated clicks
+                |--------------------------------------------------------------------------
+                */
+
+                if (
+                    submitButton.dataset.submitted ===
+                    '1'
+                ) {
+
+                    event.preventDefault();
+
+                    return;
+                }
+
+                submitButton.dataset.submitted =
+                    '1';
+
+                submitButton.style.opacity =
+                    '.65';
+
+                submitButton.style.pointerEvents =
+                    'none';
+
+            }
+        );
+
+    }
+);
 
 </script>
 
