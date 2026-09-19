@@ -1,5 +1,5 @@
 <?php
-include(DIR . '/conn.php');
+include(__DIR__ . '/conn.php');
 
 function e($value)
 {
