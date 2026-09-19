@@ -170,15 +170,24 @@ function e($value)
 */
 
 try {
+
     $pdo->exec(
         "ALTER TABLE events
          ADD COLUMN IF NOT EXISTS place VARCHAR(255) NULL AFTER title"
     );
+
     $pdo->exec(
         "ALTER TABLE events
          ADD COLUMN IF NOT EXISTS event_date DATE NULL AFTER place"
     );
+
+    $pdo->exec(
+        "ALTER TABLE events
+         ADD COLUMN IF NOT EXISTS service_provided VARCHAR(255) NULL AFTER event_date"
+    );
+
 } catch (PDOException $e) {
+
     error_log(
         'Event details schema update error: ' .
         $e->getMessage()
@@ -194,6 +203,7 @@ try {
 */
 
 try {
+
     $pdo->exec(
         "CREATE TABLE IF NOT EXISTS event_photos (
             id INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -204,7 +214,9 @@ try {
             INDEX idx_event_id (event_id)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
     );
+
 } catch (PDOException $e) {
+
     error_log(
         'Event photos table error: ' .
         $e->getMessage()
@@ -445,9 +457,6 @@ function deleteFromVercelBlob(
     |--------------------------------------------------------------------------
     | PHP 8.5 FIX
     |--------------------------------------------------------------------------
-    |
-    | curl_close() is deprecated since PHP 8.5.
-    |--------------------------------------------------------------------------
     */
 
     unset($ch);
@@ -528,10 +537,15 @@ if (
                      FROM event_photos
                      WHERE event_id = :event_id"
                 );
+
                 $photoStmt->execute([
                     ':event_id' => $eventId
                 ]);
-                $eventPhotos = $photoStmt->fetchAll(PDO::FETCH_ASSOC);
+
+                $eventPhotos =
+                    $photoStmt->fetchAll(
+                        PDO::FETCH_ASSOC
+                    );
 
                 /*
                 |--------------------------------------------------------------------------
@@ -576,7 +590,13 @@ if (
                 */
 
                 foreach ($eventPhotos as $photo) {
-                    if (!empty($photo['image_url'])) {
+
+                    if (
+                        !empty(
+                            $photo['image_url']
+                        )
+                    ) {
+
                         deleteFromVercelBlob(
                             $photo['image_url'],
                             $blobToken
@@ -586,17 +606,25 @@ if (
 
                 /*
                 |--------------------------------------------------------------------------
-                | DELETE DATABASE RECORD
+                | DELETE DATABASE PHOTO RECORDS
                 |--------------------------------------------------------------------------
                 */
 
-                $photoDeleteStmt = $pdo->prepare(
-                    "DELETE FROM event_photos
-                     WHERE event_id = :event_id"
-                );
+                $photoDeleteStmt =
+                    $pdo->prepare(
+                        "DELETE FROM event_photos
+                         WHERE event_id = :event_id"
+                    );
+
                 $photoDeleteStmt->execute([
                     ':event_id' => $eventId
                 ]);
+
+                /*
+                |--------------------------------------------------------------------------
+                | DELETE EVENT
+                |--------------------------------------------------------------------------
+                */
 
                 $stmt =
                     $pdo->prepare(
@@ -692,14 +720,13 @@ if (
     }
 }
 
-
 /*
 |--------------------------------------------------------------------------
 | EDIT EVENT DETAILS
 |--------------------------------------------------------------------------
 |
 | Existing events can be updated without re-uploading their media.
-| This updates the title, place, and event date.
+| This updates the title, place, event date, and service provided.
 |--------------------------------------------------------------------------
 */
 
@@ -708,47 +735,92 @@ if (
     isset($_POST['update_event'])
 ) {
 
-    $eventId = (int)($_POST['event_id'] ?? 0);
-    $editTitle = trim($_POST['edit_title'] ?? '');
-    $editPlace = trim($_POST['edit_place'] ?? '');
-    $editDate = trim($_POST['edit_event_date'] ?? '');
+    $eventId =
+        (int) (
+            $_POST['event_id'] ?? 0
+        );
+
+    $editTitle =
+        trim(
+            $_POST['edit_title'] ?? ''
+        );
+
+    $editPlace =
+        trim(
+            $_POST['edit_place'] ?? ''
+        );
+
+    $editDate =
+        trim(
+            $_POST['edit_event_date'] ?? ''
+        );
+
+    $editServiceProvided =
+        trim(
+            $_POST['edit_service_provided'] ?? ''
+        );
 
     if ($eventId <= 0) {
 
-        $statusError = 'Invalid event.';
+        $statusError =
+            'Invalid event.';
 
     } elseif ($editTitle === '') {
 
-        $statusError = 'Please enter an event title.';
+        $statusError =
+            'Please enter an event title.';
 
     } elseif (
         $editDate !== '' &&
-        !preg_match('/^\d{4}-\d{2}-\d{2}$/', $editDate)
+        !preg_match(
+            '/^\d{4}-\d{2}-\d{2}$/',
+            $editDate
+        )
     ) {
 
-        $statusError = 'Please enter a valid event date.';
+        $statusError =
+            'Please enter a valid event date.';
 
     } else {
 
         try {
 
-            $stmt = $pdo->prepare(
-                "UPDATE events
-                 SET
-                    title = :title,
-                    place = :place,
-                    event_date = :event_date
-                 WHERE id = :id"
-            );
+            $stmt =
+                $pdo->prepare(
+                    "UPDATE events
+                     SET
+                        title = :title,
+                        place = :place,
+                        event_date = :event_date,
+                        service_provided = :service_provided
+                     WHERE id = :id"
+                );
 
             $stmt->execute([
-                ':title' => $editTitle,
-                ':place' => ($editPlace !== '' ? $editPlace : null),
-                ':event_date' => ($editDate !== '' ? $editDate : null),
-                ':id' => $eventId
+                ':title' =>
+                    $editTitle,
+
+                ':place' =>
+                    ($editPlace !== ''
+                        ? $editPlace
+                        : null),
+
+                ':event_date' =>
+                    ($editDate !== ''
+                        ? $editDate
+                        : null),
+
+                ':service_provided' =>
+                    ($editServiceProvided !== ''
+                        ? $editServiceProvided
+                        : null),
+
+                ':id' =>
+                    $eventId
             ]);
 
-            $statusMessage = 'Event details updated successfully.';
+            $statusMessage =
+                'Event details updated successfully.';
 
         } catch (PDOException $e) {
 
@@ -757,7 +829,8 @@ if (
                 $e->getMessage()
             );
 
-            $statusError = 'Unable to update event details.';
+            $statusError =
+                'Unable to update event details.';
         }
     }
 }
@@ -793,6 +866,11 @@ if (
             $_POST['event_date'] ?? ''
         );
 
+    $serviceProvided =
+        trim(
+            $_POST['service_provided'] ?? ''
+        );
+
     /*
     |--------------------------------------------------------------------------
     | VALIDATE BLOB TOKEN
@@ -823,7 +901,10 @@ if (
 
     } elseif (
         $eventDate !== '' &&
-        !preg_match('/^\\d{4}-\\d{2}-\\d{2}$/', $eventDate)
+        !preg_match(
+            '/^\d{4}-\d{2}-\d{2}$/',
+            $eventDate
+        )
     ) {
 
         $statusError =
@@ -1141,6 +1222,7 @@ if (
                                     title,
                                     place,
                                     event_date,
+                                    service_provided,
                                     type,
                                     file_url,
                                     thumbnail_url,
@@ -1152,6 +1234,7 @@ if (
                                     :title,
                                     :place,
                                     :event_date,
+                                    :service_provided,
                                     :type,
                                     :file_url,
                                     :thumbnail_url,
@@ -1165,10 +1248,19 @@ if (
                                 $title,
 
                             ':place' =>
-                                ($place !== '' ? $place : null),
+                                ($place !== ''
+                                    ? $place
+                                    : null),
 
                             ':event_date' =>
-                                ($eventDate !== '' ? $eventDate : null),
+                                ($eventDate !== ''
+                                    ? $eventDate
+                                    : null),
+
+                            ':service_provided' =>
+                                ($serviceProvided !== ''
+                                    ? $serviceProvided
+                                    : null),
 
                             ':type' =>
                                 $type,
@@ -1180,7 +1272,8 @@ if (
                                 $thumbnailUrl
                         ]);
 
-                        $eventId = (int) $pdo->lastInsertId();
+                        $eventId =
+                            (int) $pdo->lastInsertId();
 
                         /*
                         |--------------------------------------------------------------------------
@@ -1189,80 +1282,148 @@ if (
                         */
 
                         $additionalPhotoCount = 0;
-                        $additionalPhotoUrls = [];
 
                         if (
-                            isset($_FILES['event_photos']) &&
-                            is_array($_FILES['event_photos']['name'] ?? null)
+                            isset(
+                                $_FILES['event_photos']
+                            ) &&
+                            is_array(
+                                $_FILES['event_photos']['name'] ?? null
+                            )
                         ) {
 
-                            $photoCount = count($_FILES['event_photos']['name']);
+                            $photoCount =
+                                count(
+                                    $_FILES['event_photos']['name']
+                                );
 
                             $allowedPhotoExtensions = [
-                                'jpg', 'jpeg', 'png', 'webp'
+                                'jpg',
+                                'jpeg',
+                                'png',
+                                'webp'
                             ];
 
-                            for ($i = 0; $i < $photoCount; $i++) {
+                            for (
+                                $i = 0;
+                                $i < $photoCount;
+                                $i++
+                            ) {
 
                                 if (
-                                    ($_FILES['event_photos']['error'][$i] ?? UPLOAD_ERR_NO_FILE) !==
+                                    (
+                                        $_FILES['event_photos']['error'][$i]
+                                        ??
+                                        UPLOAD_ERR_NO_FILE
+                                    ) !==
                                     UPLOAD_ERR_OK
                                 ) {
                                     continue;
                                 }
 
-                                $photoTmp = $_FILES['event_photos']['tmp_name'][$i] ?? '';
-                                $photoOriginal = $_FILES['event_photos']['name'][$i] ?? '';
-                                $photoSize = (int) ($_FILES['event_photos']['size'][$i] ?? 0);
+                                $photoTmp =
+                                    $_FILES['event_photos']['tmp_name'][$i]
+                                    ??
+                                    '';
 
-                                if (!is_file($photoTmp) || $photoSize > 50 * 1024 * 1024) {
+                                $photoOriginal =
+                                    $_FILES['event_photos']['name'][$i]
+                                    ??
+                                    '';
+
+                                $photoSize =
+                                    (int) (
+                                        $_FILES['event_photos']['size'][$i]
+                                        ??
+                                        0
+                                    );
+
+                                if (
+                                    !is_file($photoTmp) ||
+                                    $photoSize >
+                                    50 * 1024 * 1024
+                                ) {
                                     continue;
                                 }
 
-                                $photoExtension = strtolower(
-                                    pathinfo($photoOriginal, PATHINFO_EXTENSION)
-                                );
+                                $photoExtension =
+                                    strtolower(
+                                        pathinfo(
+                                            $photoOriginal,
+                                            PATHINFO_EXTENSION
+                                        )
+                                    );
 
-                                if (!in_array($photoExtension, $allowedPhotoExtensions, true)) {
+                                if (
+                                    !in_array(
+                                        $photoExtension,
+                                        $allowedPhotoExtensions,
+                                        true
+                                    )
+                                ) {
                                     continue;
                                 }
 
-                                $photoMime = mime_content_type($photoTmp);
+                                $photoMime =
+                                    mime_content_type(
+                                        $photoTmp
+                                    );
+
                                 if (!$photoMime) {
-                                    $photoMime = 'image/jpeg';
+
+                                    $photoMime =
+                                        'image/jpeg';
                                 }
 
                                 $photoFileName =
                                     'events/' .
                                     $safeTitle .
                                     '-photo-' .
-                                    bin2hex(random_bytes(8)) .
+                                    bin2hex(
+                                        random_bytes(8)
+                                    ) .
                                     '.' .
                                     $photoExtension;
 
-                                $photoResult = uploadToVercelBlob(
-                                    $photoTmp,
-                                    $photoFileName,
-                                    $photoMime,
-                                    $blobToken
-                                );
+                                $photoResult =
+                                    uploadToVercelBlob(
+                                        $photoTmp,
+                                        $photoFileName,
+                                        $photoMime,
+                                        $blobToken
+                                    );
 
-                                if (!$photoResult['success']) {
+                                if (
+                                    !$photoResult['success']
+                                ) {
                                     continue;
                                 }
 
-                                $photoUrl = $photoResult['url'];
-                                $additionalPhotoUrls[] = $photoUrl;
+                                $photoUrl =
+                                    $photoResult['url'];
 
-                                $photoStmt = $pdo->prepare(
-                                    "INSERT INTO event_photos
-                                     (event_id, image_url, created_at)
-                                     VALUES (:event_id, :image_url, NOW())"
-                                );
+                                $photoStmt =
+                                    $pdo->prepare(
+                                        "INSERT INTO event_photos
+                                         (
+                                            event_id,
+                                            image_url,
+                                            created_at
+                                         )
+                                         VALUES
+                                         (
+                                            :event_id,
+                                            :image_url,
+                                            NOW()
+                                         )"
+                                    );
 
                                 $photoStmt->execute([
-                                    ':event_id' => $eventId,
-                                    ':image_url' => $photoUrl
+                                    ':event_id' =>
+                                        $eventId,
+
+                                    ':image_url' =>
+                                        $photoUrl
                                 ]);
 
                                 $additionalPhotoCount++;
@@ -1271,9 +1432,19 @@ if (
 
                         $statusMessage =
                             'Event uploaded successfully' .
-                            ($additionalPhotoCount > 0
-                                ? ' with ' . $additionalPhotoCount . ' additional photo' . ($additionalPhotoCount === 1 ? '' : 's') . '.'
-                                : '.');
+                            (
+                                $additionalPhotoCount > 0
+                                ? ' with ' .
+                                    $additionalPhotoCount .
+                                    ' additional photo' .
+                                    (
+                                        $additionalPhotoCount === 1
+                                        ? ''
+                                        : 's'
+                                    ) .
+                                    '.'
+                                : '.'
+                            );
 
                     } catch (PDOException $e) {
 
@@ -1318,21 +1489,23 @@ if (
 |--------------------------------------------------------------------------
 | POST → REDIRECT → GET
 |--------------------------------------------------------------------------
-|
-| This prevents duplicate form submissions and ensures that
-| headers are sent before any HTML output.
-|--------------------------------------------------------------------------
 */
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST'
+) {
 
-    if ($statusMessage !== '') {
+    if (
+        $statusMessage !== ''
+    ) {
 
         $_SESSION['event_status_message'] =
             $statusMessage;
     }
 
-    if ($statusError !== '') {
+    if (
+        $statusError !== ''
+    ) {
 
         $_SESSION['event_status_error'] =
             $statusError;
@@ -1362,12 +1535,17 @@ try {
                 title,
                 place,
                 event_date,
+                service_provided,
                 type,
                 file_url,
                 thumbnail_url,
                 is_visible,
                 created_at,
-                (SELECT COUNT(*) FROM event_photos ep WHERE ep.event_id = events.id) AS photo_count
+                (
+                    SELECT COUNT(*)
+                    FROM event_photos ep
+                    WHERE ep.event_id = events.id
+                ) AS photo_count
              FROM events
              ORDER BY id DESC"
         );
@@ -1399,7 +1577,9 @@ $totalEvents =
 
 $visibleEvents = 0;
 
-foreach ($events as $event) {
+foreach (
+    $events as $event
+) {
 
     if (
         (int) $event['is_visible'] === 1
@@ -1518,6 +1698,7 @@ foreach ($events as $event) {
         background: #fafafa;
         color: var(--text);
         outline: none;
+        box-sizing: border-box;
     }
 
     .event-form-group input:focus,
@@ -1734,6 +1915,7 @@ foreach ($events as $event) {
         margin-top: 2px;
         color: var(--orange);
         text-align: center;
+        flex-shrink: 0;
     }
 
     .event-admin-details strong {
@@ -1774,6 +1956,7 @@ foreach ($events as $event) {
 /* ==================================================
    EVENT EDIT PANEL
 ================================================== */
+
 .event-edit-panel {
     margin-top: 14px;
     border: 1px solid #2f2f2f;
@@ -2087,7 +2270,7 @@ foreach ($events as $event) {
 
         <p>
             Upload and manage event images, videos,
-            places, and dates.
+            places, services, and dates.
         </p>
 
     </div>
@@ -2276,7 +2459,6 @@ foreach ($events as $event) {
                     type="text"
                     id="title"
                     name="title"
-                    placeholder=""
                     required
                 >
 
@@ -2318,6 +2500,27 @@ foreach ($events as $event) {
 
                 <span class="event-help">
                     Date shown on the event details page.
+                </span>
+
+            </div>
+
+
+            <div class="event-form-group">
+
+                <label for="service_provided">
+                    Service Provided
+                </label>
+
+                <input
+                    type="text"
+                    id="service_provided"
+                    name="service_provided"
+                    placeholder="e.g. Event Photography"
+                    maxlength="255"
+                >
+
+                <span class="event-help">
+                    Service provided by ABAA Entertainment for this event.
                 </span>
 
             </div>
@@ -2388,7 +2591,8 @@ foreach ($events as $event) {
                 >
 
                 <span class="event-help">
-                    Select multiple photos to create a gallery for this event. JPG, PNG, WEBP · Maximum 50MB each.
+                    Select multiple photos to create a gallery for this event.
+                    JPG, PNG, WEBP · Maximum 50MB each.
                 </span>
 
             </div>
@@ -2661,44 +2865,127 @@ foreach ($events as $event) {
 
                         </h3>
 
+
                         <div class="event-photo-count">
-                            <i class="fa-regular fa-images"></i>
-                            <?= (int) ($event['photo_count'] ?? 0) ?> additional photo<?= ((int) ($event['photo_count'] ?? 0) === 1 ? '' : 's') ?>
+
+                            <i
+                                class="fa-regular fa-images"
+                            ></i>
+
+                            <?= (int) (
+                                $event['photo_count'] ?? 0
+                            ) ?>
+
+                            additional photo<?= (
+                                (int) (
+                                    $event['photo_count'] ?? 0
+                                ) === 1
+                                ? ''
+                                : 's'
+                            ) ?>
+
                         </div>
 
 
                         <div class="event-admin-details">
 
-                            <div>
-                                <i class="fa-solid fa-location-dot"></i>
-                                <span>
-                                    <strong>Place:</strong>
-                                    <?= e(
-                                        !empty($event['place'])
-                                            ? $event['place']
-                                            : 'Not specified'
-                                    ) ?>
-                                </span>
-                            </div>
+
+                            <!-- PLACE -->
 
                             <div>
-                                <i class="fa-regular fa-calendar"></i>
+
+                                <i
+                                    class="fa-solid fa-location-dot"
+                                ></i>
+
                                 <span>
-                                    <strong>Date:</strong>
-                                    <?php if (!empty($event['event_date'])): ?>
+
+                                    <strong>
+                                        Place:
+                                    </strong>
+
+                                    <?= e(
+                                        !empty(
+                                            $event['place']
+                                        )
+                                        ? $event['place']
+                                        : 'Not specified'
+                                    ) ?>
+
+                                </span>
+
+                            </div>
+
+
+                            <!-- SERVICE -->
+
+                            <div>
+
+                                <i
+                                    class="fa-solid fa-screwdriver-wrench"
+                                ></i>
+
+                                <span>
+
+                                    <strong>
+                                        Service:
+                                    </strong>
+
+                                    <?= e(
+                                        !empty(
+                                            $event['service_provided']
+                                        )
+                                        ? $event['service_provided']
+                                        : 'Not specified'
+                                    ) ?>
+
+                                </span>
+
+                            </div>
+
+
+                            <!-- DATE -->
+
+                            <div>
+
+                                <i
+                                    class="fa-regular fa-calendar"
+                                ></i>
+
+                                <span>
+
+                                    <strong>
+                                        Date:
+                                    </strong>
+
+                                    <?php if (
+                                        !empty(
+                                            $event['event_date']
+                                        )
+                                    ): ?>
+
                                         <?= e(
                                             date(
                                                 'F j, Y',
-                                                strtotime($event['event_date'])
+                                                strtotime(
+                                                    $event['event_date']
+                                                )
                                             )
                                         ) ?>
+
                                     <?php else: ?>
+
                                         Not specified
+
                                     <?php endif; ?>
+
                                 </span>
+
                             </div>
 
+
                         </div>
+
 
                         <div
                             class="event-admin-date"
@@ -2709,6 +2996,7 @@ foreach ($events as $event) {
                             ></i>
 
                             Uploaded:
+
                             <?= e(
                                 $event['created_at']
                             ) ?>
@@ -2716,25 +3004,44 @@ foreach ($events as $event) {
                         </div>
 
 
-                        <details class="event-edit-panel">
+                        <!-- =================================================
+                             EDIT EVENT
+                        ================================================= -->
+
+                        <details
+                            class="event-edit-panel"
+                        >
+
                             <summary>
-                                <i class="fa-solid fa-pen-to-square"></i>
+
+                                <i
+                                    class="fa-solid fa-pen-to-square"
+                                ></i>
+
                                 Edit Event Details
+
                             </summary>
+
 
                             <form
                                 method="POST"
                                 action="/admin/events"
                                 class="event-edit-form"
                             >
+
                                 <input
                                     type="hidden"
                                     name="event_id"
                                     value="<?= (int) $event['id'] ?>"
                                 >
 
+
+                                <!-- TITLE -->
+
                                 <label>
+
                                     Event Title
+
                                     <input
                                         type="text"
                                         name="edit_title"
@@ -2742,10 +3049,16 @@ foreach ($events as $event) {
                                         maxlength="255"
                                         required
                                     >
+
                                 </label>
 
+
+                                <!-- PLACE -->
+
                                 <label>
+
                                     Event Place
+
                                     <input
                                         type="text"
                                         name="edit_place"
@@ -2753,27 +3066,66 @@ foreach ($events as $event) {
                                         maxlength="255"
                                         placeholder="Venue or location"
                                     >
+
                                 </label>
 
+
+                                <!-- DATE -->
+
                                 <label>
+
                                     Event Date
+
                                     <input
                                         type="date"
                                         name="edit_event_date"
                                         value="<?= e($event['event_date'] ?? '') ?>"
                                     >
+
                                 </label>
+
+
+                                <!-- SERVICE -->
+
+                                <label>
+
+                                    Service Provided
+
+                                    <input
+                                        type="text"
+                                        name="edit_service_provided"
+                                        value="<?= e($event['service_provided'] ?? '') ?>"
+                                        maxlength="255"
+                                        placeholder="e.g. Event Photography"
+                                    >
+
+                                </label>
+
+
+                                <!-- SAVE -->
 
                                 <button
                                     type="submit"
                                     name="update_event"
                                     class="event-save-button"
                                 >
-                                    <i class="fa-solid fa-floppy-disk"></i>
+
+                                    <i
+                                        class="fa-solid fa-floppy-disk"
+                                    ></i>
+
                                     Save Changes
+
                                 </button>
+
                             </form>
+
                         </details>
+
+
+                        <!-- =================================================
+                             ACTIONS
+                        ================================================= -->
 
                         <div
                             class="event-admin-actions"
@@ -2864,6 +3216,7 @@ foreach ($events as $event) {
 
 
                         </div>
+
 
                     </div>
 
